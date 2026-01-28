@@ -1,0 +1,78 @@
+/* ファイル名のカスタマイズ */
+.nav-file-title-content {
+    font-size: 14px;
+    color: #4a9eff;
+}
+
+/* GitHub Alert記法のサポート */
+/* Note */
+.callout[data-callout="note"] {
+    background-color: rgba(9, 105, 218, 0.1);
+    border-left: 4px solid #0969da;
+}
+
+.callout[data-callout="note"] .callout-title {
+    color: #0969da;
+}
+
+/* Warning */
+.callout[data-callout="warning"] {
+    background-color: rgba(191, 135, 0, 0.1);
+    border-left: 4px solid #bf8700;
+}
+
+.callout[data-callout="warning"] .callout-title {
+    color: #bf8700;
+}
+
+/* Important */
+.callout[data-callout="important"] {
+    background-color: rgba(130, 80, 223, 0.1);
+    border-left: 4px solid #8250df;
+}
+
+.callout[data-callout="important"] .callout-title {
+    color: #8250df;
+}
+
+/* Tip */
+.callout[data-callout="tip"] {
+    background-color: rgba(26, 127, 55, 0.1);
+    border-left: 4px solid #1a7f37;
+}
+
+.callout[data-callout="tip"] .callout-title {
+    color: #1a7f37;
+}
+
+/* Caution */
+.callout[data-callout="caution"] {
+    background-color: rgba(207, 34, 46, 0.1);
+    border-left: 4px solid #cf222e;
+}
+
+.callout[data-callout="caution"] .callout-title {
+    color: #cf222e;
+}
+
+/* コードブロックのカスタマイズ */
+.markdown-source-view.mod-cm6 .cm-line {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+}
+
+/* テーブルのスタイリング */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table th {
+    background-color: rgba(100, 100, 100, 0.1);
+    font-weight: bold;
+}
+
+table td, table th {
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    padding: 8px;
+}
