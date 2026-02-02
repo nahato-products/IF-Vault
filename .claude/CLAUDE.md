@@ -78,7 +78,36 @@
 - テンプレート変更時はチームに通知
 - 新入社員向けには docs/クイックスタートガイド.md を案内
 
+## 外観設定
+
+- テーマ: Pink Topaz
+- アクセントカラー: #a85cf5（紫）
+- フォントサイズ: 30px
+- CSSスニペット: `custom` が有効
+
+## カスタムCSS (`snippets/custom.css`)
+
+- 見出し（h1-h6）を大文字表示（text-transform: uppercase）
+- ファイル名の色変更（青 #4a9eff）
+- GitHub Alert記法のスタイリング（NOTE, WARNING, IMPORTANT, TIP, CAUTION）
+- コードブロックのフォント設定（JetBrains Mono）
+- テーブルスタイリング
+
+## トラブルシューティング
+
+### プラグイン読み込みエラー
+GitHubからソースをクローンした場合、`main.js`がビルドフォルダ内にあり読み込めないことがある：
+- **dataview**: `build/main.js` → ルートにコピー
+- **code-emitter**: `dist/main.js` → ルートにコピー
+
+確認コマンド：
+```bash
+for dir in ".obsidian/plugins/"*/; do
+  [ -f "$dir/main.js" ] && echo "$(basename $dir): OK" || echo "$(basename $dir): MISSING main.js"
+done
+```
+
 ---
 
 _このファイルはClaude Codeがプロジェクトコンテキストを理解するための永続メモリです_
-_最終更新: 2026-01-28_
+_最終更新: 2026-02-02_

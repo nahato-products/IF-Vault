@@ -1,7 +1,8 @@
 {
-  "cssTheme": "Retroma",
-  "enabledCssSnippets": [
-    "custom"
-  ],
-  "accentColor": "#ea5cf5"
+  "cssTheme": "",
+  "enabledCssSnippets": [],
+  "accentColor": "#a85cf5",
+  "baseFontSize": 20,
+  "baseFontSizeAction": true,
+  "translucency": true
 }
