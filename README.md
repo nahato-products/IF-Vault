@@ -7,7 +7,7 @@ Obsidian を使用したチーム向けナレッジベース
 - **docs/** - ドキュメント
   - daily/ - デイリーノート
   - reference/ - リファレンス
-- **team/** - チームメンバー別(muro/guchi/iku)
+- **team/** - チームメンバー別(muro/guchi/ikura)
 - **templates/** - テンプレート
   - daily-note-template.md - デイリーノート用
   - meeting-note-template.md - 会議メモ用

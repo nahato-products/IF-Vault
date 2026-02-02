@@ -1,3 +1,8 @@
+/* 見出しを大文字にする */
+h1, h2, h3, h4, h5, h6 {
+    text-transform: uppercase;
+}
+
 /* ファイル名のカスタマイズ */
 .nav-file-title-content {
     font-size: 14px;
