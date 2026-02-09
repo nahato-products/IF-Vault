@@ -92,21 +92,7 @@
 - コードブロックのフォント設定（JetBrains Mono）
 - テーブルスタイリング
 
-## トラブルシューティング
-
-### プラグイン読み込みエラー
-GitHubからソースをクローンした場合、`main.js`がビルドフォルダ内にあり読み込めないことがある：
-- **dataview**: `build/main.js` → ルートにコピー
-- **code-emitter**: `dist/main.js` → ルートにコピー
-
-確認コマンド：
-```bash
-for dir in ".obsidian/plugins/"*/; do
-  [ -f "$dir/main.js" ] && echo "$(basename $dir): OK" || echo "$(basename $dir): MISSING main.js"
-done
-```
-
 ---
 
 _このファイルはClaude Codeがプロジェクトコンテキストを理解するための永続メモリです_
-_最終更新: 2026-02-03_
+_最終更新: 2026-02-09_
