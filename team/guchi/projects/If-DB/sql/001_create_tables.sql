@@ -1,8 +1,10 @@
 -- ============================================================
--- ANSEMプロジェクト データベース設計書 v5.4.0
+-- ANSEMプロジェクト データベース設計書 v5.5.0
 -- ファイル: 001_create_tables.sql
 -- 説明: 全32テーブルのCREATE TABLE文（FK依存関係順）
 -- 生成日: 2026-02-10
+-- 更新日: 2026-02-12
+-- 変更点: FK緩和(NO ACTION), CHECK制約追加, 自己参照ループ防止, influencer_nameデフォルト
 --
 -- 実行順序: 001 → 002 → 003 → 004 → 005
 -- ============================================================
@@ -49,7 +51,9 @@ CREATE TABLE m_departments (
   CONSTRAINT fk_department_parent
     FOREIGN KEY (parent_department_id)
     REFERENCES m_departments(department_id)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  CONSTRAINT chk_no_self_parent CHECK (parent_department_id != department_id)
 );
 
 -- ------------------------------------------------------------
@@ -73,7 +77,9 @@ CREATE TABLE m_categories (
     REFERENCES m_categories(category_id)
     ON DELETE RESTRICT,
 
-  CONSTRAINT uq_category_code UNIQUE (category_code)
+  CONSTRAINT uq_category_code UNIQUE (category_code),
+
+  CONSTRAINT chk_no_self_parent CHECK (parent_category_id != category_id)
 );
 
 -- ------------------------------------------------------------
@@ -187,7 +193,7 @@ CREATE TABLE m_influencers (
   influencer_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   -- 基本情報
   login_id TEXT NOT NULL UNIQUE,
-  influencer_name TEXT,
+  influencer_name TEXT NOT NULL DEFAULT '（未登録）',
   influencer_alias TEXT,
   email_address TEXT,
   phone_number TEXT,
@@ -348,7 +354,9 @@ CREATE TABLE t_addresses (
   CONSTRAINT fk_address_country
     FOREIGN KEY (country_id)
     REFERENCES m_countries(country_id)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  CONSTRAINT chk_address_valid_period CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 
 -- ------------------------------------------------------------
@@ -394,7 +402,9 @@ CREATE TABLE t_bank_accounts (
   CONSTRAINT fk_bank_account_country
     FOREIGN KEY (country_id)
     REFERENCES m_countries(country_id)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  CONSTRAINT chk_bank_valid_period CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 
 -- ------------------------------------------------------------
@@ -411,7 +421,7 @@ CREATE TABLE t_billing_info (
   -- 請求情報
   billing_type_id SMALLINT,
   invoice_tax_id TEXT,
-  purchase_order_status_id SMALLINT CHECK (purchase_order_status_id IN (1, 2, 3, 9)),
+  purchase_order_status_id SMALLINT,
   evidence_url TEXT,
   -- フラグ
   is_primary BOOLEAN NOT NULL DEFAULT FALSE,
@@ -428,7 +438,10 @@ CREATE TABLE t_billing_info (
   CONSTRAINT fk_billing_influencer
     FOREIGN KEY (influencer_id)
     REFERENCES m_influencers(influencer_id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+
+  CONSTRAINT chk_billing_info_po_status CHECK (purchase_order_status_id IN (1, 2, 3, 9)),
+  CONSTRAINT chk_billing_info_valid_period CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 
 -- ------------------------------------------------------------
@@ -461,7 +474,9 @@ CREATE TABLE t_influencer_sns_accounts (
     REFERENCES m_sns_platforms(platform_id)
     ON DELETE RESTRICT,
 
-  CONSTRAINT chk_sns_account_status CHECK (status_id IN (1, 2, 3))
+  CONSTRAINT chk_sns_account_status CHECK (status_id IN (1, 2, 3)),
+
+  CONSTRAINT chk_follower_positive CHECK (follower_count >= 0)
 );
 
 -- ------------------------------------------------------------
@@ -719,8 +734,8 @@ CREATE TABLE m_campaigns (
   site_id BIGINT NOT NULL,
   influencer_id BIGINT,
   platform_id BIGINT NOT NULL,
-  reward_type SMALLINT NOT NULL DEFAULT 1 CHECK (reward_type IN (1, 2, 3)),
-  price_type SMALLINT NOT NULL DEFAULT 1 CHECK (price_type IN (1, 2)),
+  reward_type SMALLINT NOT NULL DEFAULT 1,
+  price_type SMALLINT NOT NULL DEFAULT 1,
   status_id SMALLINT NOT NULL DEFAULT 1,
   -- 楽観ロック
   version INTEGER NOT NULL DEFAULT 1,
@@ -744,6 +759,8 @@ CREATE TABLE m_campaigns (
     REFERENCES m_sns_platforms(platform_id)
     ON DELETE RESTRICT,
 
+  CONSTRAINT chk_campaign_reward_type CHECK (reward_type IN (1, 2, 3)),
+  CONSTRAINT chk_campaign_price_type CHECK (price_type IN (1, 2)),
   CONSTRAINT chk_campaign_status CHECK (status_id IN (1, 2, 3))
 );
 
@@ -781,7 +798,11 @@ CREATE TABLE t_unit_prices (
   CONSTRAINT fk_unit_price_client
     FOREIGN KEY (client_id)
     REFERENCES m_clients(client_id)
-    ON DELETE RESTRICT
+    ON DELETE RESTRICT,
+
+  CONSTRAINT chk_price_positive CHECK (unit_price >= 0),
+
+  CONSTRAINT chk_unit_price_period CHECK (end_at IS NULL OR end_at >= start_at)
 );
 
 -- ============================================================
@@ -828,24 +849,26 @@ CREATE TABLE t_daily_performance_details (
   CONSTRAINT fk_daily_perf_partner
     FOREIGN KEY (partner_id)
     REFERENCES m_partners(partner_id)
-    ON DELETE RESTRICT,
+    ON DELETE NO ACTION,
 
   CONSTRAINT fk_daily_perf_site
     FOREIGN KEY (site_id)
     REFERENCES t_partner_sites(site_id)
-    ON DELETE RESTRICT,
+    ON DELETE NO ACTION,
 
   CONSTRAINT fk_daily_perf_client
     FOREIGN KEY (client_id)
     REFERENCES m_clients(client_id)
-    ON DELETE RESTRICT,
+    ON DELETE NO ACTION,
 
   CONSTRAINT fk_daily_perf_content
     FOREIGN KEY (content_id)
     REFERENCES m_ad_contents(content_id)
-    ON DELETE RESTRICT,
+    ON DELETE NO ACTION,
 
-  CONSTRAINT chk_daily_perf_status CHECK (status_id IN (1, 2, 9))
+  CONSTRAINT chk_daily_perf_status CHECK (status_id IN (1, 2, 9)),
+
+  CONSTRAINT chk_cv_non_negative CHECK (cv_count >= 0)
 ) PARTITION BY RANGE (action_date);
 
 -- ------------------------------------------------------------
@@ -879,7 +902,7 @@ CREATE TABLE t_daily_click_details (
   CONSTRAINT fk_daily_click_site
     FOREIGN KEY (site_id)
     REFERENCES t_partner_sites(site_id)
-    ON DELETE RESTRICT
+    ON DELETE NO ACTION
 ) PARTITION BY RANGE (action_date);
 
 -- ============================================================
@@ -925,7 +948,9 @@ CREATE TABLE t_billing_runs (
     CHECK (
       (is_cancelled = FALSE AND cancelled_by IS NULL AND cancelled_at IS NULL)
       OR (is_cancelled = TRUE AND cancelled_by IS NOT NULL AND cancelled_at IS NOT NULL)
-    )
+    ),
+
+  CONSTRAINT chk_billing_run_period CHECK (billing_period_to >= billing_period_from)
 );
 
 -- ------------------------------------------------------------
@@ -990,11 +1015,13 @@ CREATE TABLE ingestion_logs (
   target_from TIMESTAMPTZ NOT NULL,
   target_to TIMESTAMPTZ NOT NULL,
   parameters JSONB,
-  status TEXT NOT NULL CHECK (status IN ('RUNNING', 'SUCCESS', 'FAILED')),
+  status TEXT NOT NULL,
   records_count INTEGER NOT NULL DEFAULT 0,
   error_message TEXT,
   started_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  finished_at TIMESTAMPTZ
+  finished_at TIMESTAMPTZ,
+
+  CONSTRAINT chk_ingestion_status CHECK (status IN ('RUNNING', 'SUCCESS', 'FAILED'))
 );
 
 COMMIT;

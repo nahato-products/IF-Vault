@@ -1,8 +1,10 @@
 -- ============================================================
--- ANSEMプロジェクト データベース設計書 v5.4.0
+-- ANSEMプロジェクト データベース設計書 v5.5.0
 -- ファイル: 002_create_indexes.sql
 -- 説明: 全テーブルのCREATE INDEX文
 -- 生成日: 2026-02-10
+-- 更新日: 2026-02-12
+-- 変更点: cancelled_by部分インデックス追加
 --
 -- 実行順序: 001 → 002 → 003 → 004 → 005
 -- ============================================================
@@ -153,6 +155,9 @@ CREATE INDEX idx_billing_info_invoice ON t_billing_info(invoice_tax_id)
 CREATE INDEX idx_billing_info_valid ON t_billing_info(influencer_id, valid_from, valid_to)
   WHERE is_active = TRUE;
 
+-- ※ t_addresses, t_bank_accounts, t_billing_info の3テーブルとも
+--    influencer_id × valid期間 × is_active のインデックスパターンを統一
+
 -- ------------------------------------------------------------
 -- t_influencer_sns_accounts
 -- ------------------------------------------------------------
@@ -258,6 +263,8 @@ CREATE INDEX idx_click_detail_count
 -- ------------------------------------------------------------
 CREATE INDEX idx_billing_runs_period ON t_billing_runs(billing_period_from, billing_period_to);
 CREATE INDEX idx_billing_runs_confirmed_by ON t_billing_runs(confirmed_by);
+CREATE INDEX idx_billing_runs_cancelled_by ON t_billing_runs(cancelled_by)
+  WHERE cancelled_by IS NOT NULL;
 CREATE INDEX idx_billing_runs_active ON t_billing_runs(is_cancelled, confirmed_at DESC)
   WHERE is_cancelled = FALSE;
 

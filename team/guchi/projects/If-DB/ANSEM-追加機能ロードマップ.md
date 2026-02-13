@@ -130,12 +130,13 @@ CSV/Excelエクスポート
 
 ## 将来対応
 
-### 11. 権限管理（RBAC）
+### 11. 権限管理（RBAC + RLS）
 
 | 項目 | 内容 |
 |------|------|
-| 概要 | ロールベースのアクセス制御 |
+| 概要 | ロールベースのアクセス制御 + 行レベルセキュリティ |
 | 設計状況 | `006_create_roles.sql` として別途作成予定（ansem_app / ansem_readonly / ansem_admin） |
+| RLS対象 | m_influencers（担当エージェント別）、t_audit_logs（操作者別）等。RBACのロール定義後に一括実装 |
 
 ### 12. 監査ログ閲覧画面
 
@@ -181,7 +182,7 @@ Phase 3（運用改善）
   └── 一括登録のWebUI化（Phase 1のCLIロジックを再利用）
 
 Phase 4（拡張）
-  └── RBAC + 監査ログ閲覧 + ファイル管理 + 多言語
+  └── RBAC + RLS（Row-Level Security） + 監査ログ閲覧 + ファイル管理 + 多言語
 ```
 
 ---

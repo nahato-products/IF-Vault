@@ -1,8 +1,10 @@
 -- ============================================================
--- ANSEMプロジェクト データベース設計書 v5.4.0
+-- ANSEMプロジェクト データベース設計書 v5.5.0
 -- ファイル: 003_create_comments.sql
 -- 説明: 全テーブル・カラムのCOMMENT ON文
 -- 生成日: 2026-02-10
+-- 更新日: 2026-02-12
+-- 変更点: 監査4カラムコメント全テーブル追加, v5.5.0制約コメント追加
 --
 -- 実行順序: 001 → 002 → 003 → 004 → 005
 -- ============================================================
@@ -91,7 +93,7 @@ COMMENT ON COLUMN m_agent_security.locked_until IS 'アカウントロック解�
 COMMENT ON TABLE m_influencers IS 'インフルエンサー基本情報テーブル（正規化版）';
 COMMENT ON COLUMN m_influencers.influencer_id IS '主キー（PK）';
 COMMENT ON COLUMN m_influencers.login_id IS 'ログインID（ユニーク）';
-COMMENT ON COLUMN m_influencers.influencer_name IS 'インフルエンサー名（本名）';
+COMMENT ON COLUMN m_influencers.influencer_name IS 'インフルエンサー名（本名）。NOT NULL DEFAULT ''（未登録）''';
 COMMENT ON COLUMN m_influencers.influencer_alias IS '活動名・ニックネーム';
 COMMENT ON COLUMN m_influencers.email_address IS 'メールアドレス';
 COMMENT ON COLUMN m_influencers.phone_number IS '電話番号';
@@ -469,5 +471,190 @@ COMMENT ON COLUMN ingestion_logs.records_count IS '取り込みレコード数';
 COMMENT ON COLUMN ingestion_logs.error_message IS 'エラーメッセージ';
 COMMENT ON COLUMN ingestion_logs.started_at IS '実行開始日時';
 COMMENT ON COLUMN ingestion_logs.finished_at IS '実行終了日時';
+
+-- ============================================================
+-- 全CHECK制約コメント
+-- ============================================================
+
+-- ステータス系
+COMMENT ON CONSTRAINT chk_client_status ON m_clients IS 'ステータス（1: 取引中, 2: 取引停止）';
+COMMENT ON CONSTRAINT chk_agent_status ON m_agents IS 'ステータス（1: 現役, 2: 退任, 3: 休職）';
+COMMENT ON CONSTRAINT chk_influencer_status ON m_influencers IS 'ステータス（1: 契約中, 2: 休止中, 3: 契約終了）';
+COMMENT ON CONSTRAINT chk_partner_status ON m_partners IS 'ステータス（1: 有効, 2: 無効）';
+COMMENT ON CONSTRAINT chk_partner_site_status ON t_partner_sites IS 'ステータス（1: 稼働中, 2: 審査中, 3: 一時停止, 9: 停止）';
+COMMENT ON CONSTRAINT chk_sns_account_status ON t_influencer_sns_accounts IS 'ステータス（1: 有効, 2: 停止中, 3: 削除済）';
+COMMENT ON CONSTRAINT chk_campaign_status ON m_campaigns IS 'ステータス（1: 進行中, 2: 完了, 3: 中止）';
+COMMENT ON CONSTRAINT chk_daily_perf_status ON t_daily_performance_details IS 'ステータス（1: 承認済, 2: 未承認, 9: キャンセル）';
+COMMENT ON CONSTRAINT chk_content_delivery_status ON m_ad_contents IS '配信ステータス（1: 承認待ち, 2: 配信中, 3: 停止）';
+COMMENT ON CONSTRAINT chk_content_itp_status ON m_ad_contents IS 'ITPパラメータ（0: 未設定, 1: 設定済）';
+
+-- 区分・種別系
+COMMENT ON CONSTRAINT chk_campaign_reward_type ON m_campaigns IS '報酬体系（1: 固定, 2: 予算, 3: 成果）';
+COMMENT ON CONSTRAINT chk_campaign_price_type ON m_campaigns IS '価格体系（1: Gross, 2: Net）';
+COMMENT ON CONSTRAINT chk_billing_info_po_status ON t_billing_info IS '発注書ステータス（1: 未発行, 2: 発行済, 3: 承認済, 9: 取消）';
+COMMENT ON CONSTRAINT chk_ingestion_status ON ingestion_logs IS '実行ステータス（RUNNING/SUCCESS/FAILED）';
+COMMENT ON CONSTRAINT chk_action_type ON t_audit_logs IS '操作種別（INSERT/UPDATE/DELETE）';
+COMMENT ON CONSTRAINT chk_operator_type ON t_audit_logs IS '操作者種別（1: Agent, 2: Influencer）';
+COMMENT ON CONSTRAINT chk_user_type ON t_notifications IS '通知先種別（1: Agent, 2: Influencer, 3: Partner）';
+COMMENT ON CONSTRAINT chk_entity_type ON t_files IS 'エンティティ種別（1: Agent, 2: Influencer, 3: Partner, 4: AdContent, 5: Campaign）';
+
+-- 論理整合
+COMMENT ON CONSTRAINT chk_billing_run_cancel ON t_billing_runs IS '取消整合性: is_cancelled=TRUEならcancelled_by/cancelled_atが必須、FALSEなら両方NULL';
+
+-- 自己参照ループ防止
+COMMENT ON CONSTRAINT chk_no_self_parent ON m_departments IS '自己参照ループ防止: 自分自身を親部署に設定できない';
+COMMENT ON CONSTRAINT chk_no_self_parent ON m_categories IS '自己参照ループ防止: 自分自身を親カテゴリに設定できない';
+
+-- 値域
+COMMENT ON CONSTRAINT chk_follower_positive ON t_influencer_sns_accounts IS 'フォロワー数は0以上';
+COMMENT ON CONSTRAINT chk_price_positive ON t_unit_prices IS '単価は0以上';
+COMMENT ON CONSTRAINT chk_cv_non_negative ON t_daily_performance_details IS 'CV件数は0以上';
+
+-- 期間逆転防止
+COMMENT ON CONSTRAINT chk_address_valid_period ON t_addresses IS '有効期間: 終了日は開始日以降（NULLは無期限）';
+COMMENT ON CONSTRAINT chk_bank_valid_period ON t_bank_accounts IS '有効期間: 終了日は開始日以降（NULLは無期限）';
+COMMENT ON CONSTRAINT chk_unit_price_period ON t_unit_prices IS '有効期間: 終了日は開始日以降（NULLは無期限）';
+COMMENT ON CONSTRAINT chk_billing_info_valid_period ON t_billing_info IS '有効期間: 終了日は開始日以降（NULLは無期限）';
+COMMENT ON CONSTRAINT chk_billing_run_period ON t_billing_runs IS '請求対象期間: 終了日は開始日以降';
+
+-- FK ON DELETE NO ACTION（集計テーブル）
+COMMENT ON CONSTRAINT fk_daily_perf_partner ON t_daily_performance_details IS 'パートナーID（ON DELETE NO ACTION: 集計データ保護）';
+COMMENT ON CONSTRAINT fk_daily_perf_site ON t_daily_performance_details IS 'サイトID（ON DELETE NO ACTION: 集計データ保護）';
+COMMENT ON CONSTRAINT fk_daily_perf_client ON t_daily_performance_details IS 'クライアントID（ON DELETE NO ACTION: 集計データ保護）';
+COMMENT ON CONSTRAINT fk_daily_perf_content ON t_daily_performance_details IS 'コンテンツID（ON DELETE NO ACTION: 集計データ保護）';
+COMMENT ON CONSTRAINT fk_daily_click_site ON t_daily_click_details IS 'サイトID（ON DELETE NO ACTION: 集計データ保護）';
+
+-- ============================================================
+-- 共通監査カラムコメント（全テーブル一括）
+-- t_daily_performance_details, t_daily_click_details,
+-- t_billing_runs, t_billing_line_items は既に個別定義済み
+-- ============================================================
+COMMENT ON COLUMN m_countries.created_by IS '作成者ID';
+COMMENT ON COLUMN m_countries.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_countries.created_at IS '作成日時';
+COMMENT ON COLUMN m_countries.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_departments.created_by IS '作成者ID';
+COMMENT ON COLUMN m_departments.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_departments.created_at IS '作成日時';
+COMMENT ON COLUMN m_departments.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_categories.created_by IS '作成者ID';
+COMMENT ON COLUMN m_categories.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_categories.created_at IS '作成日時';
+COMMENT ON COLUMN m_categories.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_agents.created_by IS '作成者ID';
+COMMENT ON COLUMN m_agents.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_agents.created_at IS '作成日時';
+COMMENT ON COLUMN m_agents.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_agent_role_types.created_by IS '作成者ID';
+COMMENT ON COLUMN m_agent_role_types.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_agent_role_types.created_at IS '作成日時';
+COMMENT ON COLUMN m_agent_role_types.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_agent_security.created_by IS '作成者ID';
+COMMENT ON COLUMN m_agent_security.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_agent_security.created_at IS '作成日時';
+COMMENT ON COLUMN m_agent_security.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_influencers.created_by IS '作成者ID';
+COMMENT ON COLUMN m_influencers.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_influencers.created_at IS '作成日時';
+COMMENT ON COLUMN m_influencers.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_influencer_security.created_by IS '作成者ID';
+COMMENT ON COLUMN m_influencer_security.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_influencer_security.created_at IS '作成日時';
+COMMENT ON COLUMN m_influencer_security.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_ad_groups.created_by IS '作成者ID';
+COMMENT ON COLUMN m_ad_groups.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_ad_groups.created_at IS '作成日時';
+COMMENT ON COLUMN m_ad_groups.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_ad_contents.created_by IS '作成者ID';
+COMMENT ON COLUMN m_ad_contents.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_ad_contents.created_at IS '作成日時';
+COMMENT ON COLUMN m_ad_contents.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_clients.created_by IS '作成者ID';
+COMMENT ON COLUMN m_clients.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_clients.created_at IS '作成日時';
+COMMENT ON COLUMN m_clients.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_sns_platforms.created_by IS '作成者ID';
+COMMENT ON COLUMN m_sns_platforms.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_sns_platforms.created_at IS '作成日時';
+COMMENT ON COLUMN m_sns_platforms.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_partners.created_by IS '作成者ID';
+COMMENT ON COLUMN m_partners.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_partners.created_at IS '作成日時';
+COMMENT ON COLUMN m_partners.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_partners_division.created_at IS '作成日時';
+COMMENT ON COLUMN m_partners_division.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN m_campaigns.created_by IS '作成者ID';
+COMMENT ON COLUMN m_campaigns.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN m_campaigns.created_at IS '作成日時';
+COMMENT ON COLUMN m_campaigns.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_addresses.created_by IS '作成者ID';
+COMMENT ON COLUMN t_addresses.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_addresses.created_at IS '作成日時';
+COMMENT ON COLUMN t_addresses.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_bank_accounts.created_by IS '作成者ID';
+COMMENT ON COLUMN t_bank_accounts.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_bank_accounts.created_at IS '作成日時';
+COMMENT ON COLUMN t_bank_accounts.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_billing_info.created_by IS '作成者ID';
+COMMENT ON COLUMN t_billing_info.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_billing_info.created_at IS '作成日時';
+COMMENT ON COLUMN t_billing_info.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_influencer_sns_accounts.created_by IS '作成者ID';
+COMMENT ON COLUMN t_influencer_sns_accounts.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_influencer_sns_accounts.created_at IS '作成日時';
+COMMENT ON COLUMN t_influencer_sns_accounts.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_account_categories.created_by IS '作成者ID';
+COMMENT ON COLUMN t_account_categories.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_account_categories.created_at IS '作成日時';
+COMMENT ON COLUMN t_account_categories.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_partner_sites.created_by IS '作成者ID';
+COMMENT ON COLUMN t_partner_sites.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_partner_sites.created_at IS '作成日時';
+COMMENT ON COLUMN t_partner_sites.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_unit_prices.created_by IS '作成者ID';
+COMMENT ON COLUMN t_unit_prices.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_unit_prices.created_at IS '作成日時';
+COMMENT ON COLUMN t_unit_prices.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_influencer_agent_assignments.created_by IS '作成者ID';
+COMMENT ON COLUMN t_influencer_agent_assignments.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_influencer_agent_assignments.created_at IS '作成日時';
+COMMENT ON COLUMN t_influencer_agent_assignments.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_notifications.created_by IS '作成者ID';
+COMMENT ON COLUMN t_notifications.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_notifications.created_at IS '作成日時';
+COMMENT ON COLUMN t_notifications.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_translations.created_by IS '作成者ID';
+COMMENT ON COLUMN t_translations.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_translations.created_at IS '作成日時';
+COMMENT ON COLUMN t_translations.updated_at IS '最終更新日時（トリガーで自動更新）';
+
+COMMENT ON COLUMN t_files.created_by IS '作成者ID';
+COMMENT ON COLUMN t_files.updated_by IS '最終更新者ID';
+COMMENT ON COLUMN t_files.created_at IS '作成日時';
+COMMENT ON COLUMN t_files.updated_at IS '最終更新日時（トリガーで自動更新）';
 
 COMMIT;

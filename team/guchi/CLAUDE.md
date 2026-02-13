@@ -20,6 +20,9 @@
 #### レビュー
 - `team/guchi/projects/If-DB/レビューガイド/ANSEM-DB設計レビューガイド.md` - レビューフロー・チェックリスト
 
+#### サマリー
+- `team/guchi/projects/If-DB/ANSEM-プロジェクト全体サマリー.md` - プロジェクト全体の概要・意思決定・進捗
+
 #### 運用・機能
 - `team/guchi/projects/If-DB/ANSEM-データ投入運用方針.md` - データ投入の運用方針
 - `team/guchi/projects/If-DB/ANSEM-一括登録機能メモ.md` - 一括登録機能の仕様メモ
@@ -87,6 +90,13 @@
 - 多言語: t_translations（翻訳テーブル方式・既存カラム変更なし）
 - ファイル管理: t_files（ポリモーフィック・S3/GCS連携）
 - 請求確定: t_billing_runs（論理削除・filter_conditions JSONB）+ t_billing_line_items（スナップショット方式）
+
+## 技術メモ（notes/）
+
+- `team/guchi/notes/Claude-Code-Skills一覧.md` - インストール済みSkills一覧（48個）
+- `team/guchi/notes/Claude-Code-Skills-カタログ.md` - Skills全カタログ（150+候補含む）
+- `team/guchi/notes/Qiita下書き-IT情報自動収集.md` - Qiita記事下書き
+- `team/guchi/notes/OceanBase-SeekDB-Meetup学習メモ.md` - Meetup学習メモ
 
 ---
 
@@ -161,6 +171,8 @@
 - 何か提案するときは選択肢を出す
 - 仕様変更やカラム追加など影響が大きい変更は必ず確認する
 - テキストの書き漏れ・誤字など明らかなミスは勝手に直してOK
+- 改善提案するときは「安全（既存動作に影響なし）」と「判断が必要（要件・動作が変わる）」を必ず分けて提示する
+- 判断ポイントは先出し。全部まとめて出してから作業に入る
 
 ### 例
 
@@ -175,4 +187,4 @@
 ---
 
 _guchiの作業スペース設定（口調・スタイル設定含む）_
-_最終更新: 2026-02-13_
+_最終更新: 2026-02-14_
