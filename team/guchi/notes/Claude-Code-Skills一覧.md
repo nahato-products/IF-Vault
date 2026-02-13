@@ -45,7 +45,7 @@ status: active
 ### UI/UXデザイン（13個）
 | スキル | 内容 | ソース |
 |--------|------|--------|
-| ux-psychology | 認知心理学ベースのUX原則46+ | 自作 |
+| ux-psychology | アプリ開発特化UX 30原則+10H+AI UX+ニューロダイバーシティ（464+144行） | 自作 |
 | baseline-ui | エージェント向けUI制約ガイド（`/baseline-ui`） | ibelick/ui-skills |
 | fixing-accessibility | アクセシビリティ修正（`/fixing-accessibility`） | ibelick/ui-skills |
 | fixing-metadata | メタデータ修正（`/fixing-metadata`） | ibelick/ui-skills |
@@ -125,7 +125,7 @@ UI作業時に複数スキルが同時ロードされる可能性あり。特に
 | スキル | 行数 | 発火条件 |
 |--------|------|---------|
 | web-design-guidelines | 1,288行 | HTML/CSS/WCAG関連で自動 |
-| ux-psychology | 745行 | UI/UX設計・実装で自動 |
+| ux-psychology | 464行（+reference 144行） | UI/UX設計・実装で自動 |
 | baseline-ui | ~90行 | `/baseline-ui`コマンドで手動 |
 | fixing-accessibility | ~100行 | `/fixing-accessibility`コマンドで手動 |
 | fixing-motion-performance | ~100行 | アニメーション関連で自動 |
@@ -148,6 +148,14 @@ ibelick系はコマンド呼び出し式なので自動発火は限定的。実�
 ---
 
 ## 変更ログ
+
+### 2026-02-13: v2.2 ux-psychology最終版
+- **更新**: ux-psychology v3.0（745行→587行）
+  - マーケティング心理学22原則を削除、アプリ開発特化に最適化
+  - AI UXパターン（#29-#30）追加（NNGroup 2026準拠）
+  - ニューロダイバーシティ対応（ADHD/ディスレクシア/自閉症）追加
+  - チェックリストにAI UXカテゴリ追加
+  - team/shared/skills/ でチーム共有化
 
 ### 2026-02-13: v2.1 最適化
 - **削除**: creative-coder（fixing-motion-performanceが上位互換）
@@ -182,4 +190,4 @@ npx skills update
 
 ---
 
-_最終更新: 2026-02-13_
+_最終更新: 2026-02-14_
