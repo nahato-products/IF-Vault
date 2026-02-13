@@ -1,6 +1,6 @@
 ---
 name: ux-psychology
-description: Guides UI/UX design and implementation using cognitive psychology principles, Nielsen's heuristics, and anti-patterns. Covers AI UX and neurodiversity. Use when designing, implementing, or reviewing UI components, forms, buttons, navigation, modals, dialogs, notifications, toasts, user flows, onboarding, error handling, validation, loading states, skeleton UI, empty states, responsive layouts, dashboards, data tables, search UI, design systems, dark mode, animations, accessibility, AI features, or conducting UX reviews.
+description: Guides UI/UX design and implementation using cognitive psychology principles, Nielsen's heuristics, and anti-patterns. Covers AI UX and neurodiversity. Use when designing, implementing, fixing, or improving UI components, forms, buttons, navigation, modals, dialogs, notifications, toasts, user flows, onboarding, error handling, validation, loading states, skeleton UI, empty states, responsive layouts, dashboards, data tables, search UI, design systems, dark mode, animations, accessibility, usability, AI features, or conducting UX reviews and audits.
 user-invocable: false
 ---
 
@@ -55,7 +55,7 @@ user-invocable: false
 
 ### 3. 段階的開示
 
-すべてを一度に見せない。必要な情報を必要なタイミングで出す。→ #25 パレートの法則と併用
+すべてを一度に見せない。必要な情報を必要なタイミングで出す。
 
 - 高度な設定は「詳細オプション」で折りたたむ
 - フォームは必須項目だけ最初に表示、任意項目は展開式
@@ -76,7 +76,7 @@ user-invocable: false
 
 - 確認ダイアログの破壊的操作ボタンは赤、キャンセルはニュートラル
 - 視線の流れ（F型、Z型）に沿って重要要素を配置
-- 空白を使って重要な要素を浮かせる → #15 視覚的階層
+- 空白を使って重要な要素を浮かせる
 
 ### 6. 系列位置効果
 
@@ -103,7 +103,7 @@ user-invocable: false
 - ログイン画面は「メール＋パスワード」が上、ソーシャルログインが下
 - 大幅なUIリニューアルは段階的に行う
 - プラットフォーム標準に従う（iOS/Android/Webの慣習）
-- ボタンの色・サイズ・配置・用語は全画面で統一 → H4
+- ボタンの色・サイズ・配置・用語は全画面で統一
 
 ---
 
@@ -182,17 +182,11 @@ user-invocable: false
 
 ### 16. ゲシュタルト原則
 
-人は視覚要素を自動的にグループ化して認識する。
-
-**近接:** 近くにある要素は関連と認識 → フォームのラベルと入力欄は密着、グループ間は離す
-
-**類似:** 似た見た目は同じグループ → 同じ機能のボタンは同じスタイル
-
-**閉合:** 不完全な形でも完全と認識 → カルーセルの端を少し見せて「続きがある」ことを示す
-
-**連続:** 滑らかな線に沿って要素を追う → ステップインジケーターは直線やアーチで接続
-
-**図と地:** 前景と背景を区別 → モーダルは背景を暗くして前面要素を浮かせる
+- **近接:** 関連要素は密着、グループ間は離す（ラベルと入力欄は密着）
+- **類似:** 同じ機能は同じスタイル
+- **閉合:** カルーセルの端を少し見せて「続きがある」を示唆
+- **連続:** ステップインジケーターは線やアーチで接続
+- **図と地:** モーダルは背景を暗くして前面を浮かせる
 
 ### 17. ビジュアルアンカー
 
@@ -259,7 +253,9 @@ user-invocable: false
 - Undo/Redo機能の提供
 - 破壊的操作もソフトデリート（完全削除前の猶予期間）
 
-### H4. 一貫性と標準 → #8 慣習と一貫性
+### H4. 一貫性と標準
+
+ボタン、色、用語、配置を全画面で統一。プラットフォーム標準に従う。→ #8
 
 ### H5. エラー防止 → #14 意図的摩擦
 
@@ -283,7 +279,9 @@ user-invocable: false
 - カスタマイズ可能なダッシュボード
 - コマンドパレット（`Cmd+K`）でクイックアクセス
 
-### H8. 美的で最小限のデザイン → #24 オッカムの剃刀
+### H8. 美的で最小限のデザイン
+
+不要な情報やノイズを排除。ユーザーの目的に直接関係する要素だけ残す。→ #24
 
 ### H9. エラー回復の支援
 
@@ -363,7 +361,7 @@ AI機能の信頼はUXで決まる。
 - 信頼度・確信度を示す（「80%の確率で〜」「高い確度」等）
 - AIの判断根拠を説明可能にする（なぜこの提案なのかを見せる）
 
-**信頼の段階的構築**: いきなり全部任せさせない → #3 段階的開示と同じ思想
+**信頼の段階的構築**: いきなり全部任せさせない
 - 初回はAI提案の精度を見せてから権限を広げる
 - AIの限界を正直に伝える（「この種のタスクは精度が下がります」）
 

@@ -45,7 +45,7 @@ status: active
 ### UI/UXデザイン（13個）
 | スキル | 内容 | ソース |
 |--------|------|--------|
-| ux-psychology | アプリ開発特化UX 29原則+10H+AI UX+ニューロダイバーシティ（412+346行） | 自作 |
+| ux-psychology | アプリ開発特化UX 29原則+10H+AI UX+ニューロダイバーシティ（410+346行） | 自作 |
 | baseline-ui | エージェント向けUI制約ガイド（`/baseline-ui`） | ibelick/ui-skills |
 | fixing-accessibility | アクセシビリティ修正（`/fixing-accessibility`） | ibelick/ui-skills |
 | fixing-metadata | メタデータ修正（`/fixing-metadata`） | ibelick/ui-skills |
@@ -125,7 +125,7 @@ UI作業時に複数スキルが同時ロードされる可能性あり。特に
 | スキル | 行数 | 発火条件 |
 |--------|------|---------|
 | web-design-guidelines | 1,288行 | HTML/CSS/WCAG関連で自動 |
-| ux-psychology | 412行（+reference 346行） | UI/UX設計・実装・AI機能で自動 |
+| ux-psychology | 410行（+reference 346行） | UI/UX設計・実装・AI機能で自動 |
 | baseline-ui | ~90行 | `/baseline-ui`コマンドで手動 |
 | fixing-accessibility | ~100行 | `/fixing-accessibility`コマンドで手動 |
 | fixing-motion-performance | ~100行 | アニメーション関連で自動 |
@@ -148,6 +148,12 @@ ibelick系はコマンド呼び出し式なので自動発火は限定的。実�
 ---
 
 ## 変更ログ
+
+### 2026-02-14: v2.6 100点最適化
+- **更新**: ux-psychology v4.3（410行+346行）
+  - description強化: fixing/improving/usability/auditsトリガー追加
+  - トークン最適化: 自明な相互参照5件削除、ゲシュタルト原則を箇条書きに圧縮
+  - H4/H8に独立した説明文追加（純粋な参照→独立価値）
 
 ### 2026-02-14: v2.5 最終レビュー+最適化
 - **更新**: ux-psychology v4.2（412行+346行）
