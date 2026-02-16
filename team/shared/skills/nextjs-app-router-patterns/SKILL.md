@@ -1,6 +1,6 @@
 ---
 name: nextjs-app-router-patterns
-description: "Next.js 15 App Router architecture patterns for routing (parallel, intercepting, route groups, dynamic/catch-all segments), data fetching and caching (ISR, tag-based revalidation, use cache, PPR), Suspense streaming, Server Actions with revalidation, Route Handlers, generateMetadata/generateStaticParams for SEO, and Middleware. Use when building or migrating to App Router, designing nested routing, configuring caching or revalidation, implementing streaming, creating Route Handlers, optimizing SEO metadata, or writing auth/i18n middleware. Not for component design (react-component-patterns), runtime performance (vercel-react-best-practices), or error boundaries (error-handling-logging)."
+description: "Use when building or migrating to App Router, designing nested routing, configuring caching or revalidation, implementing streaming, creating Route Handlers, optimizing SEO metadata, or writing auth/i18n middleware. Covers Next.js 15 routing (parallel, intercepting, route groups, dynamic segments), data fetching and caching (ISR, tag-based revalidation, use cache, PPR), Suspense streaming, Server Actions with revalidation, Route Handlers, generateMetadata/generateStaticParams, and Middleware. Does NOT cover component design (react-component-patterns), runtime performance (vercel-react-best-practices), or error boundaries (error-handling-logging)."
 user-invocable: false
 ---
 

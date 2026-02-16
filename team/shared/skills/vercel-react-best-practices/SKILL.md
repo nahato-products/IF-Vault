@@ -1,5 +1,6 @@
 ---
 name: vercel-react-best-practices
+user-invocable: false
 description: "Use when optimizing React/Next.js runtime performance, eliminating async request waterfalls, reducing JavaScript bundle size, improving Core Web Vitals (LCP, INP, CLS, TTFB), profiling React re-renders, auditing barrel imports, configuring next/image or next/font, deferring third-party scripts, tuning Server Component data fetching, parallelizing Promises, reviewing code for performance anti-patterns, analyzing Lighthouse reports, or diagnosing slow hydration. Covers 57 rules across 8 impact-ranked categories from Vercel Engineering. Does NOT cover component design (react-component-patterns), routing or caching (nextjs-app-router-patterns), or deploy pipelines (ci-cd-deployment)."
 ---
 
@@ -39,7 +40,7 @@ React/Next.js ランタイムパフォーマンス最適化。57ルール / 8カ
 
 各 sequential await がレイテンシを加算する。最優先で除去。
 
-#### Promise.all() で並列化
+### Promise.all() で並列化
 
 ```typescript
 // BAD: 3回の逐次リクエスト
@@ -53,7 +54,7 @@ const [user, posts, comments] = await Promise.all([
 ])
 ```
 
-#### await を使う分岐まで遅延
+### await を使う分岐まで遅延
 
 ```typescript
 // BAD: skip=true でも待つ
@@ -71,7 +72,7 @@ async function handle(userId: string, skip: boolean) {
 }
 ```
 
-#### Suspense で streaming
+### Suspense で streaming
 
 ```tsx
 // BAD: データ取得がページ全体をブロック
@@ -99,7 +100,7 @@ function Page() {
 
 ### Bundle Size Optimization [CRITICAL]
 
-#### Barrel file を避ける
+### Barrel file を避ける
 
 ```tsx
 // BAD: ライブラリ全体をロード (200-800ms)
@@ -113,7 +114,7 @@ import X from 'lucide-react/dist/esm/icons/x'
 // next.config.js: experimental.optimizePackageImports: ['lucide-react']
 ```
 
-#### Dynamic import で遅延ロード
+### Dynamic import で遅延ロード
 
 ```tsx
 // BAD: 初期バンドルに含まれる
@@ -126,7 +127,7 @@ const HeavyEditor = dynamic(() => import('@/components/heavy-editor'), {
 })
 ```
 
-#### Third-party を hydration 後にロード
+### Third-party を hydration 後にロード
 
 ```tsx
 const Analytics = dynamic(
@@ -141,7 +142,7 @@ const Analytics = dynamic(
 
 ### Server-Side Performance [HIGH]
 
-#### React.cache() でリクエスト内重複排除
+### React.cache() でリクエスト内重複排除
 
 ```typescript
 import { cache } from 'react'
@@ -154,7 +155,7 @@ export const getCurrentUser = cache(async () => {
 // 注意: インラインオブジェクト引数はキャッシュミス。プリミティブ値を使う。
 ```
 
-#### RSC 境界でのシリアライズ最小化
+### RSC 境界でのシリアライズ最小化
 
 ```tsx
 // BAD: オブジェクト全体をクライアントに渡す
@@ -164,7 +165,7 @@ export const getCurrentUser = cache(async () => {
 <ClientComponent userName={user.name} userAvatar={user.avatar} />
 ```
 
-#### コンポーネント構造で並列フェッチ
+### コンポーネント構造で並列フェッチ
 
 ```tsx
 // BAD: 逐次（親が子のデータも取得）
@@ -191,7 +192,7 @@ async function Dashboard() {
 
 ### Image & Font Optimization [HIGH]
 
-#### next/image で LCP 改善
+### next/image で LCP 改善
 
 ```tsx
 import Image from 'next/image'
@@ -207,7 +208,7 @@ import Image from 'next/image'
 <Image src={img} alt="Photo" placeholder="blur" blurDataURL={blurUrl} />
 ```
 
-#### next/font でレイアウトシフト防止
+### next/font でレイアウトシフト防止
 
 ```tsx
 import { Inter } from 'next/font/google'
@@ -253,21 +254,21 @@ setCount(prev => prev + 1)  // NOT setCount(count + 1)
 
 ### Rendering / JS / Advanced [MEDIUM-LOW]
 
-#### Rendering (9 rules)
+### Rendering (9 rules)
 
 - `content-visibility: auto` で画面外レンダリングスキップ
 - SVG アニメーションはラッパー div で（レイアウト再計算回避）
 - 静的 JSX をコンポーネント外に hoist
 - 条件レンダリング: `&&` でなく三項演算子（falsy 0 の問題回避）
 
-#### JavaScript (12 rules)
+### JavaScript (12 rules)
 
 - `Set`/`Map` で O(1) ルックアップ
 - DOM 操作は `classList`/`cssText` でバッチ化
 - ループ内プロパティアクセスをキャッシュ
 - `toSorted()` でイミュータブルソート
 
-#### Advanced (3 rules)
+### Advanced (3 rules)
 
 - `advanced-init-once`: アプリ初期化を一度だけ
 - `advanced-event-handler-refs`: ハンドラを ref に格納

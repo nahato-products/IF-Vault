@@ -1,7 +1,7 @@
 ---
 name: security-review
-description: "Detect, analyze, and report exploitable security vulnerabilities in application code and infrastructure configs. Use when asked to 'security review', 'find vulnerabilities', 'check for security issues', 'audit security', 'OWASP review', 'pen test code', 'threat model', 'check for injection', 'find XSS', 'review auth bypass', or assess code for SQL injection, XSS, SSRF, CSRF, IDOR, deserialization, path traversal, command injection, cryptography weaknesses, or hardcoded secrets. Traces attacker-controlled input, verifies exploitability against framework mitigations, classifies severity per OWASP Top 10 and CWE, and outputs structured remediation."
-user-invocable: true
+description: "Use when asked to 'security review', 'find vulnerabilities', 'check for security issues', 'audit security', 'OWASP review', 'pen test code', 'threat model', 'check for injection', 'find XSS', 'review auth bypass', or assess code for SQL injection, XSS, SSRF, CSRF, IDOR, deserialization, path traversal, command injection, cryptography weaknesses, or hardcoded secrets. Traces attacker-controlled input, verifies exploitability against framework mitigations, classifies severity per OWASP Top 10 and CWE, and outputs structured remediation. Does NOT cover auth flow implementation (supabase-auth-patterns), container hardening (docker-expert), or pipeline security design (ci-cd-deployment)."
+user-invocable: false
 ---
 
 <!--
@@ -254,7 +254,7 @@ random.random() for token            # FLAG: Security tokens need secrets module
 
 ### Findings
 
-#### [VULN-001] [Vulnerability Type] (Severity)
+**[VULN-001] [Vulnerability Type] (Severity)**
 - **Location**: `file.py:123`
 - **Confidence**: High
 - **Issue**: [What the vulnerability is]
@@ -267,7 +267,7 @@ random.random() for token            # FLAG: Security tokens need secrets module
 
 ### Needs Verification
 
-#### [VERIFY-001] [Potential Issue]
+**[VERIFY-001] [Potential Issue]**
 - **Location**: `file.py:456`
 - **Question**: [What needs to be verified]
 ```

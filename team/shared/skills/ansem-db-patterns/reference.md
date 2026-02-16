@@ -138,21 +138,21 @@ CREATE TRIGGER trg_{table}_updated_at
 ### 年次パーティション
 
 ```sql
-CREATE TABLE t_daily_performance_details_2025
+CREATE TABLE t_daily_performance_details_{YYYY}
   PARTITION OF t_daily_performance_details
-  FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
+  FOR VALUES FROM ('{YYYY}-01-01') TO ('{YYYY+1}-01-01');
 
 -- アーカイブ
 ALTER TABLE t_daily_performance_details
-  DETACH PARTITION t_daily_performance_details_2022;
+  DETACH PARTITION t_daily_performance_details_{old_YYYY};
 ```
 
 ### 月次パーティション
 
 ```sql
-CREATE TABLE t_audit_logs_2025_01
+CREATE TABLE t_audit_logs_{YYYY}_{MM}
   PARTITION OF t_audit_logs
-  FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+  FOR VALUES FROM ('{YYYY}-{MM}-01') TO ('{YYYY}-{MM+1}-01');
 ```
 
 ### 自動作成関数

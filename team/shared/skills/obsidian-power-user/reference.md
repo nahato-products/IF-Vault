@@ -41,6 +41,52 @@ SKILL.md の補足資料。SKILL.md で `[reference.md](reference.md) 参照` �
 
 ---
 
+## Bases: Complete Task Management Example
+
+```yaml
+filters:
+  and:
+    - file.hasTag("task")
+    - 'status != "archived"'
+
+formulas:
+  days_until: 'if(due_date, (date(due_date) - today()).days, "")'
+  overdue: 'if(due_date, date(due_date) < today() && status != "done", false)'
+
+properties:
+  formula.days_until:
+    displayName: "Days Left"
+  formula.overdue:
+    displayName: "Overdue?"
+
+views:
+  - type: table
+    name: "Active Tasks"
+    filters:
+      and:
+        - 'status != "done"'
+    order:
+      - file.name
+      - status
+      - priority
+      - due_date
+      - formula.days_until
+    summaries:
+      priority: Average
+
+  - type: cards
+    name: "By Status"
+    groupBy:
+      property: status
+      direction: ASC
+    order:
+      - file.name
+      - priority
+      - due_date
+```
+
+---
+
 ## Templater: Daily Note Template Example
 
 ```markdown
@@ -156,7 +202,7 @@ tags: [topic/ai, area/work]
 | `lower(str)` | 小文字化 | |
 | `upper(str)` | 大文字化 | |
 | `length(str)` | 文字数 | |
-| `regexmatch(pattern, str)` | 正規表現マッチ | `regexmatch("^2025", string(date))` |
+| `regexmatch(pattern, str)` | 正規表現マッチ | `regexmatch("^\\d{4}", string(date))` |
 | `split(str, sep)` | 分割 | |
 | `join(list, sep)` | 結合 | `join(file.tags, ", ")` |
 

@@ -1,6 +1,7 @@
 ---
 name: mobile-first-responsive
-description: "Mobile-first responsive for LIFF mini apps, PWA, and mobile web with Next.js App Router + Tailwind CSS v4. Covers LIFF size modes and WebView constraints, safe-area insets via env(), viewport units (svh/lvh/dvh), touch targets (48dp), bottom sheet, mobile navigation (bottom tab bar, stack), PWA manifest and Serwist service worker, virtual keyboard handling with visualViewport, and form UX (inputMode, enterKeyHint). Use when building LIFF viewport layouts, implementing mobile-first breakpoints, fixing safe-area or keyboard issues, creating bottom sheets, setting up PWA offline support, or optimizing mobile touch and form inputs."
+description: "Use when building LIFF viewport layouts, implementing mobile-first breakpoints, fixing safe-area or keyboard issues, creating bottom sheets, setting up PWA offline support, or optimizing mobile touch and form inputs with Next.js App Router + Tailwind CSS v4. Covers LIFF size modes, WebView constraints, safe-area insets via env(), viewport units (svh/lvh/dvh), touch targets (48dp), bottom sheet, mobile navigation (bottom tab bar, stack), PWA manifest with Serwist, virtual keyboard handling, and form UX (inputMode, enterKeyHint). Does NOT cover UX psychology (ux-psychology), WCAG/aria (web-design-guidelines), token design (design-token-system), or LIFF SDK auth (line-bot-dev)."
+user-invocable: false
 ---
 
 # Mobile-First Responsive Implementation
@@ -81,9 +82,11 @@ LIFF 内ではブラウザの戻るボタンが使えないため、ヘッダー
 | Property | Value | 理由 |
 |----------|-------|------|
 | `viewportFit` | `'cover'` | ノッチ対応に必須 |
-| `maximumScale` | `1` | ダブルタップズーム防止 |
-| `userScalable` | `false` | LIFF/PWA では通常無効 |
+| `maximumScale` | `5` | ズーム許可（WCAG SC 1.4.4 準拠） |
+| `userScalable` | `true` | **ズーム無効化は WCAG 違反**（web-design-guidelines 参照） |
 | `interactiveWidget` | `'resizes-content'` | キーボード時に viewport リサイズ |
+
+> **LIFF 限定の例外**: LIFF WebView 内で `userScalable: false` / `maximumScale: 1` を使うケースがあるが、WCAG SC 1.4.4 違反となる。アクセシビリティを優先し、原則 `userScalable: true` + `maximumScale: 5` を推奨。ダブルタップズーム防止には CSS `touch-action: manipulation` を使う。
 
 > 完全な viewport + metadata 設定コードは [reference.md](reference.md) セクション 12 を参照。
 

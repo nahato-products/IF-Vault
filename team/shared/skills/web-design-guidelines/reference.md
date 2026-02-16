@@ -264,23 +264,11 @@ dialog.addEventListener('keydown', (e) => {
 
 ## SS2 Responsive Design -- Code Examples
 
-### SS2.1 Mobile-First Grid
+### SS2.1-2.2 Mobile-First Grid and Fluid Sizing
 
-```css
-.grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 48rem) { .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 64rem) { .grid { grid-template-columns: repeat(3, 1fr); } }
-```
+See SKILL.md SS2.1-2.2 for base examples.
 
-### SS2.2 Fluid Sizing
-
-```css
-h1 { font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem); }
-.container { width: min(90%, 72rem); margin-inline: auto; }
-.gap { gap: clamp(0.5rem, 1vw, 1.5rem); }
-```
-
-### SS2.3 Container Queries
+### SS2.3 Container Queries (Extended)
 
 ```css
 .card-container {
@@ -966,4 +954,210 @@ Text in images cannot be translated, resized, or read by screen readers.
 @page :first {
   margin-top: 3cm;
 }
+```
+
+---
+
+## SS12 SEO -- Code Examples
+
+### SS12.1 Essential Meta Tags
+
+```html
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Name -- Category | Site Name</title>
+  <meta name="description" content="Concise 150-160 character description of page content for search results.">
+  <link rel="canonical" href="https://example.com/products/widget">
+  <meta name="robots" content="index, follow">
+  <!-- Alternate languages -->
+  <link rel="alternate" hreflang="en" href="https://example.com/en/page">
+  <link rel="alternate" hreflang="ja" href="https://example.com/ja/page">
+  <link rel="alternate" hreflang="x-default" href="https://example.com/page">
+  <!-- Sitemap -->
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+</head>
+```
+
+### SS12.2 Open Graph and Twitter Cards
+
+```html
+<!-- Open Graph -->
+<meta property="og:title" content="Page Title">
+<meta property="og:description" content="Engaging description for social shares (up to 200 chars)">
+<meta property="og:image" content="https://example.com/images/og-page.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Description of the image">
+<meta property="og:url" content="https://example.com/page">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Site Name">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@sitehandle">
+<meta name="twitter:title" content="Page Title">
+<meta name="twitter:description" content="Page description for Twitter">
+<meta name="twitter:image" content="https://example.com/images/twitter-card.jpg">
+
+<!-- Article-specific -->
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2000-01-15T08:00:00Z">
+<meta property="article:author" content="https://example.com/authors/name">
+```
+
+### SS12.3 JSON-LD Structured Data
+
+```html
+<!-- Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Company Name",
+  "url": "https://example.com",
+  "logo": "https://example.com/logo.png",
+  "sameAs": [
+    "https://twitter.com/company",
+    "https://linkedin.com/company/name"
+  ]
+}
+</script>
+
+<!-- BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://example.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://example.com/products" },
+    { "@type": "ListItem", "position": 3, "name": "Widget Pro" }
+  ]
+}
+</script>
+
+<!-- Article -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How to Optimize Web Performance",
+  "author": { "@type": "Person", "name": "Author Name" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Site Name",
+    "logo": { "@type": "ImageObject", "url": "https://example.com/logo.png" }
+  },
+  "image": "https://example.com/images/article-hero.jpg",
+  "description": "A guide to Core Web Vitals and performance optimization."
+}
+</script>
+
+<!-- FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is LCP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Largest Contentful Paint measures loading performance. Aim for under 2.5 seconds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is CLS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cumulative Layout Shift measures visual stability. Aim for a score under 0.1."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Product -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Widget Pro",
+  "image": "https://example.com/images/widget.jpg",
+  "description": "Professional widget for developers",
+  "brand": { "@type": "Brand", "name": "BrandName" },
+  "offers": {
+    "@type": "Offer",
+    "price": "29.99",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+```
+
+### SS12.4 Sitemap XML
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://example.com/</loc>
+    <lastmod>2000-06-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://example.com/products</loc>
+    <lastmod>2000-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+```
+
+### SS12.5 Robots.txt
+
+```
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /tmp/
+
+Sitemap: https://example.com/sitemap.xml
+```
+
+### SS12.6 SEO-Friendly HTML Patterns
+
+```html
+<!-- Semantic heading hierarchy for SEO -->
+<main>
+  <article>
+    <h1>Primary Page Topic</h1>
+    <p>Introduction with target keywords naturally included.</p>
+    <h2>Subtopic Section</h2>
+    <p>Supporting content...</p>
+    <h3>Detail Point</h3>
+    <p>Specific detail...</p>
+  </article>
+</main>
+
+<!-- Accessible and SEO-friendly image -->
+<figure>
+  <img src="chart.webp" alt="Revenue growth chart showing 40% increase"
+       width="800" height="450" loading="lazy">
+  <figcaption>Annual revenue growth across all regions</figcaption>
+</figure>
+
+<!-- Time element for date recognition -->
+<time datetime="2000-03-15T09:00:00Z">March 15, 2000</time>
+
+<!-- Internal linking with descriptive anchor text -->
+<a href="/guides/performance">Complete performance optimization guide</a>
+<!-- Bad: <a href="/guides/performance">click here</a> -->
 ```

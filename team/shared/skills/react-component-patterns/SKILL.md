@@ -1,6 +1,7 @@
 ---
 name: react-component-patterns
 description: "Use when designing, building, refactoring, reviewing, or architecting React component APIs and composition. Covers compound components, asChild/Slot, polymorphic components, Server/Client boundary design, CVA variant systems, form composition with React Hook Form + Zod + Server Actions, state management selection, error boundary component design, context providers, ref forwarding, controlled/uncontrolled patterns, and component-level ARIA/focus. Does NOT cover animation/state-feedback (micro-interaction-patterns), routing/data-fetching (nextjs-app-router-patterns), runtime performance (vercel-react-best-practices), or generic TypeScript (typescript-best-practices)."
+user-invocable: false
 ---
 
 # React Component Design Patterns
@@ -324,21 +325,11 @@ export function TodoItem({ todo }: { todo: Todo }) {
 
 外部制御と内部state両方をサポートするコンポーネントAPI設計。
 
-```tsx
-function Toggle({ value: controlledValue, defaultValue = false, onChange }: ToggleProps) {
-  const [internalValue, setInternalValue] = useState(defaultValue);
-  const isControlled = controlledValue !== undefined;
-  const value = isControlled ? controlledValue : internalValue;
-  const handleChange = () => {
-    const next = !value;
-    if (!isControlled) setInternalValue(next);
-    onChange?.(next);
-  };
-  return <button role="switch" aria-checked={value} onClick={handleChange}>...</button>;
-}
-```
+**パターン**: `value` (controlled) と `defaultValue` (uncontrolled) の両方を受け取り、`controlledValue !== undefined` で分岐。内部stateはuncontrolled時のみ更新。
 
 **判断**: フォーム連携やテストでcontrolled必須。スタンドアロン利用ではuncontrolledが便利。両対応で汎用性を確保。
+
+実装テンプレートは [reference.md](reference.md) の「Controlled/Uncontrolled 両対応コンポーネント」参照。
 
 ---
 

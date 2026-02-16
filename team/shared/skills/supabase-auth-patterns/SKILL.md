@@ -1,6 +1,6 @@
 ---
 name: supabase-auth-patterns
-description: "Supabase Auth and RLS patterns for Next.js App Router. Covers authentication flows (email/password, OAuth, Magic Link, LINE Login OIDC), session management with @supabase/ssr cookies, JWT validation (getUser vs getSession), RLS policy design (USING vs WITH CHECK, user-owns-row, org/team, role-based), middleware auth guard, Server Action and API Route protection, anon vs service_role key separation, PKCE flow, MFA/TOTP, password reset, and auth hooks. Use when implementing authentication, designing RLS policies, configuring login flows, protecting API routes or Server Actions, integrating LINE Login, setting up auth middleware, managing JWT claims, enrolling MFA, or debugging auth errors."
+description: "Use when implementing Supabase Auth flows (email/password, OAuth, Magic Link, LINE Login OIDC), designing RLS policies (USING vs WITH CHECK, user-owns-row, org/team, role-based), managing sessions with @supabase/ssr cookies, validating JWTs (getUser vs getSession), protecting API routes or Server Actions, configuring middleware auth guards, separating anon vs service_role keys, setting up PKCE flow, enrolling MFA/TOTP, handling password reset, or debugging auth errors in Next.js App Router. Does NOT cover: SQL query optimization or RLS performance tuning (supabase-postgres-best-practices), schema design (ansem-db-patterns), auth error UI patterns (micro-interaction-patterns)."
 user-invocable: false
 ---
 

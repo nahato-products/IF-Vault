@@ -1,6 +1,6 @@
 ---
 name: ci-cd-deployment
-description: "CI/CD pipeline architecture with GitHub Actions and Vercel deployment for Next.js applications. Covers workflow syntax (triggers, concurrency, matrix, reusable workflows), Vercel preview and production deploys, automated testing pipelines (lint, type-check, test, build in parallel), environment variable and secrets management across local/CI/Vercel, trunk-based branch strategies with protection rules, and Dependabot dependency automation. Use when setting up CI/CD pipelines, creating or debugging GitHub Actions workflows, configuring Vercel deployment settings, automating build and test stages, managing secrets across environments, or implementing branch protection and merge strategies."
+description: "Use when setting up CI/CD pipelines, creating or debugging GitHub Actions workflows, configuring Vercel deployment, automating build and test stages, managing secrets across environments, or implementing branch protection. Covers workflow syntax (triggers, concurrency, matrix, reusable workflows), Vercel preview and production deploys, parallel testing pipelines (lint, type-check, test, build), environment variable and secrets management across local/CI/Vercel, trunk-based branch strategies, and Dependabot automation. Does NOT cover test design or TDD (testing-strategy), Dockerfile optimization (docker-expert), or code-level vulnerability detection (security-review)."
 user-invocable: false
 ---
 

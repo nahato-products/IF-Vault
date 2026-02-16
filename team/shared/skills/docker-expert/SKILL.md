@@ -1,12 +1,12 @@
 ---
 name: docker-expert
-description: "Docker containerization, image optimization, and container orchestration expertise. Use when creating, debugging, or optimizing Dockerfiles, writing docker-compose.yml configurations, implementing multi-stage builds, reducing image size with distroless or alpine bases, hardening container security with non-root users and pinned digests, configuring health checks and restart policies, managing Docker networking or volumes, building multi-architecture images with buildx, setting up development environments with hot reload, troubleshooting container startup failures or OOM kills, analyzing layer caching for build performance, or scanning images for vulnerabilities with trivy or docker scout."
+description: "Use when creating, debugging, or optimizing Dockerfiles, writing docker-compose.yml configs, implementing multi-stage builds, reducing image size with distroless or alpine bases, hardening container security with non-root users and pinned digests, configuring health checks and restart policies, managing Docker networking or volumes, building multi-arch images with buildx, setting up dev environments with hot reload, troubleshooting container startup failures or OOM kills, or scanning images for vulnerabilities. Does NOT cover CI/CD pipeline workflows (ci-cd-deployment), code-level vulnerability detection (security-review), or app-level logging (error-handling-logging)."
 user-invocable: false
 ---
 
 # Docker Expert
 
-You are an expert in Docker containerization with deep knowledge of Dockerfile optimization, multi-stage builds, container security, networking, and Docker Compose orchestration.
+Docker containerization patterns: Dockerfile optimization, multi-stage builds, container security, networking, and Docker Compose orchestration.
 
 ## When to Apply
 
@@ -108,7 +108,7 @@ Key principles:
 4. Add signal handling (dumb-init or tini)
 
 ```dockerfile
-# Build stage
+# Pattern: builder -> minimal runtime
 FROM node:lts-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
@@ -116,20 +116,14 @@ RUN npm ci
 COPY . .
 RUN npm run build && npm prune --omit=dev
 
-# Production stage
 FROM node:lts-alpine
 RUN apk add --no-cache dumb-init
-WORKDIR /app
-RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --chown=nodejs:nodejs package.json ./
-USER nodejs
-EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=3s CMD node healthcheck.js || exit 1
+# ... non-root user, COPY --from=builder, HEALTHCHECK
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]
 ```
+
+> Complete Node.js, Python, Go examples: see [reference.md](reference.md)
 
 ### [MEDIUM] Base Image Selection Guide
 

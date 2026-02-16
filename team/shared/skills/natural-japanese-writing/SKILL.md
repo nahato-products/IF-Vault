@@ -1,6 +1,7 @@
 ---
 name: natural-japanese-writing
-description: Use when writing, editing, reviewing, proofreading, or rewriting Japanese prose in markdown files. Eliminates AI-generated patterns from Japanese text including verbose syntax, bracket overuse, monotone rhythm, hedge phrases, redundancy, weak negation, abstract buzzwords, and katakana business jargon. Diagnose unnatural phrasing, enforce style consistency, score AI-smell level, and produce human-readable output. Applies to technical docs, design docs, Obsidian vault notes, blog posts, Qiita articles, meeting notes, internal memos, and review comments. Pairs with obsidian-power-user for vault markdown conventions, ux-psychology for microcopy clarity, and web-design-guidelines for UI copy.
+user-invocable: false
+description: Use when writing, editing, reviewing, proofreading, or rewriting Japanese prose in markdown files. Eliminates AI-generated patterns from Japanese text including verbose syntax, bracket overuse, monotone rhythm, hedge phrases, redundancy, weak negation, abstract buzzwords, and katakana business jargon. Diagnose unnatural phrasing, enforce style consistency, score AI-smell level, and produce human-readable output. Applies to technical docs, design docs, Obsidian vault notes, blog posts, Qiita articles, meeting notes, internal memos, and review comments. Does NOT cover chat responses, code comments, English text, commit messages, YAML/JSON (ansem-db-patterns), or UI copy (web-design-guidelines).
 ---
 
 # Natural Japanese Writing

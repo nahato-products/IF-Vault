@@ -236,7 +236,34 @@ import { SparkAreaChart } from "@tremor/react";
 
 ### C-0. Supabase クライアント構成
 
-> Supabase クライアント構成はプロジェクト共通知識として省略。`supabase-postgres-best-practices` / `supabase-auth-patterns` 参照
+2つの `createClient` 関数を `lib/supabase/` に配置する。実装の詳細・RLS統合は `supabase-auth-patterns` 参照。
+
+```tsx
+// lib/supabase/server.ts - Server Component / Server Action / Route Handler
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
+export async function createClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll(), setAll: (cookiesToSet) => {
+      cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+    }}}
+  );
+}
+
+// lib/supabase/client.ts - Client Component
+import { createBrowserClient } from "@supabase/ssr";
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+```
 
 ### C-1. ページネーション + ソート + フィルタ統合
 
@@ -319,8 +346,8 @@ $$ LANGUAGE plpgsql STABLE;
 ```tsx
 // フロントエンドでの呼び出し
 const { data } = await supabase.rpc("get_dashboard_kpis", {
-  p_start_date: startDate,   // e.g. "2025-01-01"
-  p_end_date: endDate,       // e.g. "2025-01-31"
+  p_start_date: startDate,   // e.g. "YYYY-01-01"
+  p_end_date: endDate,       // e.g. "YYYY-01-31"
 });
 
 // 前期比の計算
@@ -550,7 +577,45 @@ function PrintButton() {
 - [ ] RLSポリシーがRealtime対象テーブルに設定済み
 - [ ] チャンネル名はテーブルごとにユニーク（`orders-changes`, `users-changes`）
 - [ ] useEffect内でsubscribe、クリーンアップでremoveChannel
-- [ ] 大量の変更が予想されるテーブルはフィルタで絞る:
+- [ ] 大量の変更が予想されるテーブルはフィルタで絞る
+- [ ] Realtimeの接続数上限を考慮（Free: 200同時接続、Pro: 500）
+
+### F-1. Realtime + TanStack Query 連携フック
+
+```tsx
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
+
+function useRealtimeInvalidation(table: string, queryKey: string[]) {
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`${table}-changes`)
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [table, queryKey, queryClient, supabase]);
+}
+
+// 使用例
+function OrdersTable() {
+  useRealtimeInvalidation("orders", ["orders"]);
+  const { data } = useQuery({ queryKey: ["orders"], queryFn: fetchOrders });
+  // ...
+}
+```
+
+### F-2. フィルタ付き Realtime（対象イベント・条件の絞り込み）
 
 ```tsx
 .on("postgres_changes", {
@@ -561,7 +626,32 @@ function PrintButton() {
 }, handler)
 ```
 
-- [ ] Realtimeの接続数上限を考慮（Free: 200同時接続、Pro: 500）
+### F-3. Optimistic UI + Server Action パターン
+
+```tsx
+import { useOptimistic, useTransition } from "react";
+
+function StatusToggle({ order }: { order: Order }) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(order.status);
+
+  function handleToggle() {
+    const newStatus = optimisticStatus === "active" ? "paused" : "active";
+    startTransition(async () => {
+      setOptimisticStatus(newStatus);
+      const result = await updateOrderStatus(order.id, newStatus);
+      if (result.error) toast.error("ステータスの更新に失敗しました");
+    });
+  }
+
+  return (
+    <button onClick={handleToggle} disabled={isPending}
+      className={isPending ? "opacity-60 pointer-events-none" : ""}>
+      {optimisticStatus}
+    </button>
+  );
+}
+```
 
 ---
 

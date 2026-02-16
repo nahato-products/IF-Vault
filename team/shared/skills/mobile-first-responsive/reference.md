@@ -331,8 +331,8 @@ Scenarios:    Keyboard open, Landscape, Slow 3G, Offline, Deep link, Cache
 import type { Viewport, Metadata } from 'next';
 
 export const viewport: Viewport = {
-  width: 'device-width', initialScale: 1, maximumScale: 1,
-  userScalable: false, viewportFit: 'cover',
+  width: 'device-width', initialScale: 1, maximumScale: 5,
+  userScalable: true, viewportFit: 'cover',
   interactiveWidget: 'resizes-content',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },

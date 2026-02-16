@@ -1,6 +1,7 @@
 ---
 name: ux-psychology
-description: Use when designing, evaluating, reviewing, auditing, or improving UI/UX with cognitive psychology, Nielsen heuristics, and Gestalt laws. Apply to diagnose usability issues, validate information architecture, optimize form validation, structure navigation, design onboarding, craft micro-copy, build AI chat interfaces, plan notifications, and assess neurodiversity. Covers cognitive load, Hick's Law, progressive disclosure, Doherty threshold, Fitts's Law, peak-end rule, default bias, reactance, labor illusion, dark patterns, dashboards, data tables, modals, and search UI. Provides the psychological WHY while web-design-guidelines covers WCAG/aria and micro-interaction-patterns covers animation.
+user-invocable: false
+description: Use when designing, evaluating, reviewing, auditing, or improving UI/UX with cognitive psychology, Nielsen heuristics, and Gestalt laws. Apply to diagnose usability issues, validate information architecture, optimize form validation, structure navigation, design onboarding, craft micro-copy, build AI chat interfaces, plan notifications, and assess neurodiversity. Covers cognitive load, Hick's Law, progressive disclosure, Doherty threshold, Fitts's Law, peak-end rule, default bias, reactance, labor illusion, dark patterns, dashboards, data tables, modals, and search UI. Does NOT cover WCAG/aria implementation (web-design-guidelines), animation code (micro-interaction-patterns), or chart library setup (dashboard-data-viz).
 ---
 
 # UX for App Development

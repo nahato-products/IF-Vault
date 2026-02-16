@@ -2,7 +2,7 @@
 
 guchiが作成・最適化した Claude Code Skills のセットアップと使い方。Claude Codeを使うメンバー全員が対象。
 
-全24スキルは skill-forge の10項目100点レビューで品質担保。採点済みスキルのスコアは下表に記載。
+全24スキルは skill-forge の10項目100点レビューで品質担保済み。全スキル最終レビュー＆最適化完了。
 
 ---
 
@@ -14,12 +14,12 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | Skill | 説明 | 発火タイミング | スコア |
 |-------|------|--------------|--------|
-| ux-psychology | UI/UXの認知心理学ベース設計 | UI設計・レビュー・バリデーション最適化時 | 88/100 |
-| natural-japanese-writing | AI臭を排除した自然な日本語 | Markdown日本語文の執筆・編集時 | 93/100 |
-| ansem-db-patterns | PostgreSQL本番スキーマ設計 | テーブル設計・DDL作成・FK削除ポリシー決定時 | 未採点 |
-| typescript-best-practices | 型安全パターンと実装ルール | TypeScript型設計・コードレビュー時 | 未採点 |
-| systematic-debugging | 根本原因調査の4段階プロセス | バグ診断・原因追跡・テスト失敗解析時 | 未採点 |
-| error-handling-logging | エラー分類とログ構造化設計 | エラー境界・ロギング・Sentry連携時 | 未採点 |
+| ux-psychology | UI/UXの認知心理学ベース設計 | UI設計・レビュー・バリデーション最適化時 | 最適化済 |
+| natural-japanese-writing | AI臭を排除した自然な日本語 | Markdown日本語文の執筆・編集時 | 最適化済 |
+| ansem-db-patterns | PostgreSQL本番スキーマ設計 | テーブル設計・DDL作成・FK削除ポリシー決定時 | 最適化済 |
+| typescript-best-practices | 型安全パターンと実装ルール | TypeScript型設計・コードレビュー時 | 最適化済 |
+| systematic-debugging | 根本原因調査の4段階プロセス | バグ診断・原因追跡・テスト失敗解析時 | 最適化済 |
+| error-handling-logging | エラー分類とログ構造化設計 | エラー境界・ロギング・Sentry連携時 | 最適化済 |
 
 ### Tier 2: 開発者推奨（10個）
 
@@ -27,16 +27,16 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | Skill | 説明 | 発火タイミング | スコア |
 |-------|------|--------------|--------|
-| nextjs-app-router-patterns | App Router 15ルーティング・キャッシュ | ルート設計・キャッシュ戦略決定時 | 未採点 |
-| react-component-patterns | React合成・CVA・SC/CC設計 | コンポーネント設計・リファクタリング時 | 未採点 |
-| tailwind-design-system | Tailwind v4 CSS-first設定・CVA | Tailwindユーティリティ・バリアント構築時 | 未採点 |
-| testing-strategy | TDD・テスト品質分析フロー | テスト設計・バグ修正時テスト作成時 | 未採点 |
-| supabase-auth-patterns | Auth・RLS・セッション管理 | 認証フロー・RLSポリシー実装時 | 未採点 |
-| supabase-postgres-best-practices | クエリ最適化・接続プール・RLS性能 | SQL最適化・遅いクエリ診断時 | 未採点 |
-| vercel-react-best-practices | ランタイムパフォーマンス最適化 | バンドル削減・再レンダリング抑制時 | 未採点 |
-| security-review | 脆弱性検出・セキュリティ監査 | `/security-review` で手動起動 | 未採点 |
-| ci-cd-deployment | GitHub Actions・Vercel自動化 | パイプライン構築・デプロイ設定時 | 未採点 |
-| docker-expert | Docker最適化・Compose・セキュア化 | Dockerfile作成・イメージサイズ削減時 | 未採点 |
+| nextjs-app-router-patterns | App Router 15ルーティング・キャッシュ | ルート設計・キャッシュ戦略決定時 | 最適化済 |
+| react-component-patterns | React合成・CVA・SC/CC設計 | コンポーネント設計・リファクタリング時 | 最適化済 |
+| tailwind-design-system | Tailwind v4 CSS-first設定・CVA | Tailwindユーティリティ・バリアント構築時 | 最適化済 |
+| testing-strategy | TDD・テスト品質分析フロー | テスト設計・バグ修正時テスト作成時 | 最適化済 |
+| supabase-auth-patterns | Auth・RLS・セッション管理 | 認証フロー・RLSポリシー実装時 | 最適化済 |
+| supabase-postgres-best-practices | クエリ最適化・接続プール・RLS性能 | SQL最適化・遅いクエリ診断時 | 最適化済 |
+| vercel-react-best-practices | ランタイムパフォーマンス最適化 | バンドル削減・再レンダリング抑制時 | 最適化済 |
+| security-review | 脆弱性検出・セキュリティ監査 | `/security-review` で手動起動 | 最適化済 |
+| ci-cd-deployment | GitHub Actions・Vercel自動化 | パイプライン構築・デプロイ設定時 | 最適化済 |
+| docker-expert | Docker最適化・Compose・セキュア化 | Dockerfile作成・イメージサイズ削減時 | 最適化済 |
 
 ### Tier 3: 専門特化（6個）
 
@@ -44,12 +44,12 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | Skill | 説明 | 発火タイミング | スコア |
 |-------|------|--------------|--------|
-| dashboard-data-viz | ダッシュボード・KPI・データテーブル | ダッシュボード構築・データ表示設計時 | 未採点 |
-| design-token-system | トークン階層・OKLCH色・ダークモード | カラーパレット設計・トークン定義時 | 未採点 |
-| micro-interaction-patterns | ローディング・トースト・フォームUX | UI状態フィードバック・アニメーション実装時 | 未採点 |
-| mobile-first-responsive | LIFF/PWA・モバイルファースト | モバイルレスポンシブ・LIFF実装時 | 未採点 |
-| web-design-guidelines | WCAG・セマンティックHTML・フォーム | アクセシビリティ監査・HTML設計時 | 未採点 |
-| line-bot-dev | LINE Bot・Messaging API・LIFF | LINE Bot開発・Webhook署名検証時 | 未採点 |
+| dashboard-data-viz | ダッシュボード・KPI・データテーブル | ダッシュボード構築・データ表示設計時 | 最適化済 |
+| design-token-system | トークン階層・OKLCH色・ダークモード | カラーパレット設計・トークン定義時 | 最適化済 |
+| micro-interaction-patterns | ローディング・トースト・フォームUX | UI状態フィードバック・アニメーション実装時 | 最適化済 |
+| mobile-first-responsive | LIFF/PWA・モバイルファースト | モバイルレスポンシブ・LIFF実装時 | 最適化済 |
+| web-design-guidelines | WCAG・セマンティックHTML・フォーム・SEO | アクセシビリティ監査・HTML設計時 | 最適化済 |
+| line-bot-dev | LINE Bot・Messaging API・LIFF | LINE Bot開発・Webhook署名検証時 | 最適化済 |
 
 ### Tier 4: ツール系（2個）
 
@@ -57,8 +57,8 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | Skill | 説明 | 発火タイミング | スコア |
 |-------|------|--------------|--------|
-| obsidian-power-user | Obsidian Markdown・Bases・Dataview | Obsidian本格運用・クエリ作成時 | 未採点 |
-| chrome-extension-dev | Chrome拡張MV3・DOM操作・SNS対応 | 拡張機能開発・manifest設定時 | 未採点 |
+| obsidian-power-user | Obsidian Markdown・Bases・Dataview | Obsidian本格運用・クエリ作成時 | 最適化済 |
+| chrome-extension-dev | Chrome拡張MV3・DOM操作・SNS対応 | 拡張機能開発・manifest設定時 | 最適化済 |
 
 ---
 

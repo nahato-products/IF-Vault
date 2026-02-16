@@ -58,8 +58,8 @@ CREATE INDEX idx2 ON orders (created_at);
 -- GOOD: single composite index
 CREATE INDEX CONCURRENTLY idx ON orders (status, created_at);
 -- Works: WHERE status = 'pending'
--- Works: WHERE status = 'pending' AND created_at > '2024-01-01'
--- Fails: WHERE created_at > '2024-01-01' (no leftmost prefix)
+-- Works: WHERE status = 'pending' AND created_at > '2000-01-01'
+-- Fails: WHERE created_at > '2000-01-01' (no leftmost prefix)
 ```
 
 Ref: [Multicolumn Indexes](https://www.postgresql.org/docs/current/indexes-multicolumn.html)
@@ -142,7 +142,7 @@ The query must use the same expression for the index to be used.
 
 Impact: Handle 10-100x more concurrent users.
 
-Supabase uses Supavisor (replaces PgBouncer since 2024). Configuration is managed via Supabase Dashboard.
+Supabase uses Supavisor (replaces PgBouncer). Configuration is managed via Supabase Dashboard.
 
 ```
 -- Without pooling: 500 users = 500 connections = crash
@@ -443,7 +443,7 @@ SELECT * FROM products WHERE id > $last_id ORDER BY id LIMIT 20;
 
 -- Multi-column sort cursor
 SELECT * FROM products
-WHERE (created_at, id) > ('2024-01-15 10:00:00', 12345)
+WHERE (created_at, id) > ('2000-01-15 10:00:00', 12345)
 ORDER BY created_at, id LIMIT 20;
 ```
 

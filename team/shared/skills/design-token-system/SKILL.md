@@ -1,6 +1,7 @@
 ---
 name: design-token-system
-description: Design token architecture for Tailwind CSS v4 + Next.js + shadcn/ui. Covers 3-tier hierarchy (primitive/semantic/component), OKLCH color with accessible contrast (L-value diff >= 0.40), typography modular scale, spacing grid, shadow/z-index tokens, dark mode with FOUC prevention, animation tokens, border-radius/focus-ring tokens, and globals.css @theme inline structure. Use when defining color palettes, building theme systems, creating dark mode, setting up globals.css tokens, designing typography scales, configuring spacing, integrating tokens with shadcn/ui, customizing semantic CSS variables, or establishing OKLCH accessible contrast.
+description: "Use when defining color palettes, building theme systems, creating dark mode, setting up globals.css tokens, designing typography scales, or configuring spacing with Tailwind CSS v4 + Next.js + shadcn/ui. Covers 3-tier token hierarchy (primitive/semantic/component), OKLCH color with accessible contrast (L-value diff >= 0.40), typography modular scale, spacing grid, shadow/z-index tokens, dark mode with FOUC prevention, animation tokens, border-radius/focus-ring tokens, and globals.css @theme inline structure. Does NOT cover Tailwind utility usage or CVA variants (tailwind-design-system), component design (react-component-patterns), or WCAG compliance (web-design-guidelines)."
+user-invocable: false
 ---
 
 # Design Token System
@@ -162,23 +163,11 @@ shadcn/ui にない色（success, warning, info 等）の追加手順:
 
 ### モジュラースケール
 
-比率ベース（Major Third = 1.25）でフォントサイズを決定し、一貫したリズムを作る。
-
-```css
-@theme {
-  /* Base: 16px, Ratio: 1.25 (Major Third) */
-  --text-xs: 0.64rem;      /* 10.24px */
-  --text-sm: 0.8rem;       /* 12.8px */
-  --text-base: 1rem;       /* 16px */
-  --text-lg: 1.25rem;      /* 20px */
-  --text-xl: 1.563rem;     /* 25px */
-  --text-2xl: 1.953rem;    /* 31.25px */
-  --text-3xl: 2.441rem;    /* 39.06px */
-  --text-4xl: 3.052rem;    /* 48.83px */
-}
-```
+比率ベース（Major Third = 1.25）でフォントサイズを決定し、一貫したリズムを作る。Base 16px から 1.25 倍ずつスケールアップし、xs(0.64rem) から 4xl(3.052rem) までの段階を `@theme` で定義する。
 
 **ルール**: フォントサイズが大きいほど行間を狭くする（本文 1.5 → 大見出し 1.0）。clamp() でビューポート幅に応じた流動サイズも設定可能。
+
+> 全トークン値・Line-Height ペアリング表は [reference.md](reference.md) セクション H の `@theme` ブロックを参照。
 
 > Line-Height ペアリング表・clamp() 定義・font-display 設定は [reference.md](reference.md) セクション D を参照。
 
@@ -218,28 +207,11 @@ shadcn/ui は `--radius` をベースに全段階を `calc()` で導出する。
 
 ### Shadow, Z-Index & Focus Ring トークン
 
-```css
-@theme {
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px oklch(0 0 0 / 0.07);
-  --shadow-lg: 0 10px 15px oklch(0 0 0 / 0.1);
+Shadow は sm / md / lg の3段階で OKLCH 透明度を使い分ける。Z-Index は dropdown(50) / sticky(100) / overlay(200) / modal(300) / toast(400) のレイヤー体系。
 
-  --z-dropdown: 50;
-  --z-sticky: 100;
-  --z-overlay: 200;
-  --z-modal: 300;
-  --z-toast: 400;
-}
-```
+**Focus Ring**: `--ring` 変数を `:root` / `.dark` で定義し、`@theme inline` で `--color-ring` に接続する。`focus-visible:ring-2 ring-ring ring-offset-2` で使用。
 
-**Focus Ring**: `--ring` 変数でフォーカスリング色をテーマ連動させる。
-
-```css
-:root { --ring: oklch(0.708 0 0); }
-.dark { --ring: oklch(0.556 0 0); }
-@theme inline { --color-ring: var(--ring); }
-/* 使用: focus-visible:ring-2 ring-ring ring-offset-2 */
-```
+> 全トークン値は [reference.md](reference.md) セクション H の globals.css テンプレートを参照。
 
 > コンテナ幅トークン・ブレークポイントトークンの完全定義は [reference.md](reference.md) セクション E を参照。
 
@@ -303,36 +275,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 ### Duration & Easing スケール
 
-```css
-@theme {
-  /* Duration */
-  --duration-fast: 100ms;     /* hover/focus */
-  --duration-normal: 200ms;   /* 標準 */
-  --duration-slow: 300ms;     /* パネル開閉 */
-  --duration-slower: 500ms;   /* ページ遷移 */
-
-  /* Easing */
-  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);   /* 汎用 */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);          /* 登場 */
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);           /* 退場 */
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* 弾む */
-}
-```
+Duration は fast(100ms, hover/focus) / normal(200ms, 標準) / slow(300ms, パネル開閉) / slower(500ms, ページ遷移) の4段階。Easing は default(汎用) / out(登場) / in(退場) / bounce(弾む) の4種。
 
 ### prefers-reduced-motion 対応
 
-```css
-@layer base {
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-}
-```
-
-Tailwind: `motion-safe:animate-fade-in motion-reduce:opacity-100`
+`@layer base` 内で `prefers-reduced-motion: reduce` をメディアクエリで検出し、`animation-duration` と `transition-duration` を 0.01ms に強制する。Tailwind: `motion-safe:animate-fade-in motion-reduce:opacity-100`。
 
 > カスタムキーフレーム定義・用途ガイドは [reference.md](reference.md) セクション F を参照。
 

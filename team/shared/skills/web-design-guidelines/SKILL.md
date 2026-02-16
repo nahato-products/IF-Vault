@@ -1,13 +1,24 @@
 ---
 name: web-design-guidelines
-description: Framework-agnostic web platform standards for semantic HTML, WCAG 2.2 AA accessibility, responsive CSS, forms, typography, performance, animation, dark mode, i18n, and print styles. Use when building, reviewing, auditing, refactoring, or debugging raw HTML/CSS/JS without a CSS framework. Apply to implement semantic landmarks and accessible tables, enforce color contrast and keyboard navigation, construct form validation with ARIA error messaging, configure fluid layouts with clamp and container queries, optimize Core Web Vitals, set up dark mode theming, handle RTL with logical properties, or diagnose accessibility issues. Does not cover Tailwind, React, LIFF, design tokens, or cognitive UX psychology.
+user-invocable: false
+description: >-
+  Use when building or reviewing raw HTML/CSS/JS without a framework. Covers
+  semantic HTML, WCAG 2.2 AA accessibility, responsive CSS with fluid sizing
+  and container queries, ARIA form validation, typography, Core Web Vitals
+  performance, reduced-motion animation, dark mode theming, SEO meta tags and
+  JSON-LD structured data, navigation state, touch interaction, i18n with
+  logical properties, and print styles. Apply to enforce contrast, build
+  accessible forms, optimize LCP/CLS/INP, configure fluid layouts, or handle
+  RTL. Does NOT cover Tailwind (`tailwind-design-system`), LIFF
+  (`mobile-first-responsive`), design tokens (`design-token-system`), or
+  cognitive UX (`ux-psychology`).
 ---
 
 # Web Platform Design Guidelines
 
 Framework-agnostic rules for accessible, performant, responsive web interfaces based on WCAG 2.2 and the HTML Living Standard.
 
-> Code examples are in `reference.md`. Related skills: `mobile-first-responsive` (LIFF/PWA/Tailwind mobile), `design-token-system` (token hierarchy), `tailwind-design-system` (Tailwind v4), `micro-interaction-patterns` (animation/state), `ux-psychology` (cognitive UX WHY), `testing-strategy` (accessibility testing), `security-review` (form security).
+> Related skills: `mobile-first-responsive` (LIFF/PWA/Tailwind mobile SS2-3), `design-token-system` (token hierarchy SS1-4), `tailwind-design-system` (Tailwind v4 SS1-6), `micro-interaction-patterns` (animation/state SS2-5), `ux-psychology` (cognitive UX WHY SS1-3), `testing-strategy` (accessibility testing SS4), `security-review` (form security SS3).
 
 ---
 
@@ -21,125 +32,99 @@ Use elements for their intended purpose. Semantic structure provides free access
 
 Key elements: `<main>` (one per page), `<nav>`, `<header>`/`<footer>`, `<article>`, `<section>` (with heading), `<aside>`, `<figure>`/`<figcaption>`, `<details>`/`<summary>`, `<dialog>`, `<time>`, `<address>`, `<search>`.
 
-**Anti-pattern**: `<div onclick>` instead of `<button>`.
-
-> Full element table: reference.md SS1.1
+**Anti-pattern**: `<div onclick>` instead of `<button>`. > Element table: reference.md SS1.1
 
 ### 1.2 ARIA Labels
 
-Every interactive element must have an accessible name (SC 4.1.2). Prefer visible text; use `aria-label` only when visible text is insufficient.
-
-- Icon-only buttons: need `aria-label`
-- Related sections: `aria-labelledby` referencing a heading
-- Buttons with visible text: no `aria-label` needed
-
-**Rule**: Prefer native HTML over ARIA. Use ARIA only when no native element exists.
-
-> ARIA role quick reference: reference.md SS1.11
+Every interactive element must have an accessible name (SC 4.1.2). Prefer visible text; use `aria-label` only when insufficient. Icon-only buttons need `aria-label`. Use `aria-labelledby` to reference headings. **Rule**: Prefer native HTML over ARIA. > Roles: reference.md SS1.11
 
 ### 1.3 Keyboard Navigation
 
-All interactive elements reachable and operable via keyboard (SC 2.1.1).
-
-- Use native interactive elements (`<button>`, `<a href>`, `<input>`, `<select>`)
-- Custom widgets: `tabindex="0"` + keydown handlers
-- Never use `tabindex` > 0
-- Trap focus inside modals; return focus on close
-
-> Focus trap code: reference.md SS1.3
+All interactive elements reachable via keyboard (SC 2.1.1). Use native elements (`<button>`, `<a href>`, `<input>`). Custom widgets: `tabindex="0"` + keydown. Never `tabindex` > 0. Trap focus in modals; return on close. > Focus trap: reference.md SS1.3
 
 ### 1.4 Focus Indicators
 
 Never remove focus outlines without a visible replacement (SC 2.4.7, 2.4.11).
 
-- Use `:focus-visible` for custom styles
-- WCAG 2.2: minimum area = perimeter x 2px, 3:1 contrast against adjacent colors
+```css
+:focus-visible { outline: 3px solid var(--focus-color, #4A90D9); outline-offset: 2px; }
+```
 
-> CSS example: reference.md SS1.4
+WCAG 2.2: minimum area = perimeter x 2px, 3:1 contrast against adjacent colors.
 
 ### 1.5 Skip Navigation
 
-Provide a mechanism to skip repeated content blocks (SC 2.4.1).
-
-> HTML/CSS example: reference.md SS1.5
+Skip link to bypass repeated content (SC 2.4.1). > Example: reference.md SS1.5
 
 ### 1.6 Alt Text
 
-Every `<img>` must have an `alt` attribute (SC 1.1.1).
-
-- **Informative**: describe content -- `alt="Bar chart showing sales doubled in Q4"`
-- **Decorative**: `alt=""` (screen readers skip)
-- **Functional** (inside links/buttons): describe the action
-- **Complex**: short `alt` + `<figcaption>` or long description link
+Every `<img>` needs `alt` (SC 1.1.1). **Informative**: describe content. **Decorative**: `alt=""`. **Functional**: describe action. **Complex**: short `alt` + `<figcaption>`.
 
 ### 1.7 Color Contrast
 
-Minimum contrast ratios (SC 1.4.3, 1.4.11):
-
-| Content | Ratio |
-|---------|-------|
-| Normal text | 4.5:1 |
-| Large text (>=24px / >=18.66px bold) | 3:1 |
-| UI components / graphics | 3:1 |
-
-Never rely on color alone (SC 1.4.1) -- pair with icons, text, or patterns.
+Minimum ratios (SC 1.4.3, 1.4.11): normal text 4.5:1, large text (>=24px / >=18.66px bold) 3:1, UI components/graphics 3:1. Never rely on color alone (SC 1.4.1) -- pair with icons, text, or patterns.
 
 ### 1.8 Form Labels
 
-Every input needs a programmatically associated label (SC 1.3.1, 3.3.2). Use `<label for="id">` (preferred) or implicit wrapping. Never use placeholder as sole label.
+Every input needs a programmatically associated label (SC 1.3.1, 3.3.2). Use `<label for="id">` (preferred) or implicit wrapping. Never placeholder as sole label.
 
 ### 1.9 Error Identification
 
-Identify errors in text (SC 3.3.1). Link to inputs with `aria-describedby` or `aria-errormessage`. Use `aria-invalid="true"` and `role="alert"`.
+Identify errors in text (SC 3.3.1). Link to inputs with `aria-describedby`. Use `aria-invalid="true"` and `role="alert"`.
 
 ### 1.10 Live Regions
 
-Announce dynamic content to screen readers (SC 4.1.3):
-- `aria-live="polite"`: announced when idle
-- `role="alert"` / `aria-live="assertive"`: time-sensitive only
-- `role="status"`: polite status messages
+Announce dynamic content (SC 4.1.3): `aria-live="polite"` (idle), `role="alert"` (time-sensitive), `role="status"` (polite status).
 
 ### 1.11 Table Accessibility
 
-Data tables must have programmatic structure (SC 1.3.1):
-- Use `<caption>` for table title
-- Use `<th scope="col">` / `<th scope="row">` for headers
-- Use `<thead>`, `<tbody>`, `<tfoot>` for grouping
-- Complex tables: `headers` attribute linking cells to headers
-
-> Table markup example: reference.md SS1.12
+`<caption>`, `<th scope="col|row">`, `<thead>`/`<tbody>`/`<tfoot>`, `headers` for complex tables (SC 1.3.1). > Example: reference.md SS1.12
 
 ---
 
 ## 2. Responsive Design [CRITICAL]
 
-> For LIFF/PWA/Tailwind-specific responsive patterns, see `mobile-first-responsive`.
+> LIFF/PWA/Tailwind: `mobile-first-responsive` SS2-3.
 
 ### 2.1 Mobile-First
 
 Base styles for smallest viewport. Layer with `min-width` media queries.
 
-> Grid example: reference.md SS2.1
+```css
+.grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 48rem) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .grid { grid-template-columns: repeat(3, 1fr); } }
+```
 
 ### 2.2 Fluid Sizing
 
 Use `clamp()`, `min()`, `max()` for fluid sizing without breakpoints.
 
-> Fluid sizing examples: reference.md SS2.2
+```css
+h1 { font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem); }
+.container { width: min(90%, 72rem); margin-inline: auto; }
+```
 
 ### 2.3 Container Queries
 
 Size components based on their container, not the viewport.
 
-> Full example: reference.md SS2.3
+```css
+.card-container { container-type: inline-size; container-name: card; }
+@container card (min-width: 400px) {
+  .card { display: grid; grid-template-columns: 200px 1fr; }
+}
+```
+
+> More examples: reference.md SS2.3
 
 ### 2.4 Content-Based Breakpoints
 
-Set breakpoints where content breaks, not at device widths: `30rem` (~480px), `48rem` (~768px), `64rem` (~1024px), `80rem` (~1280px).
+Set breakpoints where content breaks, not at device widths: `30rem`, `48rem`, `64rem`, `80rem`.
 
 ### 2.5 Touch Targets
 
-WCAG 2.2 SC 2.5.8 (Level AA): minimum 24x24 CSS pixels with sufficient spacing. SC 2.5.5 (Level AAA): minimum 44x44 CSS pixels. Target 44x44 for best usability. Use `::after` pseudo-element to enlarge tap area without changing visual size.
+WCAG 2.2 SC 2.5.8 (AA): min 24x24 CSS px. SC 2.5.5 (AAA): 44x44. Use `::after` to enlarge tap area without changing visual size.
 
 ### 2.6 Viewport Meta
 
@@ -147,21 +132,21 @@ WCAG 2.2 SC 2.5.8 (Level AA): minimum 24x24 CSS pixels with sufficient spacing. 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 ```
 
-Never use `maximum-scale=1` or `user-scalable=no` -- breaks pinch-to-zoom (SC 1.4.4).
+Never `maximum-scale=1` or `user-scalable=no` -- breaks pinch-to-zoom (SC 1.4.4).
 
 ### 2.7 No Horizontal Scrolling
 
-Content must reflow at 320px without horizontal scroll (SC 1.4.10): `img, video { max-width: 100%; height: auto; }`, `overflow-wrap: break-word`, scrollable containers for tables.
+Reflow at 320px without horizontal scroll (SC 1.4.10): `max-width: 100%; height: auto` on media, `overflow-wrap: break-word`, scrollable wrappers for tables.
 
 ---
 
 ## 3. Forms [HIGH]
 
-> For form security (CSRF, injection prevention), see `security-review`. For cognitive form design (progressive disclosure, validation psychology), see `ux-psychology`.
+> Security: `security-review` SS3. Cognitive design: `ux-psychology` SS2.
 
 ### 3.1 Label Every Input
 
-See SS1.8.
+Use `<label for="id">` (preferred) or implicit wrapping. See SS1.8.
 
 ### 3.2 Autocomplete Attributes
 
@@ -169,13 +154,19 @@ Use `autocomplete` for common fields (SC 1.3.5): `name`, `email`, `tel`, `street
 
 ### 3.3 Correct Input Types
 
-Use `email`, `tel`, `url`, `number` (not for phone/zip/card), `search`, `date`/`time`/`datetime-local`, `password`. Use `text` + `inputmode="numeric"` for numeric data without spinners (PINs, zip).
+Use `email`, `tel`, `url`, `number` (not phone/zip/card), `search`, `date`/`time`/`datetime-local`. Use `text` + `inputmode="numeric"` for PINs/zip.
 
 ### 3.4 Inline Validation
 
-Validate on `blur` (not every keystroke). Use `aria-describedby`, `aria-invalid`, `role="alert"`.
+Validate on `blur` (not keystroke). Use `aria-describedby`, `aria-invalid`, `role="alert"`.
 
-> Full example: reference.md SS3.4
+```html
+<label for="user">Username</label>
+<input id="user" type="text" aria-describedby="user-err" aria-invalid="true">
+<p id="user-err" role="alert">Must be at least 3 characters</p>
+```
+
+> Full CSS example: reference.md SS3.4
 
 ### 3.5 Fieldset and Legend
 
@@ -183,143 +174,304 @@ Group related inputs with `<fieldset>` + `<legend>`. Essential for radio/checkbo
 
 ### 3.6 Required Fields
 
-Use `required` attribute + visible marker. If most fields required, indicate optional ones instead.
+Use `required` + visible marker. If most fields required, indicate optional ones instead.
 
 ### 3.7 Submit Button
 
-Do not disable submit button. Validate on submit and show errors -- disabled buttons fail to communicate why the user cannot proceed.
+Never disable submit. Validate on submit and show errors -- disabled buttons fail to communicate why.
 
 ---
 
 ## 4. Typography [HIGH]
 
-> For design-token-based typography scales, see `design-token-system`.
+> For token-based scales, see `design-token-system` SS3.
 
 ### 4.1 Font Stacks
 
-System: `system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`
-Mono: `ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace`
-Web fonts: use `font-display: swap` with proper fallbacks.
+```css
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+code, pre { font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace; }
+```
+
+Web fonts: `font-display: swap`, proper fallbacks, subset to used character ranges.
 
 ### 4.2 Relative Units
 
-Use `rem` for font sizes/spacing. `html { font-size: 100%; }` respects user preference. Never `px` for font-size.
+`rem` for sizes/spacing. `html { font-size: 100%; }` respects user preference. Never `px` for font-size. `em` for local scaling.
 
 ### 4.3 Line Height and Spacing
 
-Body `line-height` >= 1.5 (SC 1.4.12). Headings: ~1.2. Paragraph spacing >= 2x font size.
+Body `line-height` >= 1.5 (SC 1.4.12). Headings: ~1.2. Paragraph spacing >= 2x font size. Letter-spacing adjustable to 0.12em, word-spacing to 0.16em.
 
 ### 4.4 Line Length
 
-Limit to ~75 characters: `.prose { max-width: 75ch; }`
+`.prose { max-width: 75ch; }` -- prevents eye fatigue.
 
 ### 4.5 Heading Hierarchy
 
-`h1`-`h6` in order, never skip levels, one `h1` per page. Use CSS classes for visual overrides.
+`h1`-`h6` in order, never skip, one `h1` per page. CSS classes for visual overrides.
 
-> Typography code examples: reference.md SS4
+### 4.6 Typographic Details
+
+`font-variant-numeric: tabular-nums` for tables. `<q>` for quotations. `<abbr title="">` for abbreviations.
+
+> Typography code: reference.md SS4
 
 ---
 
 ## 5. Performance [HIGH]
 
-### 5.1 Image Loading
+### 5.1 Core Web Vitals
 
-`loading="lazy"` for below-fold. `fetchpriority="high"` for hero images. Always set `width` and `height` to prevent CLS.
+- **LCP** < 2.5s -- preload hero image/font, inline critical CSS
+- **CLS** < 0.1 -- set `width`/`height` on media, avoid late-injected content
+- **INP** < 200ms -- minimize main-thread work, `scheduler.yield()`
 
-### 5.2 Resource Hints
+### 5.2 Image Optimization
 
-- `<link rel="preconnect">` for critical third-party origins
-- `<link rel="preload">` for critical resources (fonts, CSS)
-- `<link rel="dns-prefetch">` for non-critical origins
+```html
+<img src="hero.webp" alt="Hero" fetchpriority="high" width="1200" height="600">
+<img src="card.webp" alt="Card" loading="lazy" width="600" height="400"
+     srcset="card-400.webp 400w, card-800.webp 800w" sizes="(min-width: 48rem) 50vw, 100vw">
+```
 
-### 5.3 Code Splitting
+Use `<picture>` for format fallbacks (AVIF > WebP > JPEG). Always set dimensions.
 
-Dynamic `import()` for route-based and interaction-based splitting.
+### 5.3 Resource Hints
 
-### 5.4 Long Lists
+`<link rel="preconnect">` critical origins. `<link rel="preload">` fonts/above-fold CSS. `<link rel="dns-prefetch">` non-critical. > Examples: reference.md SS5.3
+
+### 5.4 Code Splitting
+
+Dynamic `import()` for route/interaction splitting. `<script defer>` or `<script type="module">` for non-critical JS.
+
+### 5.5 Long Lists
 
 Virtualize lists > a few hundred items -- render only visible rows + buffer.
 
-### 5.5 Layout Thrashing
+### 5.6 Layout Thrashing
 
-Batch DOM reads then writes. Never interleave read-write.
+Batch DOM reads then writes. Never interleave in loops.
 
-### 5.6 will-change
+```js
+const heights = elements.map(el => el.offsetHeight);
+elements.forEach((el, i) => { el.style.height = heights[i] + 10 + 'px'; });
+```
 
-Only on elements that will animate. Remove after animation completes. Never `* { will-change: transform; }`.
+### 5.7 will-change
 
-> Performance code examples: reference.md SS5
+Only on elements that animate. Remove after. Never `* { will-change: transform; }`.
 
----
+### 5.8 Critical CSS
 
-## 6. Animation and Motion [MEDIUM]
+Inline above-fold CSS in `<head>`. Load rest: `<link rel="preload" href="full.css" as="style" onload="this.rel='stylesheet'">`.
 
-> For Framer Motion / Next.js animation patterns, see `micro-interaction-patterns`.
-
-Respect `prefers-reduced-motion` (SC 2.3.3). Animate only `transform` and `opacity` (compositor-friendly). Never flash > 3 times/sec (SC 2.3.1). Animation should communicate state, not decorate.
-
-> Full section with examples: reference.md SS6
-
----
-
-## 7. Dark Mode and Theming [MEDIUM]
-
-> For CSS custom property token architecture, see `design-token-system`.
-
-Detect with `prefers-color-scheme: dark`. Use CSS custom properties for all theme values. Add `<meta name="color-scheme" content="light dark">`. Verify contrast in both modes.
-
-> Full section with examples: reference.md SS7
+> Performance code: reference.md SS5
 
 ---
 
-## 8. Navigation and State [MEDIUM]
+## 6. SEO [HIGH]
 
-URL must reflect meaningful state (`pushState` + `URLSearchParams`). Handle `popstate` for back/forward. Use `aria-current="page"` for active nav. Breadcrumbs for deep hierarchies. Manage scroll restoration in SPAs.
+### 6.1 Meta Tags
 
-> Full section with examples: reference.md SS8
+Every page needs unique `<title>` (50-60 chars) and `<meta name="description">` (150-160 chars). Set `<link rel="canonical">`.
+
+```html
+<title>Page Title -- Site Name</title>
+<meta name="description" content="Unique 150-160 char page summary">
+<link rel="canonical" href="https://example.com/page">
+```
+
+### 6.2 Open Graph and Social
+
+```html
+<meta property="og:title" content="Page Title">
+<meta property="og:description" content="Social sharing summary">
+<meta property="og:image" content="https://example.com/og.jpg">
+<meta property="og:url" content="https://example.com/page">
+<meta name="twitter:card" content="summary_large_image">
+```
+
+OG images: 1200x630px min. Always absolute URLs. > Full examples: reference.md SS12.2
+
+### 6.3 Structured Data (JSON-LD)
+
+`<script type="application/ld+json">` for rich results. Schemas: `Article`, `BreadcrumbList`, `FAQPage`, `Product`, `Organization`.
+
+```html
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://example.com/"},
+  {"@type":"ListItem","position":2,"name":"Products","item":"https://example.com/products"}
+]}
+</script>
+```
+
+> More schemas: reference.md SS12.3
+
+### 6.4 Sitemap and Robots
+
+`sitemap.xml` with canonical URLs and `<lastmod>`. Configure `robots.txt`. `<link rel="sitemap">` in head. > Examples: reference.md SS12.4-5
+
+### 6.5 Semantic HTML for SEO
+
+Landmarks help crawlers. One `<h1>` per page, heading hierarchy. `<time datetime="">` for dates. Descriptive anchor text. > Patterns: reference.md SS12.6
 
 ---
 
-## 9. Touch and Interaction [MEDIUM]
+## 7. Animation and Motion [MEDIUM]
 
-Use `touch-action` CSS for scroll control. Pair every `:hover` with `:focus-visible`. Never hide functionality behind hover-only. Use CSS scroll snap for carousels.
+> For Framer Motion / Next.js, see `micro-interaction-patterns` SS2-5.
 
-> Full section with examples: reference.md SS9
+### 7.1 Reduced Motion
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+### 7.2 Compositor-Friendly
+
+Animate only `transform` and `opacity` (compositor thread). Never `width`, `height`, `top`, `left`, `margin`, `padding`.
+
+### 7.3 Flash Safety
+
+Never > 3 flashes/sec (SC 2.3.1). Can trigger seizures.
+
+### 7.4 Purposeful Motion
+
+Communicate state, guide attention, show spatial relationships. 150-300ms micro, 300-500ms page transitions.
+
+> Full animation examples: reference.md SS6
 
 ---
 
-## 10. Internationalization [MEDIUM]
+## 8. Dark Mode and Theming [MEDIUM]
 
-Set `lang` on `<html>`. Use `dir="auto"` for user content. Format with `Intl` APIs (never hard-code formats). Avoid text in images. Use CSS logical properties (`margin-inline-start`, `padding-block-end`, etc.) instead of physical ones.
+> For token architecture, see `design-token-system` SS2-4.
 
-> Logical property mapping and examples: reference.md SS10
+### 8.1 System Detection
+
+```css
+:root { color-scheme: light dark; }
+@media (prefers-color-scheme: dark) {
+  :root { --color-bg: #0f0f17; --color-text: #e4e4ef; --color-surface: #1c1c2e; }
+}
+```
+
+`<meta name="color-scheme" content="light dark">`. CSS custom properties for all theme values.
+
+### 8.2 Dark Mode Contrast
+
+Verify contrast in both modes. Avoid pure `#fff` on dark -- use `#e4e4ef`. Dark surfaces need extra text legibility attention.
+
+### 8.3 Adaptive Images
+
+`<picture media="(prefers-color-scheme: dark)">` for theme images. `filter: brightness(0.9)` on decorative dark-mode images.
+
+> Full theming: reference.md SS7
 
 ---
 
-## 11. Print Styles [MEDIUM]
+## 9. Navigation and State [MEDIUM]
 
-Apply `@media print` styles to ensure pages print correctly. Hide non-essential UI (nav, footer, ads). Expand collapsed content. Show URLs after links. Use `page-break-inside: avoid` on critical blocks.
+### 9.1 URL Reflects State
 
-> Full print stylesheet: reference.md SS11
+`pushState` + `URLSearchParams` for meaningful state. Every shareable view needs a unique URL.
+
+### 9.2 Back/Forward and Scroll
+
+Handle `popstate`. Restore filters, scroll, UI state. `history.scrollRestoration = 'manual'` in SPAs.
+
+### 9.3 Active Navigation
+
+`aria-current="page"` on active nav. Breadcrumbs: `<nav aria-label="Breadcrumb">` + `<ol>` for deep hierarchies.
+
+> Full navigation: reference.md SS8
+
+---
+
+## 10. Touch and Interaction [MEDIUM]
+
+### 10.1 Touch Action
+
+`touch-action`: `pan-y` (vertical), `pan-x` (carousels), `none` (canvas).
+
+### 10.2 Hover/Focus Parity
+
+Pair `:hover` with `:focus-visible`. Never hover-only. `:focus-within` for revealed content.
+
+```css
+.card:hover, .card:focus-visible {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+```
+
+### 10.3 Scroll Snap
+
+`scroll-snap-type: x mandatory` on container, `scroll-snap-align: start` on items. > Full: reference.md SS9
+
+---
+
+## 11. Internationalization [MEDIUM]
+
+### 11.1 Language and Direction
+
+`lang` on `<html>`. `dir="auto"` for user content. `lang` on inline language switches.
+
+### 11.2 Formatting
+
+`Intl` APIs (`DateTimeFormat`, `NumberFormat`, `RelativeTimeFormat`, `ListFormat`). Never hard-code formats.
+
+### 11.3 CSS Logical Properties
+
+| Physical | Logical |
+|----------|---------|
+| `margin-left` | `margin-inline-start` |
+| `padding-right` | `padding-inline-end` |
+| `text-align: left` | `text-align: start` |
+| `width` / `height` | `inline-size` / `block-size` |
+
+### 11.4 No Text in Images
+
+Cannot be translated, resized, or read by screen readers. > Full i18n: reference.md SS10
+
+---
+
+## 12. Print Styles [MEDIUM]
+
+```css
+@media print {
+  nav, footer, .sidebar, button, .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; }
+  h1, h2, h3 { break-after: avoid; }
+  table, figure, img { break-inside: avoid; }
+  p, li { orphans: 3; widows: 3; }
+}
+@page { margin: 2cm; size: A4; }
+```
+
+Expand collapsed `<details>`. `filter: none` on images. > Full stylesheet: reference.md SS11
 
 ---
 
 ## Quick Review Checklist [HIGH]
 
-**Accessibility**: alt text, contrast (4.5:1 text / 3:1 UI), keyboard access, focus indicators (3:1, 2px perimeter), skip nav, labels, error linking, live regions, no flashing, heading hierarchy, landmarks, table headers.
-
-**Responsive**: no horizontal scroll at 320px, touch targets >= 24x24px (AA) / 44x44px (AAA), viewport meta (no user-scalable=no), works across breakpoints.
-
-**Forms**: visible labels, autocomplete, correct input types, clear errors, required indication, submit not disabled.
-
-**Performance**: lazy loading, image dimensions, font preload, preconnect, code splitting.
-
-**Motion/Theme**: prefers-reduced-motion, transform/opacity only, dark mode contrast, color-scheme meta.
-
-**i18n**: lang attribute, logical properties, Intl APIs, no image text, RTL tested.
-
-**Print**: @media print tested, nav/footer hidden, links show URLs, page breaks respected.
+- **Accessibility**: alt text, contrast (4.5:1 / 3:1), keyboard, focus indicators, skip nav, labels, error linking, live regions, no flashing, heading hierarchy, landmarks, table headers
+- **Responsive**: no h-scroll at 320px, touch targets >= 24px (AA) / 44px (AAA), viewport meta, container queries
+- **Forms**: labels, autocomplete, input types, clear errors, required markers, submit never disabled
+- **Performance**: LCP < 2.5s, CLS < 0.1, INP < 200ms, lazy load, dimensions + srcset, preload/preconnect, code split, critical CSS
+- **SEO**: unique title + description, canonical, Open Graph, JSON-LD, sitemap, semantic landmarks, h1 hierarchy
+- **Motion/Theme**: reduced-motion, transform/opacity only, dark contrast, color-scheme meta
+- **i18n**: lang, logical properties, Intl APIs, no image text, RTL tested
+- **Print**: @media print, hidden nav, link URLs shown, page breaks
 
 ---
 
@@ -328,15 +480,18 @@ Apply `@media print` styles to ensure pages print correctly. Hide non-essential 
 | Anti-Pattern | Fix |
 |---|---|
 | `<div onclick>` | `<button>` |
-| `outline: none` without replacement | `:focus-visible` with custom outline |
-| `placeholder` as label | Add `<label>` |
+| `outline: none` | `:focus-visible` custom outline |
+| `placeholder` as label | `<label>` |
 | `tabindex="5"` | `tabindex="0"` or natural order |
 | `user-scalable=no` | Remove it |
 | `font-size: 12px` | `font-size: 0.75rem` |
-| Animating `width`/`height`/`left` | `transform` and `opacity` |
-| Disabled submit button | Validate on submit |
-| Color alone for status | Add icon, text, or pattern |
+| Animating `width`/`height`/`left` | `transform` + `opacity` |
+| Disabled submit | Validate on submit |
+| Color alone for status | Icon, text, or pattern |
 | `margin-left` | `margin-inline-start` |
-| `<img>` without dimensions | Add `width`/`height` |
-| Hover-only disclosure | Add `:focus-within` and click |
-| `<table>` without `<th scope>` | Add proper header cells |
+| `<img>` without dimensions | `width`/`height` |
+| Hover-only disclosure | `:focus-within` + click |
+| `<table>` without `<th scope>` | Proper header cells |
+| Missing `<title>` / description | Unique per page |
+| No `canonical` | `<link rel="canonical">` |
+| Inline theme styles | CSS custom properties |

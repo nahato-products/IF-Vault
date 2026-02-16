@@ -1,6 +1,6 @@
 ---
 name: error-handling-logging
-description: "Error handling and logging architecture for Next.js App Router applications. Covers error.tsx/global-error.tsx boundary hierarchy, custom AppError class hierarchy with isOperational classification, structured JSON logging with log-level strategy, Sentry integration (@sentry/nextjs) with operational error filtering, API error response standardization, notFound()/redirect() control flow, Server Action result-object pattern, middleware error containment, and user-facing error message mapping. Use when implementing error boundaries, configuring structured logging, integrating Sentry monitoring, designing API error responses, classifying operational vs programmer errors, handling middleware failures, building error recovery with retry/fallback, or mapping internal errors to user-safe messages."
+description: "Use when implementing error boundaries, configuring structured logging, integrating Sentry, designing API error responses, classifying operational vs programmer errors, or handling middleware failures. Covers error.tsx/global-error.tsx hierarchy, AppError class with isOperational flag, structured JSON logging, Sentry @sentry/nextjs filtering, Server Action result-object pattern, middleware containment, and user-facing message mapping. Does NOT cover error investigation process (systematic-debugging), error state UI/animation (micro-interaction-patterns), or auth flow design (supabase-auth-patterns)."
 user-invocable: false
 ---
 
@@ -52,23 +52,11 @@ An error occurs ->
 
 ### Custom Error Base Class
 
-```typescript
-// lib/errors.ts
-export class AppError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-    public readonly statusCode: number = 500,
-    public readonly isOperational: boolean = true,
-    public readonly context?: Record<string, unknown>
-  ) {
-    super(message)
-    this.name = 'AppError'
-  }
-}
-```
+`AppError` extends `Error` with `code`, `statusCode`, `isOperational`, and `context` fields.
 
-Subclasses: `NotFoundError` (404), `ValidationError` (400), `AuthenticationError` (401), `ForbiddenError` (403), `RateLimitError` (429), `ExternalServiceError` (502) — see [reference.md > Custom Error Classes](reference.md#custom-error-classes-full-hierarchy)
+Subclasses: `NotFoundError` (404), `ValidationError` (400), `AuthenticationError` (401), `ForbiddenError` (403), `RateLimitError` (429), `ExternalServiceError` (502).
+
+See [reference.md > Custom Error Classes](reference.md#custom-error-classes-full-hierarchy) for full class hierarchy code.
 
 ### Usage
 

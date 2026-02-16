@@ -1,6 +1,6 @@
 ---
 name: micro-interaction-patterns
-description: "Use when implementing, debugging, reviewing, or refactoring UI micro-interactions in Next.js App Router with Tailwind CSS and Framer Motion. Covers loading states (skeleton, shimmer, Suspense, loading.tsx, useOptimistic), toast notifications (sonner, snackbar, banner), form validation UX (onBlur/onChange timing, inline errors, useFormStatus), empty states (first-use, no-results, error), error.tsx boundaries (reset, retry, graceful degradation), success feedback (checkmark animation), page and list transitions (AnimatePresence, layout prop, View Transitions API), hover/focus-visible/active/disabled/loading button states, streaming UI (Suspense streaming, AI chat useChat), and progress bars."
+description: "Use when implementing UI micro-interactions in Next.js App Router with Tailwind CSS and Framer Motion. Covers loading states (skeleton, shimmer, Suspense, loading.tsx, useOptimistic), toast notifications (sonner, snackbar, banner), form validation UX (onBlur/onChange timing, inline errors, useFormStatus), empty states, error.tsx boundaries (reset, retry), success feedback, page and list transitions (AnimatePresence, layout prop), button states, streaming UI (useChat), and progress bars. Does NOT cover UX psychology (ux-psychology), component API design (react-component-patterns), or token definitions (design-token-system)."
 user-invocable: false
 ---
 

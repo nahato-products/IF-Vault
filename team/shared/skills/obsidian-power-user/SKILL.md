@@ -1,6 +1,17 @@
 ---
 name: obsidian-power-user
-description: "Obsidian vault management and automation across three domains. Flavored Markdown: wikilinks, callouts (13 types with folding), embeds (notes, images, PDFs, block refs), block IDs, highlights, footnotes, properties/frontmatter. Bases: .base YAML with table/cards/list/map views, filter logic (and/or/not), formulas, summaries. Automation: Dataview DQL (TABLE/LIST/TASK/CALENDAR, FROM/WHERE/SORT/GROUP BY, inline queries, DataviewJS dv.* API), Templater (tp.file/tp.date/tp.system), QuickAdd (template/capture/macro). Use when creating, editing, querying, or debugging .md or .base files in Obsidian vaults, writing Dataview queries, building templates, configuring macros, or designing vault structure"
+user-invocable: false
+description: >-
+  Use when creating, editing, querying, or debugging .md or .base files in
+  Obsidian vaults, writing Dataview queries, building Templater templates,
+  configuring QuickAdd macros, or designing vault structure. Covers Obsidian
+  Flavored Markdown (wikilinks, callouts, embeds, block IDs, properties),
+  Bases (.base YAML with table/cards/list/map views, filter logic, formulas,
+  summaries), and automation (Dataview DQL TABLE/LIST/TASK/CALENDAR, inline
+  queries, DataviewJS dv.* API, Templater tp.file/tp.date/tp.system, QuickAdd
+  template/capture/macro). Does NOT cover standard Markdown basics, general
+  writing quality (`natural-japanese-writing`), or data visualization design
+  (`dashboard-data-viz`).
 ---
 
 # Obsidian Power User
@@ -485,7 +496,5 @@ Macro: "New Project"
 - **natural-japanese-writing**: Obsidianノートの日本語ライティング品質向上に併用
 - **typescript-best-practices**: DataviewJS コード記述時の型安全パターン
 - **dashboard-data-viz**: Bases viewsのダッシュボード設計をデータ可視化原則と組み合わせる
-
-## Reference
 
 Full function lists, field references, and API details: see [reference.md](reference.md)

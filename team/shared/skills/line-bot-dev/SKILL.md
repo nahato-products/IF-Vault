@@ -1,6 +1,18 @@
 ---
 name: line-bot-dev
-description: "LINE Bot development with Messaging API, @line/bot-sdk, and LIFF mini apps for Node.js/Next.js. Covers webhook signature verification, message types (text, template, flex, quick reply), rich menus, LIFF initialization, channel access tokens, reply vs push cost optimization, multicast and broadcast, postback routing, Supabase user sync, webhook idempotency, and conversational UX. Use when building LINE bots, implementing webhooks, verifying signatures, designing flex messages, creating template messages, setting up rich menus, developing LIFF apps, integrating LINE with Next.js, handling postback events, syncing LINE users to database, optimizing delivery costs, or debugging LINE bot issues."
+user-invocable: false
+description: >-
+  Use when building LINE bots, implementing webhooks, verifying signatures,
+  designing flex/template messages, setting up rich menus, developing LIFF
+  apps, integrating LINE with Next.js, handling postback events, or syncing
+  LINE users to database. Covers Messaging API, @line/bot-sdk, LIFF mini
+  apps, webhook signature verification, message types (text, template, flex,
+  quick reply), channel access tokens, reply vs push cost optimization,
+  multicast/broadcast, postback routing, Supabase user sync, webhook
+  idempotency, and conversational UX. Does NOT cover LINE Login/OAuth
+  (`supabase-auth-patterns`), LIFF viewport/safe-area
+  (`mobile-first-responsive`), or structured logging
+  (`error-handling-logging`).
 ---
 
 # LINE Bot Development
@@ -75,7 +87,7 @@ const client = new messagingApi.MessagingApiClient({
 });
 ```
 
-Node.js >= 20 必須（SDK v10.x）。
+Node.js LTS 以上必須。SDK の最新バージョンを使うこと。
 
 ### 2. Channel Access Token
 

@@ -1,5 +1,6 @@
 ---
 name: typescript-best-practices
+user-invocable: false
 description: "Use when writing, reviewing, refactoring, designing, or auditing TypeScript type patterns. Covers discriminated unions, branded types, exhaustive switch with never, constrained generics, type narrowing, assertion functions, mapped and conditional types, template literal types, utility type composition (Pick/Omit/Partial/Record/Extract/Exclude/satisfies), Zod runtime validation (safeParse, schema composition, z.infer), typed configuration, and functional immutability. Does NOT cover React props (react-component-patterns), error classes (error-handling-logging), test patterns (testing-strategy), typed queries (supabase-postgres-best-practices), or input validation auditing (security-review)."
 ---
 

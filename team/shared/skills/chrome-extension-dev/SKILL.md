@@ -1,7 +1,17 @@
 ---
 name: chrome-extension-dev
-description: "Use when building Chrome extensions, creating browser extensions, writing content scripts, implementing popup UI, configuring manifest.json, handling chrome.storage API, setting up background service workers, designing message passing architecture, managing permissions and host_permissions, configuring declarativeNetRequest rules, securing web_accessible_resources, scraping Instagram DOM, scraping TikTok DOM, scraping YouTube DOM, intercepting SPA API responses, testing extension content scripts and service worker logic, debugging MV3 extensions, migrating from MV2, publishing to Chrome Web Store, or developing browser automation tools. Covers Manifest V3 structure, content script injection, popup React integration, SNS DOM scraping patterns, network request control, extension testing patterns, security best practices, and WXT framework setup."
 user-invocable: false
+description: >-
+  Use when building Chrome extensions, writing content scripts, configuring
+  manifest.json, handling chrome.storage/alarms API, setting up service
+  workers, designing message passing, configuring declarativeNetRequest,
+  scraping SNS DOM (Instagram/TikTok/YouTube), intercepting SPA API responses,
+  testing extension logic, or publishing to Chrome Web Store. Covers Manifest
+  V3 structure, content script injection, popup React integration, SNS
+  scraping patterns, network request control, extension testing, security, and
+  WXT framework. Does NOT cover Firefox/Safari-only extensions, desktop apps
+  (Electron/Tauri), popup component patterns (`react-component-patterns`), or
+  extension security audits (`security-review`).
 ---
 
 # Chrome Extension Development (Manifest V3)
@@ -132,6 +142,19 @@ await chrome.storage.session.set({ count: 0 });
 // Always at file top level
 chrome.runtime.onInstalled.addListener((details) => { /* ... */ });
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => { /* ... */ });
+```
+
+### 10. Alarms API (Periodic Tasks)
+
+Use `chrome.alarms` for scheduled/periodic work. Replaces `setInterval` which is lost on SW termination. Requires `alarms` permission.
+
+```js
+// Create alarm (min period: 1 minute in production, 30s in dev)
+chrome.alarms.create("refresh", { periodInMinutes: 5 });
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "refresh") syncData();
+});
 ```
 
 ---
@@ -398,7 +421,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 });
 ```
 
-Mock `chrome.*` APIs with `@anthropic/chrome-types` or manual stubs. For testing methodology (TDD cycle, AAA pattern, mock boundaries), see `testing-strategy` skill.
+Mock `chrome.*` APIs with manual stubs or community mock libraries. For testing methodology (TDD cycle, AAA pattern, mock boundaries), see `testing-strategy` skill.
 
 ---
 

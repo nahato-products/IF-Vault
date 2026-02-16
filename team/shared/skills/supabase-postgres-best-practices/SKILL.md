@@ -1,6 +1,6 @@
 ---
 name: supabase-postgres-best-practices
-description: "Postgres query performance optimization and runtime best practices for Supabase. Covers indexing strategies (B-tree, GIN, GiST, BRIN, composite, partial, covering), EXPLAIN ANALYZE diagnostics, connection pooling (Supavisor transaction/session modes, pool sizing, timeouts), RLS performance patterns (auth.uid() subquery caching, SECURITY DEFINER bypass), concurrency control (deadlock prevention, SKIP LOCKED queues, advisory locks, statement_timeout), data access optimization (N+1 elimination, cursor/keyset pagination, batch inserts, UPSERT), runtime monitoring (pg_stat_statements, pg_stat_user_indexes, VACUUM/ANALYZE tuning), Edge Function connection handling, and advanced query tuning (full-text search tsvector, JSONB GIN indexing). Use when writing, reviewing, or optimizing SQL queries, diagnosing slow queries with EXPLAIN, configuring connection pooling, tuning RLS policy performance, implementing concurrent processing, profiling query execution, detecting unused indexes, resolving Postgres performance bottlenecks, or load-testing database throughput in Supabase projects."
+description: "Use when writing, reviewing, or optimizing SQL queries, diagnosing slow queries with EXPLAIN ANALYZE, configuring connection pooling (Supavisor), tuning RLS performance, implementing concurrency control, or resolving Postgres bottlenecks in Supabase. Covers indexing (B-tree, GIN, GiST, BRIN, composite, partial, covering), EXPLAIN ANALYZE, Supavisor pooling (transaction/session modes, pool sizing, timeouts), RLS performance (auth.uid() subquery caching, SECURITY DEFINER), concurrency (deadlock prevention, SKIP LOCKED queues, advisory locks, statement_timeout), data access (N+1 elimination, cursor/keyset pagination, batch inserts, UPSERT), monitoring (pg_stat_statements, pg_stat_user_indexes, VACUUM/ANALYZE), Edge Function connections, full-text search tsvector, JSONB GIN indexing, unused index detection. Does NOT cover: schema design/naming/types (ansem-db-patterns), auth flows/RLS creation (supabase-auth-patterns), debugging process (systematic-debugging), regression tests (testing-strategy)."
 user-invocable: false
 ---
 
@@ -73,8 +73,8 @@ Equality columns first, range columns last. Leftmost prefix rule applies.
 -- Good: status (=) before created_at (>)
 CREATE INDEX idx ON orders (status, created_at);
 -- Works for: WHERE status = 'pending'
--- Works for: WHERE status = 'pending' AND created_at > '2024-01-01'
--- Does NOT work for: WHERE created_at > '2024-01-01' alone
+-- Works for: WHERE status = 'pending' AND created_at > '2000-01-01'
+-- Does NOT work for: WHERE created_at > '2000-01-01' alone
 ```
 
 ### Choose Index Type by Query Pattern
