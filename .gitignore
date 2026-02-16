@@ -9,3 +9,4 @@ Thumbs.db
 # Obsidian個人設定ファイル(各自の作業環境が異なるため)
 .obsidian/workspace.json
 .obsidian/appearance.json
+*.DS_Store

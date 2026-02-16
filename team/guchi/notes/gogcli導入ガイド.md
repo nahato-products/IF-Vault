@@ -1,7 +1,6 @@
 ---
+date: 2026-02-12
 tags: [tool, google-workspace, claude-code, setup, gogcli]
-created: 2026-02-12
-updated: 2026-02-12
 status: todo
 ---
 

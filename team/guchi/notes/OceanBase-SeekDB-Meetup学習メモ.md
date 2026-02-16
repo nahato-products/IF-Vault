@@ -1,3 +1,15 @@
+---
+date: 2026-02-05
+tags: [database, meetup, OceanBase, SeekDB]
+status: active
+---
+
+---
+date: 2026-02-05
+tags: [database, Meetup, OceanBase, SeekDB]
+status: active
+---
+
 # OceanBase & SeekDB Meetup ハンズオン学習メモ
 
 > [!NOTE]

@@ -93,7 +93,7 @@
 
 ## 技術メモ（notes/）
 
-- `team/guchi/notes/Claude-Code-Skills一覧.md` - インストール済みSkills一覧（48個）
+- `team/guchi/notes/Claude-Code-Skills一覧.md` - インストール済みSkills一覧（55個）
 - `team/guchi/notes/Claude-Code-Skills-カタログ.md` - Skills全カタログ（150+候補含む）
 - `team/guchi/notes/Qiita下書き-IT情報自動収集.md` - Qiita記事下書き
 - `team/guchi/notes/OceanBase-SeekDB-Meetup学習メモ.md` - Meetup学習メモ

@@ -1,3 +1,15 @@
+---
+date: 2026-01-28
+tags: [Obsidian, setup, チーム環境]
+status: done
+---
+
+---
+date: 2026-01-28
+tags: [Obsidian, 環境構築, setup]
+status: done
+---
+
 # プロジェクト: Obsidian環境構築
 
 ## 🎯 目標

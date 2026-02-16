@@ -1,3 +1,9 @@
+---
+date: 2026-02-03
+tags: [Dataview, Python, snippet]
+status: active
+---
+
 # Dataview検索のサンプル
 
 ## 📌 概要

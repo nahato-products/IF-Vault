@@ -1,0 +1,466 @@
+openapi: 3.0.3
+info:
+  title: ANSEM API
+  description: |
+    ANSEMインフルエンサー管理システムのREST API。
+    Moltbot（LINE Bot）およびWebUIからのアクセスを想定。
+  version: 0.1.0
+  contact:
+    name: guchi
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: 開発環境
+  - url: https://api.ansem.example.com/api/v1
+    description: 本番環境
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: influencers
+    description: インフルエンサー管理
+  - name: categories
+    description: カテゴリマスタ
+  - name: agents
+    description: エージェント（担当者）
+  - name: sns-accounts
+    description: SNSアカウント
+
+paths:
+  /influencers:
+    get:
+      tags: [influencers]
+      summary: インフルエンサー検索
+      description: 名前・ステータス・担当者でフィルタリング
+      operationId: searchInfluencers
+      parameters:
+        - name: q
+          in: query
+          description: 検索キーワード（名前の部分一致）
+          schema:
+            type: string
+          example: 田中
+        - name: status_id
+          in: query
+          description: ステータスID（1:有効, 9:削除済み）
+          schema:
+            type: integer
+        - name: agent_id
+          in: query
+          description: 担当エージェントID
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: 検索結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 45
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InfluencerSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [influencers]
+      summary: インフルエンサー新規登録
+      operationId: createInfluencer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InfluencerCreate"
+      responses:
+        "201":
+          description: 登録完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfluencerDetail"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /influencers/{influencer_id}:
+    get:
+      tags: [influencers]
+      summary: インフルエンサー詳細取得
+      operationId: getInfluencer
+      parameters:
+        - $ref: "#/components/parameters/InfluencerId"
+      responses:
+        "200":
+          description: 詳細情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfluencerDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [influencers]
+      summary: インフルエンサー更新
+      operationId: updateInfluencer
+      parameters:
+        - $ref: "#/components/parameters/InfluencerId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InfluencerUpdate"
+      responses:
+        "200":
+          description: 更新完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InfluencerDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: 楽観ロック競合（versionが一致しない）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /influencers/{influencer_id}/status:
+    patch:
+      tags: [influencers]
+      summary: ステータス変更
+      description: Moltbotからのステータス変更に使用
+      operationId: updateInfluencerStatus
+      parameters:
+        - $ref: "#/components/parameters/InfluencerId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status_id]
+              properties:
+                status_id:
+                  type: integer
+                  description: "1:有効, 2:休止, 9:削除済み"
+                  example: 2
+      responses:
+        "200":
+          description: 変更完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  influencer_id:
+                    type: integer
+                  previous_status_id:
+                    type: integer
+                  new_status_id:
+                    type: integer
+
+  /influencers/{influencer_id}/sns-accounts:
+    get:
+      tags: [sns-accounts]
+      summary: SNSアカウント一覧
+      operationId: getInfluencerSnsAccounts
+      parameters:
+        - $ref: "#/components/parameters/InfluencerId"
+      responses:
+        "200":
+          description: SNSアカウント一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SnsAccount"
+
+  /categories:
+    get:
+      tags: [categories]
+      summary: カテゴリ一覧
+      operationId: listCategories
+      responses:
+        "200":
+          description: カテゴリ一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /agents:
+    get:
+      tags: [agents]
+      summary: エージェント一覧
+      operationId: listAgents
+      parameters:
+        - name: active_only
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: エージェント一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Agent"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API Key（サービス間認証）
+
+  parameters:
+    InfluencerId:
+      name: influencer_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1234
+
+  responses:
+    Unauthorized:
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: リソースが見つからない
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                    message:
+                      type: string
+
+  schemas:
+    InfluencerSummary:
+      type: object
+      properties:
+        influencer_id:
+          type: integer
+          example: 1234
+        influencer_name:
+          type: string
+          example: 田中太郎
+        status_id:
+          type: integer
+          example: 1
+        affiliation_type_id:
+          type: integer
+          example: 1
+        email_address:
+          type: string
+          example: tanaka@example.com
+        sns_accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              platform_name:
+                type: string
+                example: Instagram
+              account_name:
+                type: string
+                example: "@tanaka_t"
+
+    InfluencerDetail:
+      allOf:
+        - $ref: "#/components/schemas/InfluencerSummary"
+        - type: object
+          properties:
+            affiliation_name:
+              type: string
+              example: 株式会社ABC
+            compliance_check:
+              type: boolean
+            honorific:
+              type: string
+              example: 様
+            version:
+              type: integer
+              description: 楽観ロック用バージョン
+              example: 3
+            assignments:
+              type: array
+              items:
+                type: object
+                properties:
+                  agent_id:
+                    type: integer
+                  agent_name:
+                    type: string
+                  role_type:
+                    type: string
+                  is_active:
+                    type: boolean
+            categories:
+              type: array
+              items:
+                type: string
+              example: [美容, ファッション]
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+
+    InfluencerCreate:
+      type: object
+      required: [influencer_name]
+      properties:
+        influencer_name:
+          type: string
+          example: 佐藤美咲
+        affiliation_type_id:
+          type: integer
+          default: 2
+        affiliation_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        compliance_check:
+          type: boolean
+          default: false
+        honorific:
+          type: string
+          default: 様
+        sns_accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              platform_id:
+                type: integer
+              account_url:
+                type: string
+        category_ids:
+          type: array
+          items:
+            type: integer
+
+    InfluencerUpdate:
+      type: object
+      required: [version]
+      properties:
+        influencer_name:
+          type: string
+        affiliation_type_id:
+          type: integer
+        affiliation_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        compliance_check:
+          type: boolean
+        honorific:
+          type: string
+        version:
+          type: integer
+          description: 楽観ロック用。現在のversionを送信
+
+    SnsAccount:
+      type: object
+      properties:
+        account_id:
+          type: integer
+        platform_id:
+          type: integer
+        platform_name:
+          type: string
+          example: Instagram
+        account_url:
+          type: string
+          example: https://instagram.com/tanaka_t
+        account_name:
+          type: string
+          example: "@tanaka_t"
+        follower_count:
+          type: integer
+
+    Category:
+      type: object
+      properties:
+        category_id:
+          type: integer
+        category_name:
+          type: string
+          example: 美容
+        parent_category_id:
+          type: integer
+          nullable: true
+
+    Agent:
+      type: object
+      properties:
+        agent_id:
+          type: integer
+        agent_name:
+          type: string
+        department_name:
+          type: string
+        status_id:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: リソースが見つかりません
+        code:
+          type: string
+          example: NOT_FOUND

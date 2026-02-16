@@ -1,3 +1,15 @@
+---
+date: 2026-02-03
+tags: [Obsidian, guide, 使い方]
+status: active
+---
+
+---
+date: 2026-02-03
+tags: [Obsidian, ガイド, 使い方]
+status: active
+---
+
 # 📚 Obsidian使い方ガイド（guchi用）
 
 ## 🚀 はじめに
