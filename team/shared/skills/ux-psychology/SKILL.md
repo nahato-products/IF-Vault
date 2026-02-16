@@ -1,22 +1,15 @@
 ---
 name: ux-psychology
-description: Guides UI/UX design and implementation using cognitive psychology principles, Nielsen's heuristics, and anti-patterns. Covers AI UX and neurodiversity. Use when designing, implementing, fixing, or improving UI components, forms, buttons, navigation, modals, dialogs, notifications, toasts, user flows, onboarding, error handling, validation, loading states, skeleton UI, empty states, responsive layouts, dashboards, data tables, search UI, design systems, dark mode, animations, accessibility, usability, AI features, or conducting UX reviews and audits.
-user-invocable: false
+description: Use when designing, evaluating, reviewing, auditing, or improving UI/UX with cognitive psychology, Nielsen heuristics, and Gestalt laws. Apply to diagnose usability issues, validate information architecture, optimize form validation, structure navigation, design onboarding, craft micro-copy, build AI chat interfaces, plan notifications, and assess neurodiversity. Covers cognitive load, Hick's Law, progressive disclosure, Doherty threshold, Fitts's Law, peak-end rule, default bias, reactance, labor illusion, dark patterns, dashboards, data tables, modals, and search UI. Provides the psychological WHY while web-design-guidelines covers WCAG/aria and micro-interaction-patterns covers animation.
 ---
 
 # UX for App Development
 
 ## When to Apply
 
-以下のいずれかに該当するとき自動適用:
-
-- UIコンポーネント・レイアウトの設計・実装（フォーム、ボタン、ナビ、モーダル、通知、テーブル、ダッシュボード等）
-- ユーザーフロー・状態管理UI（オンボーディング、ローディング、エラー、空状態等）
-- バリデーション・フィードバック・エラーメッセージ設計
-- レスポンシブ・アクセシビリティ・ニューロダイバーシティ対応
-- デザインシステム・テーマ・色設計・タイポグラフィ・アニメーション
-- AI機能の設計・実装（チャットUI、レコメンド、生成機能、ストリーミング応答）
-- UIコードレビュー・UXレビュー
+- UI設計・実装・レビュー全般（コンポーネント、フロー、バリデーション、レスポンシブ）
+- AI機能のUX設計（チャットUI、レコメンド、ストリーミング応答）
+- ニューロダイバーシティ・アクセシビリティの認知面での対応
 
 ## When NOT to Apply
 
@@ -29,6 +22,18 @@ user-invocable: false
 - API設計（エンドポイント・レスポンス構造のみ）
 - パフォーマンス最適化（描画・レンダリング以外）
 
+## 他スキルとの棲み分け
+
+| スキル | このスキルの役割 | そのスキルの役割 |
+|--------|----------------|----------------|
+| web-design-guidelines | 認知心理学の「なぜ」+ ニューロダイバーシティ | WCAG準拠・aria・セマンティックHTMLの「どう」 |
+| micro-interaction-patterns | UX原則と心理学的根拠（なぜその状態遷移が必要か） | 実装パターン（Framer Motion、Suspense、状態管理コード） |
+| dashboard-data-viz | 認知負荷・パレートの法則の判断基準 | TanStack Table・Recharts等の具体的実装 |
+| testing-strategy | ユーザビリティ観点のテスト基準（何をテストすべきか） | Playwright等のテスト実装コード |
+| error-handling-logging | ユーザー向けエラーメッセージの心理学的設計 | error.tsx境界・ログ・Sentryの技術実装 |
+| natural-japanese-writing | UXライティングの認知原則（明確性・簡潔性） | 日本語の自然さ・AI臭排除の文体ルール |
+| security-review | 意図的摩擦の設計判断（どこに確認を入れるか） | 脆弱性検出・OWASP技術レビュー |
+
 ---
 
 ## Part 1: 認知と情報設計 [CRITICAL]
@@ -37,8 +42,8 @@ user-invocable: false
 
 ワーキングメモリには限界がある。1画面の情報量を減らせ。
 
-- 1画面の選択肢は5個以下
-- 関連情報をチャンク（塊）にまとめる → #16 ゲシュタルト原則
+- 1画面の選択肢は5個以下（Cowan 2001: ワーキングメモリは約4チャンク）
+- 関連情報をチャンク（塊）にまとめる
 - 入力フォームは論理グループに分割する
 - 視覚的ノイズ（装飾、不要なボーダー、過剰な色数）を削る
 - ステップ形式の操作では進捗インジケーターを出す
@@ -74,7 +79,6 @@ user-invocable: false
 
 人は関心のあるものしか見ない。重要な情報を見落とさせない設計。
 
-- 確認ダイアログの破壊的操作ボタンは赤、キャンセルはニュートラル
 - 視線の流れ（F型、Z型）に沿って重要要素を配置
 - 空白を使って重要な要素を浮かせる
 
@@ -98,12 +102,10 @@ user-invocable: false
 
 ユーザーは他アプリで大半の時間を過ごす。同じように動くことを期待する。
 
-- 一般的なUIパターンに従う（ロゴは左上、検索は右上、設定は歯車アイコン）
 - 業界標準のレイアウトパターンに従う（ECならカート→決済の一般的なフロー）
 - ログイン画面は「メール＋パスワード」が上、ソーシャルログインが下
 - 大幅なUIリニューアルは段階的に行う
 - プラットフォーム標準に従う（iOS/Android/Webの慣習）
-- ボタンの色・サイズ・配置・用語は全画面で統一
 
 ---
 
@@ -123,8 +125,8 @@ user-invocable: false
 裏側の処理が見えると価値を感じる。
 
 - 検索結果表示前に「〇〇件をスキャン中...」のアニメーション
-- AI生成で「分析中...最適な提案を作成中...」のステップ表示
-- 即座に結果が出ても数秒の演出で信頼度が上がるケースがある
+- 即座に結果が出ても数秒の演出で価値を感じさせるケースがある
+- AI機能での活用は → #28
 
 ### 11. リアクタンス
 
@@ -237,7 +239,7 @@ user-invocable: false
 
 ### H1. システム状態の可視性
 
-システムが今何をしているかを常にユーザーに伝える。→ #9 ドハティ閾値
+システムが今何をしているかを常にユーザーに伝える。
 
 - 「保存しました」「送信完了」のフィードバック
 - ネットワーク状態の表示（オフライン時の通知）
@@ -255,7 +257,7 @@ user-invocable: false
 
 ### H4. 一貫性と標準
 
-ボタン、色、用語、配置を全画面で統一。プラットフォーム標準に従う。→ #8
+ボタン、色、用語、配置を全画面で統一。プラットフォーム標準に従う。
 
 ### H5. エラー防止 → #14 意図的摩擦
 
@@ -281,7 +283,7 @@ user-invocable: false
 
 ### H8. 美的で最小限のデザイン
 
-不要な情報やノイズを排除。ユーザーの目的に直接関係する要素だけ残す。→ #24
+不要な情報やノイズを排除。ユーザーの目的に直接関係する要素だけ残す。
 
 ### H9. エラー回復の支援
 
@@ -304,7 +306,7 @@ user-invocable: false
 
 ターゲットが大きく、近いほどクリックしやすい。
 
-- タップターゲットは最低44x44px（モバイル）、デスクトップは24x24px以上（WCAG 2.5.8）を目安に32x32px推奨
+- タップターゲットは最低44x44px（WCAG 2.5.5 Level AAA）/ 44x44pt（iOS HIG）、デスクトップは最低24x24px（WCAG 2.5.8 Level AA）
 - CTAボタンは大きく、画面の到達しやすい位置に
 - 関連するアクションボタンは近接配置
 
@@ -381,22 +383,9 @@ AIは間違える前提で設計する。ユーザーが常に最終決定権を
 
 ---
 
-## Part 8: アクセシビリティ [CRITICAL]
+## Part 8: ニューロダイバーシティ [CRITICAL]
 
-- コントラスト比: テキストは4.5:1以上、大きなテキスト（18pt以上/14pt太字以上）は3:1以上
-- キーボード操作: 全機能がキーボードだけで操作可能
-- フォーカスインジケーター: Tab移動時にフォーカス位置が明確
-- alt属性: 装飾画像は`alt=""`、意味のある画像は説明文
-- セマンティックHTML: div連打禁止。`<nav>`, `<main>`, `<section>`, `<button>` を正しく使う
-- aria属性: `aria-label`, `aria-describedby`, `aria-live`を適切に設定
-- `prefers-reduced-motion`: アニメーションを控えるメディアクエリ対応
-- `prefers-color-scheme`: ダークモード対応
-- スクリーンリーダー: 非表示テキストで補足（`sr-only`クラス）
-- エラー表示は色だけに頼らない（アイコン+テキスト併用）
-
-### ニューロダイバーシティ対応
-
-WCAG準拠+認知多様性対応。
+技術的なアクセシビリティ実装（WCAG準拠、aria属性、セマンティックHTML、コントラスト比、キーボード操作等）は web-design-guidelines を参照。このスキルでは認知多様性の観点から補足する。
 
 - **ADHD**: 通知・ポップアップは最小限に。フォーカスモード提供。タスクを小さなステップに分割 → #1
 - **ディスレクシア**: 左揃え統一（中央揃え・両端揃え避ける）。行間1.5以上。1行60文字以下

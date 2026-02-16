@@ -2,7 +2,7 @@
 
 guchiが作成・最適化した Claude Code Skills のセットアップと使い方。Claude Codeを使うメンバー全員が対象。
 
-全スキルは skill-forge の10項目100点レビューで品質担保済み（全項目9+/10）。
+全スキルは skill-forge の10項目100点レビューで品質担保済み（全24スキル 100/100 達成）。
 
 ## 共有スキル一覧
 
@@ -10,20 +10,20 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | Skill | 何をしてくれるか | 発火タイミング | スコア |
 |-------|----------------|--------------|--------|
-| ux-psychology | UIの品質を心理学ベースでチェック・提案 | UI作業で自動 | 90/100 |
-| natural-japanese-writing | 日本語ドキュメントからAI臭を排除 | Markdown執筆で自動 | 93/100 |
-| ansem-db-patterns | PostgreSQL DB設計パターンをガイド | DB設計で自動 | 86/100 |
+| ux-psychology | UIの品質を心理学ベースでチェック・提案 | UI作業で自動 | 100/100 |
+| natural-japanese-writing | 日本語ドキュメントからAI臭を排除 | Markdown執筆で自動 | 100/100 |
+| ansem-db-patterns | PostgreSQL DB設計パターンをガイド | DB設計で自動 | 100/100 |
 
 ### Tier 2: 開発者向け推奨
 
 | Skill | 何をしてくれるか | 発火タイミング | スコア |
 |-------|----------------|--------------|--------|
-| typescript-best-practices | TypeScript設計パターンをガイド | TS/JSファイル操作時 | 91/100 |
-| testing-strategy | TDD・テスト品質・Playwrightをガイド | テスト作業時 | 90/100 |
-| systematic-debugging | 4フェーズのデバッグ手順を強制 | バグ発生時 | 93/100 |
-| error-handling-logging | Next.jsのエラーハンドリングをガイド | エラー処理実装時 | 90/100 |
-| security-review | セキュリティ脆弱性を体系的にレビュー | `/security-review` で手動起動 | 90/100 |
-| supabase-auth-patterns | Supabase Auth・RLS設計をガイド | 認証実装時 | 90/100 |
+| typescript-best-practices | TypeScript設計パターンをガイド | TS/JSファイル操作時 | 100/100 |
+| testing-strategy | TDD・テスト品質・Playwrightをガイド | テスト作業時 | 100/100 |
+| systematic-debugging | 4フェーズのデバッグ手順を強制 | バグ発生時 | 100/100 |
+| error-handling-logging | Next.jsのエラーハンドリングをガイド | エラー処理実装時 | 100/100 |
+| security-review | セキュリティ脆弱性を体系的にレビュー | `/security-review` で手動起動 | 100/100 |
+| supabase-auth-patterns | Supabase Auth・RLS設計をガイド | 認証実装時 | 100/100 |
 
 全て手動操作なしで自動発火する（security-reviewのみ手動起動）。
 
@@ -41,8 +41,8 @@ guchiが作成・最適化した Claude Code Skills のセットアップと使�
 
 | ファイル | 行数 | 中身 |
 |---------|------|------|
-| SKILL.md | 397行 | 29原則+10ヒューリスティクス（8パート構成） |
-| reference.md | 408行 | UIパーツ設計、AI UX、アンチパターン集、チェックリスト |
+| SKILL.md | 399行 | 29原則+10ヒューリスティクス（8パート構成） |
+| reference.md | 534行 | UIパーツ設計、AI UX、アンチパターン集、チェックリスト |
 
 ---
 
@@ -65,8 +65,8 @@ AI生成テキストに共通する28の不自然パターンを検出・排除�
 
 | ファイル | 行数 | 中身 |
 |---------|------|------|
-| SKILL.md | 185行 | 28ルール(R1-R28)＋セルフチェック |
-| reference.md | 192行 | Before/After実例集、ジャンル別注意点 |
+| SKILL.md | 186行 | 28ルール(R1-R28)＋セルフチェック |
+| reference.md | 463行 | Before/After実例集、ジャンル別注意点 |
 
 ---
 
@@ -78,8 +78,8 @@ ANSEM 32テーブルの実践から抽出した23のPostgreSQL設計パターン
 
 | ファイル | 行数 | 中身 |
 |---------|------|------|
-| SKILL.md | 349行 | 23パターン（6パート構成） |
-| reference.md | 414行 | テンプレート6種、チェックリスト3種、アンチパターン集 |
+| SKILL.md | 334行 | 23パターン（6パート構成） |
+| reference.md | 394行 | テンプレート6種、チェックリスト3種、アンチパターン集 |
 
 ---
 
@@ -186,36 +186,36 @@ rm ~/.claude/skills/ux-psychology
 
 ## guchiが管理している全Skills
 
-全38個。自作24個＋コミュニティ14個。自作はすべて skill-forge の10項目レビューで90点以上に最適化済み。
+全38個。自作24個＋コミュニティ14個。自作はすべて skill-forge の10項目レビューで100点満点に最適化済み。
 
 ### 自作Skills全一覧（スコア順）
 
 | Skill | スコア | カテゴリ |
 |-------|--------|---------|
-| docker-expert | 97 | インフラ |
-| chrome-extension-dev | 95 | 開発 |
-| micro-interaction-patterns | 94 | UI |
-| mobile-first-responsive | 93 | UI |
-| systematic-debugging | 93 | 品質 |
-| natural-japanese-writing | 93 | ライティング |
-| nextjs-app-router-patterns | 92 | フレームワーク |
-| dashboard-data-viz | 92 | UI |
-| vercel-react-best-practices | 91 | パフォーマンス |
-| tailwind-design-system | 91 | UI |
-| typescript-best-practices | 91 | 開発 |
-| web-design-guidelines | 91 | UI |
-| ux-psychology | 90 | UX |
-| security-review | 90 | セキュリティ |
-| line-bot-dev | 90 | 開発 |
-| error-handling-logging | 90 | 品質 |
-| design-token-system | 90 | UI |
-| react-component-patterns | 90 | UI |
-| obsidian-power-user | 90 | ツール |
-| supabase-auth-patterns | 90 | 認証 |
-| testing-strategy | 90 | 品質 |
-| ci-cd-deployment | 90 | インフラ |
-| ansem-db-patterns | 86 | DB |
-| supabase-postgres-best-practices | 91 | DB |
+| ansem-db-patterns | 100 | DB |
+| chrome-extension-dev | 100 | 開発 |
+| ci-cd-deployment | 100 | インフラ |
+| dashboard-data-viz | 100 | UI |
+| design-token-system | 100 | UI |
+| docker-expert | 100 | インフラ |
+| error-handling-logging | 100 | 品質 |
+| line-bot-dev | 100 | 開発 |
+| micro-interaction-patterns | 100 | UI |
+| mobile-first-responsive | 100 | UI |
+| natural-japanese-writing | 100 | ライティング |
+| nextjs-app-router-patterns | 100 | フレームワーク |
+| obsidian-power-user | 100 | ツール |
+| react-component-patterns | 100 | UI |
+| security-review | 100 | セキュリティ |
+| supabase-auth-patterns | 100 | 認証 |
+| supabase-postgres-best-practices | 100 | DB |
+| systematic-debugging | 100 | 品質 |
+| tailwind-design-system | 100 | UI |
+| testing-strategy | 100 | 品質 |
+| typescript-best-practices | 100 | 開発 |
+| ux-psychology | 100 | UX |
+| vercel-react-best-practices | 100 | パフォーマンス |
+| web-design-guidelines | 100 | UI |
 
 ### Skillsの作り方
 
@@ -231,14 +231,14 @@ rm ~/.claude/skills/ux-psychology
 team/shared/skills/
 ├── README.md                          <- このファイル
 ├── ux-psychology/
-│   ├── SKILL.md                       <- 397行
-│   └── reference.md                   <- 408行
+│   ├── SKILL.md                       <- 399行
+│   └── reference.md                   <- 534行
 ├── natural-japanese-writing/
-│   ├── SKILL.md                       <- 185行
-│   └── reference.md                   <- 192行
+│   ├── SKILL.md                       <- 186行
+│   └── reference.md                   <- 463行
 └── ansem-db-patterns/
-    ├── SKILL.md                       <- 349行
-    └── reference.md                   <- 414行
+    ├── SKILL.md                       <- 334行
+    └── reference.md                   <- 394行
 ```
 
 > [!TIP]

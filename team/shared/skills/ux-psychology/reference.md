@@ -1,6 +1,6 @@
 # UX for App Development — Reference
 
-SKILL.md の補足資料。実装ガイド、コンポーネント別パターン、アンチパターン、チェックリスト、参考文献。
+SKILL.md の補足資料。実装ガイド、コンポーネント別パターン、アンチパターン、チェックリスト、クロスリファレンス、参考文献。
 
 ---
 
@@ -32,7 +32,7 @@ SKILL.md の補足資料。実装ガイド、コンポーネント別パター�
 
 ---
 
-## 色とタイポグラフィ
+## 色とタイポグラフィ → #15 視覚的階層
 
 ### 色の実装ルール
 
@@ -122,7 +122,7 @@ SKILL.md の補足資料。実装ガイド、コンポーネント別パター�
 
 ---
 
-## ダッシュボード・データビジュアライゼーション
+## ダッシュボード・データビジュアライゼーション → #1 認知負荷, #25 パレート
 
 ### チャートタイプの選択基準
 | データの性質 | 推奨チャート |
@@ -183,7 +183,7 @@ SKILL.md の補足資料。実装ガイド、コンポーネント別パター�
 
 ---
 
-## 検索UI
+## 検索UI → H6 再認 > 記憶
 
 ### インクリメンタルサーチ
 - 入力2〜3文字以上でサジェスト表示（デバウンス300ms）
@@ -205,7 +205,7 @@ SKILL.md の補足資料。実装ガイド、コンポーネント別パター�
 
 ---
 
-## モーダル設計
+## モーダル設計 → #14 意図的摩擦, H3 主導権
 
 ### サイズ
 - 小（確認ダイアログ）: 300-400px幅
@@ -231,6 +231,50 @@ SKILL.md の補足資料。実装ガイド、コンポーネント別パター�
 - `role="dialog"` または `role="alertdialog"`
 - `aria-labelledby` でタイトル参照
 - `aria-modal="true"`
+
+---
+
+## 状態遷移パターン
+
+全てのデータ表示UIは4つの状態を設計する。1つでも欠けると不完全。
+
+| 状態 | 表示内容 | 実装ポイント |
+|------|---------|-------------|
+| **Loading** | スケルトンUI or スピナー | コンテンツの形状を予測表示。400ms未満はスキップ可 → #9 |
+| **Success** | データ表示 | 初期表示後のリフレッシュは差分のみアニメーション |
+| **Error** | エラーメッセージ + リトライ | 「再読み込み」ボタン必須。エラー種別で文言変更 → H9 |
+| **Empty** | イラスト + CTA | 「まだデータがありません」+次のアクション案内 → #18 |
+
+### 遷移の注意点
+- Loading → Success: スケルトンからコンテンツへのフェードイン（100-200ms）
+- Loading → Error: スケルトンを即座にエラー表示に切り替え。フェードなし
+- Success → Loading（リフレッシュ）: 現在のデータを表示したままオーバーレイスピナー
+- Error → Loading（リトライ）: エラー表示をスケルトンに戻す
+
+---
+
+## マイクロコピーガイド → H9 エラー回復
+
+ボタンやメッセージの文言がUXを大きく左右する。
+
+### ボタンラベル
+| 悪い例 | 良い例 | 理由 |
+|--------|--------|------|
+| はい / いいえ | 保存する / 破棄する | 何をするかが明確 |
+| 送信 | 注文を確定する | 結果が予測できる |
+| OK | 了解 | 攻撃的に見えない |
+| キャンセル | 変更を破棄 | 何がキャンセルされるか明確 |
+
+### エラーメッセージ
+- **構造**: 何が起きたか + なぜか + どうすればいいか
+- 悪: 「エラーが発生しました」
+- 良: 「メールアドレスの形式が正しくありません。example@email.com の形式で入力してください」
+- 技術用語は使わない（「タイムアウト」→「通信に時間がかかりすぎました」）
+
+### 確認ダイアログ
+- タイトル: 「本当に削除しますか？」ではなく「この記事を削除しますか？」（何を削除するか明示）
+- 破壊的操作ボタン: 赤色 +「削除する」（動詞で終わる）
+- キャンセルボタン: ニュートラル色 +「キャンセル」（左配置）
 
 ---
 
@@ -332,15 +376,159 @@ UIコードレビュー時は以下の形式で出力する:
 
 ## 参考文献
 
-- Miller, G.A. (1956). "The Magical Number Seven, Plus or Minus Two"
-- Cowan, N. (2001). "The Magical Number 4 in Short-Term Memory"
-- Schwartz, B. (2004). *The Paradox of Choice*
-- Nielsen, J. (1994). "10 Usability Heuristics for User Interface Design"
-- Norman, D. (2013). *The Design of Everyday Things*
-- Krug, S. (2014). *Don't Make Me Think*
-- Fitts, P.M. (1954). "The Information Capacity of the Human Motor System"
-- Doherty, W.J. & Thadani, A.J. (1982). "The Economic Value of Rapid Response Time"
-- Buell, R.W. & Norton, M.I. (2011). "The Labor Illusion"
-- W3C (2023). "Web Content Accessibility Guidelines (WCAG) 2.2"
-- NN/g (2026). "State of UX 2026: Design Deeper to Differentiate"
+- Miller, G.A. "The Magical Number Seven, Plus or Minus Two"
+- Cowan, N. "The Magical Number 4 in Short-Term Memory"
+- Schwartz, B. *The Paradox of Choice*
+- Nielsen, J. "10 Usability Heuristics for User Interface Design"
+- Norman, D. *The Design of Everyday Things*
+- Krug, S. *Don't Make Me Think*
+- Fitts, P.M. "The Information Capacity of the Human Motor System"
+- Doherty, W.J. & Thadani, A.J. "The Economic Value of Rapid Response Time"
+- Buell, R.W. & Norton, M.I. "The Labor Illusion"
+- W3C. "Web Content Accessibility Guidelines (WCAG) 2.2"
 - Laws of UX — https://lawsofux.com
+
+---
+
+## 実プロジェクトで頻出するアンチパターン
+
+教科書に載らないが実務で繰り返し遭遇するパターン。
+
+| パターン | 症状 | 対策 |
+|---------|------|------|
+| 過剰な成功フィードバック | 小さな操作に毎回トースト。連続操作でストレス | 初回のみ明示、2回目以降は控えめアニメ。楽観的UI更新 |
+| 設定画面の墓場 | 使われない設定が肥大化。重要な設定が埋没 | 「基本」「高度」分離。変更率1%未満の項目は削除検討 |
+| チュートリアルの呪い | 5画面以上の強制オンボーディング。読まずにスキップ | 最大3画面。機能説明は使う場面でコーチマーク表示（JIT） → #18 |
+| エラーメッセージのガチャ | 同じエラーが箇所によって異なる文言 | エラーメッセージを中央管理。「次にやるべきこと」を1つ明記 → H9 |
+| 検索結果の砂漠 | 0件で「該当なし」のみ。行動できず離脱 | 条件緩和した結果表示。「もしかして:」提案 |
+| ハンバーガー依存症 | 重要機能を全て隠す。存在に気づかない | 上位3機能はタブバーに常時表示 → #25 |
+| 無限スクロールの罠 | フッター情報に永遠に到達不能 | フッターはサイドバーか固定メニュー内に配置 |
+| 通知許可の早期要求 | 価値を理解する前にブロックされる | 通知が必要な具体的場面まで遅延。プリパーミッション説明 → #11 |
+| フォームの完璧主義 | 登録時に10項目以上要求。離脱率80%超 | 初回は最小限。追加情報は「後で入力」を許可 → #12 |
+| ダークパターンの後遺症 | 過去のダークパターンで信頼喪失が残り続ける | 改善を開示。解約ボタンを目立つ位置に配置 |
+
+---
+
+## クロスリファレンスガイド
+
+このスキルの原則を他スキルと組み合わせて適用するケース。非自明な接続に注目。
+
+### testing-strategy との接続
+
+UX原則はテスト設計の判断基準になる。
+
+| UX原則 | テスト観点 | 具体例 |
+|--------|-----------|--------|
+| #9 ドハティ閾値 | パフォーマンステスト | Playwright で `page.waitForSelector` の応答が400ms以内か計測 |
+| #14 意図的摩擦 | E2Eフロー | 破壊的操作に確認ダイアログが出ることを検証 |
+| H5 エラー防止 | バリデーションテスト | 不正入力でフォームが送信されないことを確認 |
+| H9 エラー回復 | エラーパステスト | エラーメッセージが表示され、リトライで復帰できることを検証 |
+| #13 ポステルの法則 | 入力バリエーション | 全角/半角、ハイフン有無のパターンを網羅テスト |
+
+### systematic-debugging との接続
+
+UX問題のデバッグは通常のバグと異なるアプローチが必要。
+
+- **再現手順の特殊性**: UXバグは「ユーザーが混乱する」という主観的事象。録画 + ヒートマップデータで再現性を確保
+- **パターン分析**: 離脱率が高いページ → 認知負荷 (#1) か選択肢過多 (#2) を疑う
+- **仮説検証**: A/Bテストで1変数ずつ変更。UX改善の効果を定量計測
+
+### error-handling-logging との接続
+
+エラーハンドリングの技術実装に心理学的設計を注入する。
+
+- `error.tsx` のUI設計 → H9 エラー回復の原則を適用（修正方法を含める）
+- ログのエラー分類 → ユーザー向けメッセージとの対応表を作る
+- Sentryアラート → ユーザー影響度（認知負荷への影響）で優先度付け
+
+### security-review との接続
+
+セキュリティ要件とUXの摩擦バランス。
+
+- 認証フロー: 安全性を保ちつつ認知負荷を下げる（パスワードレス認証、Magic Link）
+- CSRF対策のトークン → ユーザーに見せない（H8 美的で最小限）
+- レート制限 → ユーザーに残り回数を事前表示して #11 リアクタンスを防ぐ
+
+### natural-japanese-writing との接続
+
+UXライティングの日本語品質。
+
+- エラーメッセージ: 技術用語排除 + 自然な日本語で「何が起きたか + どうすればいいか」
+- ボタンラベル: 動詞で終わる（「保存する」「削除する」）。AI臭い「〜してください」を避ける
+- マイクロコピー: ユーザーの感情状態を考慮した語調選択
+
+### tailwind-design-system / design-token-system との接続
+
+デザイントークンがUX原則を体現する。
+
+- 色トークン: 意味的色（success/error/warning）→ 本スキルの色の実装ルールと一致させる
+- スペーシングトークン: ゲシュタルト近接の原則を数値化（関連要素の間隔 < グループ間の間隔）
+- タイポグラフィトークン: 視覚的階層の1.25倍比を `--font-size-*` に反映
+
+### line-bot-dev との接続
+
+LINE Bot / LIFF のUX設計。
+
+- Flex Message: 認知負荷 (#1) を考慮して情報量を制限（1メッセージ3アクション以下）
+- リッチメニュー: 系列位置効果 (#6) で左端・右端に最重要機能を配置
+- クイックリプライ: Hick's Law (#2) で選択肢を5個以下に
+
+---
+
+## コード例: UX原則の実装パターン
+
+### 楽観的UI更新 (#9 ドハティ閾値)
+
+```tsx
+// Server Action + useOptimistic で即座にUIを更新
+function TodoList({ todos }: { todos: Todo[] }) {
+  const [optimisticTodos, addOptimistic] = useOptimistic(
+    todos,
+    (state, newTodo: Todo) => [...state, newTodo]
+  );
+
+  async function addTodo(formData: FormData) {
+    const todo = { id: crypto.randomUUID(), title: formData.get("title") as string };
+    addOptimistic(todo); // 即座にUI反映
+    await createTodo(todo); // サーバー処理は裏で実行
+  }
+  // ...
+}
+```
+
+### 入力の寛容性 (#13 ポステルの法則)
+
+```ts
+// ユーザー入力を内部で正規化
+function normalizePhone(input: string): string {
+  return input
+    .replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[^\d]/g, "");
+}
+
+function normalizeEmail(input: string): string {
+  return input.trim().toLowerCase();
+}
+```
+
+### 確認ダイアログ (#14 意図的摩擦)
+
+```tsx
+// 破壊的操作の確認: 対象名を明示 + タイプ入力
+function DeleteConfirmDialog({ itemName, onConfirm }: Props) {
+  const [typed, setTyped] = useState("");
+  const canDelete = typed === itemName;
+
+  return (
+    <Dialog>
+      <DialogTitle>「{itemName}」を削除しますか？</DialogTitle>
+      <p>この操作は取り消せません。確認のため「{itemName}」と入力してください。</p>
+      <Input value={typed} onChange={(e) => setTyped(e.target.value)} />
+      <DialogActions>
+        <Button variant="ghost">キャンセル</Button>
+        <Button variant="destructive" disabled={!canDelete}>削除する</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+```

@@ -1,10 +1,10 @@
 # ansem-db-patterns — Reference
 
-SKILL.md の補足資料。テンプレート、DDLサンプル、チェックリスト、アンチパターン。
+SKILL.md の補足資料。DDLテンプレート、実装サンプル、チェックリスト、アンチパターン。
 
 ---
 
-## テーブル設計テンプレート
+## DDLテンプレート集 [CRITICAL]
 
 ### マスタテーブル
 
@@ -78,12 +78,10 @@ CREATE TABLE t_{a}_{b} (
 CREATE TABLE t_daily_{metric}_details (
   detail_id BIGINT GENERATED ALWAYS AS IDENTITY,
   action_date DATE NOT NULL,
-  -- 次元カラム（NOT NULL + FK、DEFAULTなし）
   partner_id BIGINT NOT NULL,
-  partner_name TEXT NOT NULL,       -- スナップショット
-  -- 集計値（NOT NULL DEFAULT 0）
+  partner_name TEXT NOT NULL,       -- スナップショット（#15）
   count_value INTEGER NOT NULL DEFAULT 0,
-  created_by BIGINT NOT NULL DEFAULT 1,  -- システム管理者
+  created_by BIGINT NOT NULL DEFAULT 1,
   updated_by BIGINT NOT NULL DEFAULT 1,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -98,7 +96,7 @@ CREATE TABLE t_daily_{metric}_details (
 ```sql
 CREATE TABLE t_{feature} (
   {feature}_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  entity_type TEXT NOT NULL,   -- 'influencer', 'partner', etc.
+  entity_type TEXT NOT NULL,
   entity_id BIGINT NOT NULL,
   -- 業務カラム
   created_by BIGINT NOT NULL,
@@ -112,9 +110,7 @@ CREATE INDEX idx_{feature}_entity ON t_{feature}(entity_type, entity_id);
 
 ---
 
-## updated_at 自動更新トリガー
-
-全テーブルに適用するトリガーテンプレート。
+## updated_at 自動更新トリガー [CRITICAL]
 
 ```sql
 -- 関数（1回だけ作成）
@@ -137,17 +133,16 @@ CREATE TRIGGER trg_{table}_updated_at
 
 ---
 
-## パーティション作成テンプレート
+## パーティション作成テンプレート [HIGH]
 
 ### 年次パーティション
 
 ```sql
--- 作成
 CREATE TABLE t_daily_performance_details_2025
   PARTITION OF t_daily_performance_details
   FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
 
--- デタッチ（アーカイブ用）
+-- アーカイブ
 ALTER TABLE t_daily_performance_details
   DETACH PARTITION t_daily_performance_details_2022;
 ```
@@ -184,7 +179,7 @@ $$ LANGUAGE plpgsql;
 
 ---
 
-## 楽観ロック実装パターン
+## 楽観ロック実装パターン [HIGH]
 
 ```sql
 -- テーブル定義
@@ -200,7 +195,65 @@ WHERE influencer_id = $2 AND version = $3;
 
 ---
 
-## チェックリスト
+## UPSERT パターン集 [HIGH]
+
+### 基本UPSERT（日次集計投入）
+
+```sql
+INSERT INTO t_daily_performance_details
+  (action_date, partner_id, site_id, partner_name, site_name, cv_count)
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT (action_date, partner_id, site_id)
+DO UPDATE SET
+  cv_count = EXCLUDED.cv_count,
+  partner_name = EXCLUDED.partner_name,
+  site_name = EXCLUDED.site_name,
+  updated_at = CURRENT_TIMESTAMP;
+```
+
+### バルクUPSERT
+
+```sql
+INSERT INTO m_influencers (influencer_name, affiliation_type_id, email_address, created_by, updated_by)
+VALUES
+  ($1, $2, $3, $4, $4),
+  ($5, $6, $7, $8, $8)
+ON CONFLICT (influencer_id) DO NOTHING;
+```
+
+### 条件付きUPSERT
+
+```sql
+INSERT INTO t_unit_prices (influencer_id, price, start_at, created_by, updated_by)
+VALUES ($1, $2, $3, $4, $4)
+ON CONFLICT (influencer_id, start_at)
+DO UPDATE SET price = EXCLUDED.price
+WHERE t_unit_prices.updated_at < EXCLUDED.updated_at;
+```
+
+---
+
+## FK削除ポリシー判断フローチャート [HIGH]
+
+```
+子データに独立した価値がある？
+├─ YES → RESTRICT
+│   例: SNSアカウント（実績紐付き）、集計データ
+└─ NO
+    ├─ 親子が1対1か、親なしで意味なし？
+    │   ├─ YES → CASCADE
+    │   │   例: IF→住所、IF→口座、IF→セキュリティ
+    │   └─ NO
+    │       └─ 参照がNULLABLEで任意？
+    │           ├─ YES → SET NULL
+    │           │   例: パートナー→IF兼業（optional）
+    │           └─ NO → RESTRICT（安全側に倒す）
+    └─
+```
+
+---
+
+## チェックリスト [CRITICAL]
 
 ### テーブル設計チェック
 
@@ -208,12 +261,12 @@ WHERE influencer_id = $2 AND version = $3;
 - [ ] PK: `{entity}_id` + BIGINT GENERATED ALWAYS AS IDENTITY
 - [ ] データ型: 文字列は全てTEXT、日時は全てTIMESTAMPTZ
 - [ ] 監査カラム: created_by, updated_by, created_at, updated_at
-- [ ] FK制約: 全外部キーに制約あり
-- [ ] FK削除: RESTRICT/CASCADE/SET NULLの判断が明確
+- [ ] FK制約: 全外部キーに制約あり + 削除ポリシー明示
 - [ ] NULL: 必須カラムに NOT NULL、任意カラムのみNULLABLE
 - [ ] BOOLEAN: `is_` プレフィックス + NOT NULL + DEFAULT
-- [ ] インデックス: 全FK、頻出検索条件、複合検索
+- [ ] インデックス: 全FK + 頻出検索条件
 - [ ] コメント: テーブルと主要カラムにCOMMENT ON
+- [ ] 制約命名: fk_/idx_/uq_/chk_ プレフィックス
 
 ### 集計テーブルチェック
 
@@ -233,13 +286,13 @@ WHERE influencer_id = $2 AND version = $3;
 
 ---
 
-## アンチパターン集
+## アンチパターン集 [HIGH]
 
 ### データ型
 
-| パターン | 問題 | 対策 |
+| やりがち | 問題 | 正解 |
 |----------|------|------|
-| VARCHAR(255)乱用 | 根拠のない長さ制限、ALTER地獄 | TEXT統一 |
+| VARCHAR(255)乱用 | 根拠のない長さ制限 | TEXT統一 |
 | TIMESTAMP without TZ | タイムゾーン問題 | TIMESTAMPTZ統一 |
 | FLOAT/DOUBLEで金額 | 浮動小数点誤差 | DECIMAL(12, 0) |
 | INTEGERでID | 21億で枯渇 | BIGINT |
@@ -247,35 +300,35 @@ WHERE influencer_id = $2 AND version = $3;
 
 ### 命名
 
-| パターン | 問題 | 対策 |
+| やりがち | 問題 | 正解 |
 |----------|------|------|
 | プレフィックスなし | テーブルの性質が不明 | m_/t_ プレフィックス |
-| キャメルケース | PostgreSQLはダブルクォート必須に | スネークケース統一 |
+| キャメルケース | ダブルクォート必須に | スネークケース統一 |
 | 略語乱用 | 可読性低下 | フルスペル推奨 |
 | id だけのPK | JOINで曖昧 | {entity}_id |
 
 ### 制約
 
-| パターン | 問題 | 対策 |
+| やりがち | 問題 | 正解 |
 |----------|------|------|
 | FK制約なし | データ不整合 | 全FKに制約必須 |
 | 全部CASCADE | 意図しない連鎖削除 | RESTRICTをデフォルトに |
-| 全部SET NULL | 孤児レコード | 用途に応じて使い分け |
 | NULL許容しすぎ | 三値論理の罠 | 業務必須はNOT NULL |
+| 制約名なし | ALTER/DROPで困る | fk_/chk_/uq_ 命名 |
 
 ### 設計
 
-| パターン | 問題 | 対策 |
+| やりがち | 問題 | 正解 |
 |----------|------|------|
 | 物理削除 | データ復旧不能 | status_idでソフトデリート |
 | updated_at手動更新 | 更新漏れ | トリガーで自動化 |
-| 監査カラムなし | 誰がいつ変えたか不明 | 全テーブルに4カラム必須 |
+| 監査カラムなし | 誰がいつ変えたか不明 | 4カラム必須 |
 | 集計をJOINで毎回計算 | パフォーマンス劣化 | スナップショット方式 |
 | パーティションなし | 大規模テーブルの性能劣化 | RANGE パーティション |
 
 ---
 
-## DDLファイル構成
+## DDLファイル構成 [MEDIUM]
 
 実行順序が重要。FK依存を考慮して番号順に実行する。
 
@@ -287,34 +340,55 @@ WHERE influencer_id = $2 AND version = $3;
 | 004_create_triggers.sql | 更新トリガー | 001 |
 | 005_create_partitions.sql | パーティション | 001 |
 
-この5ファイル構成で、テーブル作成から運用準備まで一気通貫で実行できる。
-
 ---
 
-## FK削除ポリシー判断フローチャート
+## マイグレーション手順 [HIGH]
 
-```
-子データに独立した価値がある？
-├─ YES → RESTRICT
-│   例: SNSアカウント（キャンペーン実績紐付き）
-│       担当割当（履歴として保持）
-│       集計データ（消したら終わり）
-└─ NO
-    ├─ 親子が1対1か、親なしで意味なし？
-    │   ├─ YES → CASCADE
-    │   │   例: IF→住所、IF→口座、IF→セキュリティ
-    │   └─ NO
-    │       └─ 参照がNULLABLEで任意？
-    │           ├─ YES → SET NULL
-    │           │   例: パートナー→IF兼業（optional）
-    │           └─ NO → RESTRICT（安全側に倒す）
-    └─
+### カラム追加
+
+```sql
+-- 1. NULLABLEで追加（ロックなし）
+ALTER TABLE m_influencers ADD COLUMN nickname TEXT;
+
+-- 2. デフォルト値付きで追加（PG11以降ロックなし）
+ALTER TABLE m_influencers ADD COLUMN is_verified BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 3. NOT NULL + デフォルトなし（既存データの更新が先）
+ALTER TABLE m_influencers ADD COLUMN nickname TEXT;
+UPDATE m_influencers SET nickname = influencer_name WHERE nickname IS NULL;
+ALTER TABLE m_influencers ALTER COLUMN nickname SET NOT NULL;
 ```
 
----
+### カラム型変更
 
-## 参考文献
+```sql
+-- SMALLINT→INTEGERは安全、INTEGER→SMALLINTはデータ次第で失敗
+ALTER TABLE m_influencers ALTER COLUMN status_id TYPE INTEGER;
+```
 
-- PostgreSQL公式ドキュメント: https://www.postgresql.org/docs/current/
-- Supabase Postgres Best Practices（Skills連携）
-- ANSEM プロジェクト設計書: team/guchi/projects/If-DB/
+### VARCHAR→TEXT移行
+
+```sql
+-- メタデータのみ変更。テーブルREWRITE不要で即完了
+ALTER TABLE m_influencers ALTER COLUMN influencer_name TYPE TEXT;
+-- 長さチェックが必要ならCHECK制約で
+ALTER TABLE m_influencers ADD CONSTRAINT chk_name_length CHECK (length(influencer_name) <= 200);
+```
+
+### インデックス追加
+
+```sql
+-- CONCURRENTLY: テーブルロックなしで作成（本番推奨）
+-- 注意: トランザクション内では使えない
+CREATE INDEX CONCURRENTLY idx_influencers_email ON m_influencers(email_address);
+```
+
+### マイグレーションチェックリスト
+
+- [ ] ALTER TABLE はロックが必要か確認
+- [ ] 大テーブルのインデックス追加は CONCURRENTLY を使用
+- [ ] NOT NULL制約の追加はデフォルト値セットが先
+- [ ] FK追加は参照先テーブルにインデックスがあることを確認
+- [ ] 本番実行前にステージングで実行時間を測定
+- [ ] ロールバック手順を用意
+- [ ] マイグレーション前後のデータ整合性テストを用意 → `testing-strategy` 参照
