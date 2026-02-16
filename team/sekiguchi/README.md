@@ -28,7 +28,7 @@ limit 5
 
 | プロジェクト | ステータス | 概要 |
 |---|---|---|
-| [[team/guchi/projects/If-DB/ANSEM-プロジェクト全体サマリー\|ANSEM IF-DB]] | DB設計完了（v5.4.0）→ Phase 1実装待ち | インフルエンサー管理DB（32テーブル） |
+| [[ANSEM-プロジェクト全体サマリー\|ANSEM IF-DB]] | DB設計完了（v5.4.0）→ Phase 1実装待ち | インフルエンサー管理DB（32テーブル） |
 
 ### 最近のノート
 ```dataview
