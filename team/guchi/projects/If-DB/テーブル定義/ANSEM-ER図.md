@@ -231,23 +231,23 @@ COMMENT ON COLUMN t_addresses.address_type_id IS
 
 #### マスタテーブル（15テーブル）
 
-| # | テーブル名 | 日本語名 | 主な用途 |
-|---|-----------|---------|---------|
-| 1 | m_countries | 国マスタ | 国際化対応・ISO準拠 |
-| 2 | m_departments | 部署マスタ（階層） | 組織階層管理 |
-| 3 | m_categories | カテゴリマスタ（2階層） | IFのジャンル分類 |
-| 4 | m_agents | エージェント | 社内担当者管理 |
-| 5 | m_agent_role_types | エージェント役割 | 役割・権限定義 |
-| 6 | m_agent_security | エージェント認証 | パスワード・セッション管理 |
-| 7 | m_influencers | インフルエンサー | IFプロファイル管理 |
-| 8 | m_influencer_security | IF認証 | パスワード・セッション管理 |
-| 9 | m_ad_groups | 広告グループ | 広告の大分類 |
-| 10 | m_clients | クライアント | 広告主企業 |
-| 11 | m_ad_contents | 広告コンテンツ | 具体的な広告素材 |
-| 12 | m_partners | パートナー | ASP・広告配信パートナー |
-| 13 | m_partners_division | パートナー区分 | IF卸/トータルマーケ |
-| 14 | m_sns_platforms | SNSプラットフォーム | YouTube/Instagram等 |
-| 15 | m_campaigns | キャンペーン（加工用） | 案件管理 |
+| #   | テーブル名                 | 日本語名         | 主な用途               |
+| --- | --------------------- | ------------ | ------------------ |
+| 1   | m_countries           | 国マスタ         | 国際化対応・ISO準拠        |
+| 2   | m_departments         | 部署マスタ（階層）    | 組織階層管理             |
+| 3   | m_categories          | カテゴリマスタ（2階層） | IFのジャンル分類          |
+| 4   | m_agents              | エージェント       | 社内担当者管理            |
+| 5   | m_agent_role_types    | エージェント役割     | 役割・権限定義            |
+| 6   | m_agent_security      | エージェント認証     | パスワード・セッション管理      |
+| 7   | m_influencers         | インフルエンサー     | IFプロファイル管理         |
+| 8   | m_influencer_security | IF認証         | パスワード・セッション管理      |
+| 9   | m_ad_groups           | 広告グループ       | 広告の大分類             |
+| 10  | m_clients             | クライアント       | 広告主企業              |
+| 11  | m_ad_contents         | 広告コンテンツ      | 具体的な広告素材           |
+| 12  | m_partners            | パートナー        | ASP・広告配信パートナー      |
+| 13  | m_partners_division   | パートナー区分      | IF卸/トータルマーケ        |
+| 14  | m_sns_platforms       | SNSプラットフォーム  | YouTube/Instagram等 |
+| 15  | m_campaigns           | キャンペーン（加工用）  | 案件管理               |
 
 #### トランザクションテーブル（16テーブル）
 
