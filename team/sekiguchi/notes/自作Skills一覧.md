@@ -1,345 +1,330 @@
 ---
-date: 2026-02-14
-tags: [Claude Code, Skills, 自作]
+date: 2026-02-17
+tags: [Claude Code, Skills, 自作, チーム共有]
 status: active
 ---
 
-# 自作Skills
+# 自作Skills 全24スキル
 
-10項目レビュー通過済みの4スキル。
+skill-forgeの10項目100点レビューで全スキル品質担保済み。全24スキルをIF-Vault `team/shared/skills/` でチーム共有化。
+
+skill-forgeはメタスキル（Skillsを作るSkills）なので共有対象外。個人環境のみ。
 
 ---
 
-## ux-psychology
+## Tier 1: 全員必須（6個）
 
-アプリ開発に特化したUX心理学スキル。UIを触る作業で自動発火する。
+日常で最も発火する基盤系。全メンバー必須。
 
-### 基本情報
+### ux-psychology
+
+UIを触る作業で自動発火する認知心理学ベースのUX設計スキル。
 
 | 項目 | 値 |
 |------|-----|
 | 発火方式 | 自動 |
-| SKILL.md | 410行 |
-| reference.md | 346行 |
-| 品質スコア | 100/100（自己レビュー）→ 88/100（再レビュー） |
+| SKILL.md | 400行 |
+| reference.md | 534行 |
 
-### v3.0 再レビュー結果
+29原則＋ニールセン10ヒューリスティクス＋AI UXパターン＋ニューロダイバーシティを8パートで構成。認知心理学の「なぜそうすべきか」に特化し、「どう実装するか」は他スキルに委譲。
 
-| 項目 | スコア | メモ |
-|------|--------|------|
-| Trigger Accuracy | 10 | キーワード網羅、誤発火なし |
-| Content Accuracy | 9 | 認知心理学の原則・数値が正確 |
-| Content Completeness | 10 | 全主要トピックカバー |
-| Token Efficiency | 8→9 | 自明な相互参照3件を削除して改善 |
-| Actionability | 10 | 具体的な数値で即実装可能 |
-| Structure | 10 | 優先度タグ、論理的パート分割 |
-| Cross-reference | 8→9 | 同上、自明な参照を削除 |
-| Spec Compliance | 10 | 全項目準拠 |
-| reference.md Quality | 10 | 実装詳細が充実 |
-| Differentiation | 4 | 既存UX知識ベースとの差別化が課題 |
+### natural-japanese-writing
 
-Differentiationは「認知心理+ニールセン+AI UX+ニューロダイバーシティ」の統合が独自性だが、個別の知識は汎用的。プロジェクト固有のアンチパターン実例を追加すれば改善できる。
+Markdown日本語文を書くとき自動発火。AI生成テキスト特有のパターンを排除する。
 
-### SKILL.md の構成
+| 項目 | 値 |
+|------|-----|
+| 発火方式 | 自動 |
+| SKILL.md | 187行 |
+| reference.md | 463行 |
 
-29原則と10ヒューリスティクスを8パートに分けている。
+R1-R28の28ルールを6パートに分類。全ルールにx(悪い例)→o(良い例)付き。reference.mdに全ルールのBefore/After集、AI臭スコアリング（5段階）、ジャンル別注意点を収録。187行で28ルールを収める驚異のトークン効率。
 
-| パート | 内容 | 重要度 |
-|--------|------|--------|
-| Part 1 | 認知と情報設計 | CRITICAL |
-| Part 2 | フィードバックと応答性 | CRITICAL |
-| Part 3 | 入力とバリデーション | HIGH |
-| Part 4 | フローと導線 | HIGH |
-| Part 5 | ニールセンの10ヒューリスティクス | CRITICAL |
-| Part 6 | 基本法則 | MEDIUM |
-| Part 7 | AI UXパターン | HIGH |
-| Part 8 | アクセシビリティ | CRITICAL |
+### ansem-db-patterns
 
-### reference.md の構成
+PostgreSQLのテーブル設計やDDL作成で自動発火。ANSEM 32テーブルの実践知を抽出。
 
-| カテゴリ | セクション |
-|----------|-----------|
-| UIパーツ設計 | フォーム、モーダル、通知とトースト、検索UI |
-| ビジュアル | 色とタイポグラフィ、レスポンシブとモバイル |
-| データ表示 | データテーブルとリスト、ダッシュボード |
-| AI | AIチャットUI |
-| 品質管理 | アンチパターン集、実装チェックリスト、UI Review Output Format |
-| 出典 | 参考文献 |
+| 項目 | 値 |
+|------|-----|
+| 発火方式 | 自動 |
+| SKILL.md | 334行 |
+| reference.md | 394行 |
 
-### いつ発火するか
+22パターンを6パートに分類。DDLテンプレート6種、FK削除ポリシー判断フロー、チェックリスト3種、アンチパターン集を収録。完全オリジナルの実践知で独自性が高い。
 
-フォーム、ボタン、ナビゲーション、モーダル、通知、テーブル、ダッシュボードなどUIコンポーネントの設計や実装で発火する。ローディングやエラー状態のような状態管理UI、AI機能のインターフェース設計、アクセシビリティ対応でも反応する。
+### typescript-best-practices
 
-バックエンドロジック、DB設計、CI/CD、テストコードでは発火しない。
+TypeScript型設計やコードレビューで自動発火。
 
-### ファイル配置
+| 項目 | 値 |
+|------|-----|
+| 発火方式 | 自動 |
+| SKILL.md | 307行 |
+| reference.md | 198行 |
 
-| 場所 | 用途 |
-|------|------|
-| `~/.claude/skills/ux-psychology/` | 個人環境 |
-| `team/shared/skills/ux-psychology/` | チーム共有用 |
+discriminated unions、branded types、exhaustive switch、Zod runtime validation等19パターンを6パートで構成。言語レベルの型パターンに特化し、フレームワーク固有の型は各専門スキルに委譲。
 
-### 開発経緯
+### systematic-debugging
 
-初版はマーケティング心理学22原則を含む745行の巨大スキルだった。マーケティング部分を削ってアプリ開発特化に絞り込み、NNGroup準拠のAI UXパターンとニューロダイバーシティ対応を追加。5並列レビューで事実誤認3件を修正し、トークン最適化で410行まで圧縮した。
+バグ診断や原因追跡で自動発火。4段階の根本原因調査プロセス。
+
+| 項目 | 値 |
+|------|-----|
+| 発火方式 | 自動 |
+| SKILL.md | 190行 |
+| reference.md | 184行 |
+
+Phase 1(調査)→Phase 2(パターン分析)→Phase 3(仮説検証)→Phase 4(修正検証)の4段階メソッド。git bisect、境界ロギング、単一変数仮説テスト、3回修正ルールを体系化。
+
+### error-handling-logging
+
+エラー境界やロギング設計で自動発火。Next.js App Router特化。
+
+| 項目 | 値 |
+|------|-----|
+| 発火方式 | 自動 |
+| SKILL.md | 316行 |
+| reference.md | 548行 |
+
+AppErrorクラス階層、error.tsx/global-error.tsx境界、構造化JSONロギング、Sentry連携、API標準エラーレスポンスを8セクションで構成。Decision Treeが入口にあり、どのパターンを使うべきか即座に判断できる。
 
 ---
 
-## skill-forge
+## Tier 2: 開発者推奨（10個）
 
-Skillsの作成、検索、取得、評価、最適化を行うメタスキル。`/skill-forge` で起動する。
+プロジェクト開発で頻繁に使う。担当領域に合わせて選択。
 
-### 基本情報
+### nextjs-app-router-patterns
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 494行 | 472行 | ルート設計・キャッシュ戦略決定時 |
+
+App Router 15のルーティング、データフェッチ、キャッシュ(ISR/PPR/use cache)、Suspense streaming、Server Actions、Middleware。500行ギリギリまで詰め込んだ最大級スキル。
+
+### react-component-patterns
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 461行 | 458行 | コンポーネント設計・リファクタリング時 |
+
+Compound components、asChild/Slot、CVAバリアント、React Hook Form + Zod + Server Actions、SC/CC境界設計。コンポーネントの「内部設計」に特化。
+
+### tailwind-design-system
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 495行 | 1092行 | Tailwindユーティリティ・バリアント構築時 |
+
+Tailwind v4 CSS-first @theme設定、CVAコンポーネント、container queries、@utility、dark mode、cn()。189行から495行に大幅拡充し、reference.mdは1092行と全スキル最大級。
+
+### testing-strategy
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 298行 | 441行 | テスト設計・バグ修正時テスト作成時 |
+
+TDD Red-Green-Refactorサイクル、テスト品質分析、AAA、Mock境界ルール、Playwright E2E。全コード例がTypeScript/Vitest統一。
+
+### supabase-auth-patterns
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 356行 | 369行 | 認証フロー・RLSポリシー実装時 |
+
+認証フロー（email/OAuth/Magic Link/LINE Login OIDC）、セッション管理、JWT検証、RLS設計（USING/WITH CHECK）、Middleware auth guard。
+
+### supabase-postgres-best-practices
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 337行 | 673行 | SQL最適化・遅いクエリ診断時 |
+
+インデックス戦略(B-tree/GIN/GiST/BRIN)、EXPLAIN ANALYZE、Supavisor接続プール、RLS性能最適化、同時実行制御。ansem-db-patternsとは「設計 vs ランタイム性能」で棲み分け。
+
+### vercel-react-best-practices
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 302行 | 358行 | バンドル削減・再レンダリング抑制時 |
+
+async request waterfall排除、JSバンドルサイズ削減、Core Web Vitals(LCP/INP/CLS)、React再レンダリング最適化、next/image・next/font設定。
+
+### security-review
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 277行 | 143行 | `/security-review`で手動起動 |
+
+OWASP Top 10ベースの脆弱性検出。Confidence Levels(HIGH/MEDIUM/LOW)分類、Do Not Flagリスト、Severity Decision Tree。user-invocable:falseに変更済み（自動発火に対応）。
+
+### ci-cd-deployment
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 295行 | 379行 | パイプライン構築・デプロイ設定時 |
+
+GitHub Actions workflow、Vercel preview/production deploy、環境変数管理、trunk-basedブランチ戦略、Dependabot、rollback。
+
+### docker-expert
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 307行 | 259行 | Dockerfile作成・イメージサイズ削減時 |
+
+Multi-stage build、distroless/alpine最適化、docker-compose、non-rootユーザー、health check。言語別Dockerfileテンプレート付き。
+
+---
+
+## Tier 3: 専門特化（6個）
+
+特定ドメインで発火。担当プロジェクトに応じて導入。
+
+### dashboard-data-viz
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 350行 | 753行 | ダッシュボード構築・データ表示設計時 |
+
+サイドバーレイアウト、KPIカード、TanStack Table、Recharts/Tremor、Supabase Realtime、フィルタパターン、エクスポート。
+
+### design-token-system
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 331行 | 578行 | カラーパレット設計・トークン定義時 |
+
+3層トークン階層(primitive/semantic/component)、OKLCH色空間、L値差0.40コントラスト、globals.css @theme inline、next-themes統合。
+
+### micro-interaction-patterns
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 369行 | 842行 | UI状態フィードバック・アニメーション実装時 |
+
+スケルトン/シマー、トースト(sonner)、フォームバリデーションUX、空状態、error.tsx境界、ページ遷移、ボタン状態、ストリーミングUI。
+
+### mobile-first-responsive
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 362行 | 569行 | モバイルレスポンシブ・LIFF実装時 |
+
+LIFF Size Modes、safe-area insets、viewport units(svh/lvh/dvh)、タッチターゲット48dp、PWA Serwist、virtual keyboard、bottom sheet。WCAG準拠のviewport設定に修正済み。
+
+### web-design-guidelines
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 497行 | 1163行 | アクセシビリティ監査・HTML設計時 |
+
+WCAG 2.2 AA、セマンティックHTML、コントラスト・キーボードナビ、フォーム・バリデーション、SEO(meta/OG/JSON-LD/sitemap)、Core Web Vitals、dark mode、i18n、print styles。フレームワーク非依存のWeb標準ルール集。
+
+### line-bot-dev
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 339行 | 339行 | LINE Bot開発・Webhook署名検証時 |
+
+Messaging API、@line/bot-sdk、LIFF mini app、Webhook署名検証、Flex Message、Rich Menu、reply vs push最適化、冪等性テンプレート。
+
+---
+
+## Tier 4: ツール系（2個）
+
+特定ツール操作に特化。使うツールに合わせて導入。
+
+### obsidian-power-user
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 500行 | 406行 | オブ本格運用・クエリ作成時 |
+
+Flavored Markdown（wikilinks/callouts/embeds）、Bases（.base YAML/filter/formula）、Automation（Dataview DQL/Templater/QuickAdd）の3ドメイン。
+
+### chrome-extension-dev
+
+| SKILL.md | reference.md | 発火タイミング |
+|----------|-------------|--------------|
+| 438行 | 259行 | 拡張機能開発・manifest設定時 |
+
+Chrome MV3、content scripts、popup UI、chrome.storage、background service worker、chrome.alarms、message passing、SNS DOM scraping。
+
+---
+
+## メタスキル（共有対象外）
+
+### skill-forge
+
+Skillsの作成・検索・評価・最適化を行うメタスキル。`/skill-forge` で起動。個人環境のみ。
 
 | 項目 | 値 |
 |------|-----|
 | 発火方式 | 手動 `/skill-forge` |
-| SKILL.md | 272行 |
-| reference.md | 354行 |
-| 品質スコア | 100/100（自己レビュー）→ 91/100（再レビュー） |
+| SKILL.md | 226行 |
+| reference.md | 321行 |
 
-### v3.0 再レビュー結果
-
-| 項目 | スコア | メモ |
-|------|--------|------|
-| Trigger Accuracy | 9→10 | description強化済み（refines, building, finding等追加） |
-| Content Accuracy | 10 | 公式仕様・コマンド・スコアリング基準が正確 |
-| Content Completeness | 10 | 3モード・8フェーズ・10項目レビューを網羅 |
-| Token Efficiency | 8 | Phase説明の重複表現あり。次回最適化候補 |
-| Actionability | 10 | 8フェーズの具体的手順で即実行可能 |
-| Structure | 10 | モード別→Phase別の明確な構造 |
-| Cross-reference | 10 | reference.mdへの適切な誘導 |
-| Spec Compliance | 10 | 全項目準拠 |
-| reference.md Quality | 10 | テンプレート集・スコアリング詳細・コマンドリファレンスが充実 |
-| Differentiation | 4 | 公式ドキュメントとの重複が課題。実践知の追加で改善可能 |
-
-### skill-forgeのここがすごい
-
-**Skillsを作るSkillsという再帰構造**。ux-psychologyとnatural-japanese-writingはどちらもskill-forgeのCreate Modeで作った。つまりskill-forge自身が「自分の方法論で作られたSkillを量産できることの証明」になっている。
-
-**Description Engineeringという独自方法論**。Claude CodeのSkillsトリガーエンジンは英語のdescriptionフィールドを解析して発火判定する。この仕組みを逆算して「どう書けば狙ったタイミングで確実に発火するか」を体系化した。"Use when"パターン、動詞5個以上、500-700文字の最適長、カテゴリ別トリガーキーワード辞書をreference.mdに収録している。
-
-**10項目100点スコアリング**。Skillの品質を定量評価する仕組みがなかったので自作した。Trigger Accuracy、Content Accuracy、Token Efficiencyなど10観点で各10点、合計100点。8点以下の項目を優先的に改善するフローが組み込まれているため、「何を直せば良くなるか」が明確になる。
-
-**Acquire & Optimizeフロー**。コミュニティの既存Skillは玉石混交で、そのまま使うと発火精度やトークン効率に問題があるケースが多い。このフローは「取得→ギャップ分析→10項目レビュー→最適化→100点検証」を一気通貫で回す。50個のSkillsインストール作業でこのフローが威力を発揮した。
-
-**再現性が高い**。8フェーズのCreate Modeに従えば、ドメイン知識がなくても一定品質のSkillを作れる。実際にnatural-japanese-writingは初回作成で97点を出している。
-
-### 3つのモード
-
-**1. Create Mode [CRITICAL]**
-
-8フェーズでゼロからSkillを作る。
-
-| Phase | やること |
-|-------|---------|
-| 1 要件定義 | スコープと発火方式を決める |
-| 2 競合調査 | 既存Skillを検索して重複を避ける |
-| 3 設計 | SKILL.mdとreference.mdの分離を決める |
-| 4 Description Engineering | トリガー精度を決定づけるdescriptionを書く |
-| 5 コンテンツ作成 | 構造ルールとトークン効率を意識して書く |
-| 6 品質レビュー | 10項目100点で採点する |
-| 7 最適化 | 8点以下の項目を優先順位付きで改善する |
-| 8 リリース前チェック | 公式仕様への準拠を最終確認する |
-
-**2. Search Mode [HIGH]**
-
-既存Skillを検索して評価する。6基準の即座判定フィルターと5観点の比較フレームワークで候補を絞り込む。
-
-**即座判定フィルター（6基準）** — descriptionが空、SKILL.mdが10行未満、最終更新が1年以上前、ライセンス不明、依存ツール未記載、名前とdescriptionの不一致。1つでも該当したら候補から外す。
-
-**比較フレームワーク（5観点）** — トリガー精度、コンテンツ深度、トークン効率、メンテナンス状況、既存Skillとの重複度。複数候補を横並びで比較して最適なものを選ぶ。
-
-Acquire & Optimize フローを内蔵していて、良い既存Skillを見つけたら取得→ギャップ分析→10項目レビュー→最適化→100点検証まで一気に回せる。
-
-**3. Review Mode [HIGH]**
-
-既存Skillを10項目100点満点で採点する。
-
-| # | 項目 | 見ること |
-|---|------|---------|
-| 1 | Trigger Accuracy | descriptionで正しく発火するか |
-| 2 | Content Accuracy | 事実や数値は正確か |
-| 3 | Content Completeness | 主要トピックに抜けはないか |
-| 4 | Token Efficiency | 無駄な行や冗長な表現はないか |
-| 5 | Actionability | 読んですぐ実装できるか |
-| 6 | Structure | 論理的でナビゲートしやすいか |
-| 7 | Cross-reference Quality | 相互参照は正確で価値があるか |
-| 8 | Spec Compliance | 公式仕様に準拠しているか |
-| 9 | reference.md Quality | 補足資料は十分か |
-| 10 | Differentiation | 既存Skillにない独自の価値があるか |
-
-### reference.md の構成
-
-| カテゴリ | セクション |
-|----------|-----------|
-| Description | テンプレート集、実例集、カテゴリ別トリガーキーワード |
-| 構造 | SKILL.md構造テンプレート2種 |
-| 品質管理 | 10項目スコアリング詳細ルーブリック |
-| A&O | ギャップ分析テンプレート |
-| 失敗回避 | アンチパターン集 |
-| コマンド | npx skills コマンドリファレンス、品質チェック用コマンド |
-
-### ファイル配置
-
-| 場所 | 用途 |
-|------|------|
-| `~/.claude/skills/skill-forge/` | 個人環境 |
-
-### 実績
-
-| 成果物 | スコア | 備考 |
-|--------|--------|------|
-| ux-psychology | 100/100 | 745行→410行に圧縮、事実誤認3件修正 |
-| natural-japanese-writing | 97/100 | 初回作成で全項目9点以上 |
-| 50個のSkillsインストール | — | A&Oフローで品質判定・取捨選択 |
-
-### 開発経緯
-
-ux-psychologyを作る過程で確立したノウハウを再利用可能な形にまとめた。Description Engineering、10項目100点スコアリング、5並列レビュー、トークン最適化手法を全てこのスキルに凝縮している。初版261行から、Acquire & Optimizeフロー追加を経て272行。
+3モード（Create/Search/Review）。8フェーズのCreate Mode、10項目100点スコアリング、Description Engineering方法論を搭載。全24スキルはこのskill-forgeの品質基準で作成・レビュー済み。
 
 ---
 
-## natural-japanese-writing
+## 最終レビュー結果（2026-02-17）
 
-日本語ドキュメントからAI生成テキスト特有のパターンを排除するスキル。Markdownファイルに日本語の散文を書くとき自動で発火する。
+全24スキルに対して以下のチェックを実施し、全項目PASSを確認。
 
-### 基本情報
+### Spec Compliance（ハード要件）
 
-| 項目 | 値 |
-|------|-----|
-| 発火方式 | 自動 |
-| SKILL.md | 176行 |
-| reference.md | 184行 |
-| 品質スコア | 97/100（自己レビュー）→ 93/100（再レビュー） |
+| チェック項目 | 結果 |
+|-------------|------|
+| `user-invocable: false` | 24/24 PASS |
+| description "Use when"先頭 | 24/24 PASS |
+| description ≤1024文字 | 24/24 PASS |
+| description "Does NOT cover" | 24/24 PASS |
+| SKILL.md ≤500行 | 24/24 PASS |
+| h4(####)見出しゼロ | 24/24 PASS |
+| ハードコード日付ゼロ | 24/24 PASS |
+| クロスリファレンス整合 | 240参照 ALL PASS |
 
-### v3.0 再レビュー結果
+### 修正した主な問題
 
-| 項目 | スコア | メモ |
-|------|--------|------|
-| Trigger Accuracy | 9→10 | description強化済み（polishing, rewriting, removing AI-like patterns等追加） |
-| Content Accuracy | 10 | AI生成文の特徴分析が正確 |
-| Content Completeness | 10 | 記号・リズム・スタンス・構造・言葉選びを網羅 |
-| Token Efficiency | 10 | 冗長性なし |
-| Actionability | 10 | Before/Afterで即適用可能 |
-| Structure | 10 | 5パート明確、優先度タグ、セルフチェック |
-| Cross-reference | 10 | 不要（独立構造） |
-| Spec Compliance | 10 | 全項目準拠 |
-| reference.md Quality | 10 | Before/After 20+、アンチパターン表、ジャンル別注意点 |
-| Differentiation | 4 | 汎用的な「自然な日本語」ガイドとの差別化が課題 |
-
-Differentiationは定量的チェックツール（括弧密度・語尾連続数の計算式）を追加すれば改善できる。
-
-### SKILL.md の構成
-
-20ルールを5パートに分けている。
-
-| パート | 内容 | 重要度 |
-|--------|------|--------|
-| Part 1 | 記号と表記（括弧乱用、ラベル列挙、スラッシュ並列） | CRITICAL |
-| Part 2 | 文のリズム（語尾連続、接続詞、長短混合） | CRITICAL |
-| Part 3 | スタンス（安全クッション、両論逃げ、弱い否定） | HIGH |
-| Part 4 | 構造と進行（前置き宣言、番号連呼、定型締め） | HIGH |
-| Part 5 | 言葉選び（抽象語、根拠なき強調、同義語連打） | MEDIUM |
-
-末尾にセルフチェック手順7項目を配置している。
-
-### reference.md の構成
-
-| カテゴリ | セクション |
-|----------|-----------|
-| 実例 | Before/After 5組（括弧、語尾、安全クッション、両論併記、前置き宣言） |
-| 品質管理 | アンチパターン集（文体8パターン＋構造4パターン） |
-| ジャンル別 | 設計書、ブログ/Qiita、社内メモ、レビューコメント |
-| チェック | セルフチェック詳細（検出方法＋修正手順） |
-
-### いつ発火するか
-
-日本語のMarkdownドキュメントを書くとき全般で発火する。オブのノート、設計書、ブログ下書き、READMEファイル、仕様書、レポートが対象。技術メモやQiita記事も含む。
-
-チャット応答、コードコメント、英語ドキュメント、コミットメッセージでは発火しない。
-
-### ファイル配置
-
-| 場所 | 用途 |
-|------|------|
-| `~/.claude/skills/natural-japanese-writing/` | 個人環境 |
-| `team/shared/skills/natural-japanese-writing/` | チーム共有用 |
-
-### 開発経緯
-
-guchiのCLAUDE.mdにあった「ドキュメント執筆ルール（AI臭を消す）」をSkill化した。元の6カテゴリ20行程度のルールリストを、5パート20ルール＋Before/After例＋アンチパターン集＋ジャンル別注意点に拡充。skill-forgeのCreate Modeで8フェーズを経て作成し、自己レビュー97点で全項目9点以上をクリアしている。
+| カテゴリ | 件数 |
+|---------|------|
+| SPEC違反（description超過、h4見出し等） | 3件 |
+| frontmatter不備（user-invocable漏れ、description形式） | 12件 |
+| コード重複（SKILL.md⇔reference.md間） | 5件 |
+| 技術的正確性（Playwright言語、WCAG違反等） | 3件 |
+| コンテンツ不足（tailwind拡充、SEO新設等） | 3件 |
+| ハードコード日付 | 7件 |
 
 ---
 
-## ansem-db-patterns
+## セットアップ
 
-ANSEM 32テーブルの設計経験から抽出したPostgreSQL DB設計パターン集。DB設計やDDL作成時に自動発火する。
+IF-Vaultのルートで `git pull` してからシンボリックリンクを作成。
 
-### 基本情報
+```bash
+# Tier 1: 全員必須
+ln -s "$(pwd)/team/shared/skills/ux-psychology" ~/.claude/skills/ux-psychology
+ln -s "$(pwd)/team/shared/skills/natural-japanese-writing" ~/.claude/skills/natural-japanese-writing
+ln -s "$(pwd)/team/shared/skills/ansem-db-patterns" ~/.claude/skills/ansem-db-patterns
+ln -s "$(pwd)/team/shared/skills/typescript-best-practices" ~/.claude/skills/typescript-best-practices
+ln -s "$(pwd)/team/shared/skills/systematic-debugging" ~/.claude/skills/systematic-debugging
+ln -s "$(pwd)/team/shared/skills/error-handling-logging" ~/.claude/skills/error-handling-logging
+```
 
-| 項目 | 値 |
-|------|-----|
-| 発火方式 | 自動 |
-| SKILL.md | 340行 |
-| reference.md | 320行 |
-| 品質スコア | 未採点（初版） |
-
-### SKILL.md の構成
-
-22パターンを6パートに分けている。
-
-| パート | 内容 | 重要度 |
-|--------|------|--------|
-| Part 1 | 命名規則（プレフィックス、カラム命名、制約命名） | CRITICAL |
-| Part 2 | データ型（TEXT統一、TIMESTAMPTZ統一、数値型、BOOLEAN） | CRITICAL |
-| Part 3 | 整合性と制約（PK戦略、FK削除ポリシー、監査カラム、NULL） | HIGH |
-| Part 4 | 同時実行と履歴（楽観ロック、ソフトデリート、期間管理） | HIGH |
-| Part 5 | 高度なパターン（スナップショット、ポリモーフィック、辞書テーブル判断、パーティション、多言語） | MEDIUM |
-| Part 6 | スケーリング（インデックス設計、PgBouncer、リードレプリカ） | MEDIUM |
-
-### reference.md の構成
-
-| カテゴリ | セクション |
-|----------|-----------|
-| テンプレート | マスタ/トランザクション/セキュリティ/中間/集計/ポリモーフィック 6種 |
-| DDLサンプル | updated_atトリガー、パーティション作成、楽観ロック |
-| 品質管理 | テーブル設計チェックリスト、集計テーブルチェック、リリース前チェック |
-| 失敗回避 | アンチパターン集（データ型5、命名4、制約4、設計5） |
-| フロー | FK削除ポリシー判断フローチャート |
-
-### いつ発火するか
-
-PostgreSQLのテーブル設計、DDL作成、FK制約の設定、データ型の選択、インデックス設計、パーティション計画で発火する。
-
-MySQLや他DBの最適化、アプリ層のロジック、ORM設定では発火しない。supabase-postgres-best-practicesとはスコープが異なる（こちらは設計パターン、あちらはクエリ最適化）。
-
-### ファイル配置
-
-| 場所 | 用途 |
-|------|------|
-| `~/.claude/skills/ansem-db-patterns/` | 個人環境 |
-
-### 開発経緯
-
-ANSEMプロジェクトでv1.0からv5.4.0まで5回のメジャーバージョンアップを重ねる過程で蓄積した設計判断を、再利用可能なSkillにまとめた。TEXT統一、FK削除ポリシーの3パターン使い分け、スナップショット方式、監査カラムの例外パターンなど、全て実際の設計レビューで検証済みの実践知。完全オリジナルのコンテンツなので、Differentiation（独自性）が他の自作Skillsより高い。
+Tier 2-4は [[team/shared/skills/README|Skills README]] のセットアップセクション参照。
 
 ---
 
 ## 共通の設計原則
 
-見出しはh3まで。h4以降はボールドの段落見出しで代替する。
-
-セクションには優先度タグを付ける。`[CRITICAL]` が最重要、次に `[HIGH]`、`[MEDIUM]` の順。
-
-SKILL.mdには核心だけ残す。毎回コンテキストにロードされるため、詳細やテンプレート、チェックリストはreference.mdに分離する。
-
-descriptionは英語で書く。トリガーエンジンが英語ベースなので日本語では発火しない。"Use when" パターンを必ず含め、動詞は5個以上入れる。
-
-Skill本体に日付やバージョン番号は入れない。時間依存情報は変更ログなど外部ドキュメントで管理する。
-
-SKILL.mdは500行以内。公式仕様の絶対制約。
+- 見出しはh3まで。h4以降はボールドの段落見出しで代替
+- セクションには `[CRITICAL]`/`[HIGH]`/`[MEDIUM]` の優先度タグ
+- SKILL.mdには核心だけ。詳細はreference.mdに分離
+- descriptionは英語。"Use when"パターン必須、"Does NOT cover"で境界明示
+- 日付やバージョン番号は入れない
+- SKILL.md 500行以内（公式仕様の絶対制約）
 
 ---
 
-_最終更新: 2026-02-14_
+_最終更新: 2026-02-17_
