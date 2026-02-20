@@ -1,10 +1,17 @@
 ---
 date: 2026-02-13
-tags: [Claude Code, Skills, ツール]
+tags: [Claude Code, Skills, ツール, カタログ, リソース]
 status: active
 ---
 
-# Claude Code Skills 一覧
+# Claude Code Skills 一覧 & カタログ
+
+インストール済み・保留・未インストールの全Skills統合リスト。
+自作スキルの詳細は [[自作Skills一覧]] を、v2.7時点の品質スキャンは [[Skills-49個スキャンレポート]] を参照。
+
+✅ インストール済み、🔒 HOLD（評価済み・保留）、❌ REJECT（不要と判断）、無印は未インストール。
+
+---
 
 ## インストール済み（55個）
 
@@ -135,6 +142,13 @@ status: active
 |--------|------|--------|
 | keybindings-help | キーボードショートカットカスタマイズ | プリインストール |
 
+### 削除済み
+| スキル | 理由 |
+|--------|------|
+| ~~postgres-pro~~ | supabase版に置換（34ルール vs 5トピック） |
+| ~~remotion-animation~~ | イージング実装が不正確、存在しないスキルを参照 |
+| ~~creative-coder~~ | fixing-motion-performanceが上位互換 |
+
 ---
 
 ## 同時発火の注意点
@@ -161,13 +175,14 @@ React/Next.js作業時はvercel-react-best-practices（136行）+ nextjs-app-rou
 
 | スキル | 理由 | ソース | 再評価(2/15) |
 |--------|------|--------|-------------|
-| owasp-security | OWASP 2025-2026対応。security-reviewと相乗効果ありそう | agamm/claude-code-owasp | INSTALL検討 |
-| claude-code-nextjs-skills | Next.js 16 + AI SDK 6 + pgvector | laguagu | pgvector使う段階で |
-| shadcn-ui | shadcn/ui専門 | giuseppe-trisciuoglio/developer-kit | shadcn採用決定時に |
-| nextjs-devtools | ライブ診断・RSC最適化。品質未検証 | mcpmarket | 様子見 |
-| playwright-skill | webapp-testingと重複大（言語違い） | lackeyjb | 必要になったら |
+| 🔒 owasp-security | OWASP 2025-2026対応。security-reviewと相乗効果ありそう | agamm/claude-code-owasp | INSTALL検討 |
+| 🔒 claude-code-nextjs-skills | Next.js 16 + AI SDK 6 + pgvector | laguagu | pgvector使う段階で |
+| 🔒 shadcn-ui | shadcn/ui専門 | giuseppe-trisciuoglio/developer-kit | shadcn採用決定時に |
+| 🔒 nextjs-devtools | ライブ診断・RSC最適化。品質未検証 | mcpmarket | 様子見 |
+| 🔒 playwright-skill | webapp-testingと重複大（言語違い） | lackeyjb | 必要になったら |
+| 🔒 ui-ux-pro-max-skill | テンプレ化リスク。ux-psychologyのUX部分と被る | nextlevelbuilder | 様子見 |
 
-### REJECT（不要と判断）
+### ❌ REJECT（不要と判断）
 
 | スキル | 理由 | ソース |
 |--------|------|--------|
@@ -176,7 +191,168 @@ React/Next.js作業時はvercel-react-best-practices（136行）+ nextjs-app-rou
 
 ---
 
+## 未インストール・カタログ
+
+以下は3つのAwesomeリスト（BehiSecc、VoltAgent、各リポジトリ）から収集した未インストールSkills。必要になったタイミングで導入を検討する。
+
+### Anthropic公式（残り）
+
+| スキル | 内容 | コマンド |
+|--------|------|---------|
+| web-artifacts-builder | React+Tailwind+shadcnでHTMLアーティファクト構築 | `npx skills add anthropics/skills --skill web-artifacts-builder` |
+| internal-comms | 社内コミュニケーション作成（レポート、FAQ等） | `npx skills add anthropics/skills --skill internal-comms` |
+| skill-creator | 新しいSkill構築テンプレート | `npx skills add anthropics/skills --skill skill-creator` |
+
+### Stripe / Vercel / Sentry 公式
+
+| スキル | 内容 | コマンド |
+|--------|------|---------|
+| stripe-agent-toolkit | Stripe API統合、決済、サブスク管理 | `npx skills add stripe/agent-toolkit` |
+| vercel-v0-skill | v0でUI生成、Next.jsデプロイ | `npx skills add vercel-labs/v0-skill` |
+| sentry-skill | Sentryエラー追跡・パフォーマンス監視 | `npx skills add getsentry/sentry-skill` |
+
+### Microsoft
+
+| スキル | 内容 |
+|--------|------|
+| azure-openai-ts | Azure OpenAI TypeScriptパターン |
+| nextjs-app-router-ts | Next.js App Router |
+| playwright-testing-ts | Playwrightテスト |
+| prisma-schema-ts | Prismaスキーマ設計 |
+| react-component-ts | Reactコンポーネント設計 |
+| supabase-auth-ts | Supabase認証 |
+| tailwind-ui-ts | Tailwind UIパターン |
+| zustand-store-ts | Zustandストア |
+| mcp-builder | MCPサーバー作成ガイド |
+
+### 開発・コード品質
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| root-cause-tracing | ランタイムエラーから根本原因を特定 | obra/superpowers |
+| subagent-driven-development | マルチサブエージェント開発 | obra/superpowers |
+| verification-before-completion | 完了前の検証 | obra/superpowers |
+| requesting-code-review | コードレビュー依頼 | obra/superpowers |
+| receiving-code-review | コードレビュー受領・反映 | obra/superpowers |
+| dispatching-parallel-agents | 並列エージェント管理 | obra/superpowers |
+| defense-in-depth | 多層テスト・セキュリティ | obra/superpowers |
+| varlock-claude-skill | 環境変数の安全管理 | wrsmith108 |
+| agnix | SKILL.md/CLAUDE.md/hooks/MCPの156ルールリンター | avefenesh/agnix |
+| changelog-generator | gitコミットからリリースノート生成 | ComposioHQ |
+| recursive-decomposition-skill | 大規模タスク分解（100+ファイル/50k+トークン） | massimodeluisa |
+| claude-bootstrap | セキュリティファーストのプロジェクト初期化 | alinaqi |
+
+### プロジェクト管理・コラボ
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| writing-plans | 戦略ドキュメント作成 | obra/superpowers |
+| executing-plans | 戦略プランの実行 | obra/superpowers |
+| kanban-skill | Markdownベースカンバンボード | mattjoyce |
+| Product-Manager-Skills | PMスキル（PRD作成等） | deanpeters |
+| claude-memory-skill | 階層的メモリシステム | hanfang |
+
+### ドキュメント・コンテンツ
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| content-research-writer | リサーチ付きコンテンツ執筆 | ComposioHQ |
+| article-extractor | Web記事テキスト抽出 | michalparkola/tapestry |
+| youtube-transcript | YouTube動画トランスクリプト取得・要約 | michalparkola/tapestry |
+| claude-epub-skill | Markdown→epub変換 | smerchek |
+| kreuzberg | 62+ドキュメント形式からテキスト抽出 | kreuzberg-dev |
+| beautiful_prose | AI臭のない英語散文 | SHADOWPR0 |
+
+### AI画像・メディア生成
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| imagen | Google Gemini画像生成 | sanjay3290/ai-skills |
+| fal-generate | fal.aiで画像・動画生成 | fal-ai-community |
+| fal-image-edit | AI画像編集 | fal-ai-community |
+| video-prompting-skill | 動画生成モデル向けプロンプト作成 | Square-Zero-Labs |
+
+### セキュリティ特化
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| Trail of Bits Skills | CodeQL/Semgrep静的解析 | trailofbits/skills |
+| ffuf_claude_skill | FFUF Webファジング | jthack |
+
+### インフラ・クラウド
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| aws-skills | CDKベスプラ、サーバーレス | zxkane |
+| hashicorp/terraform-* | Terraform HCL生成 | hashicorp |
+| cloudflare-skill | Workers, Pages, AI | dmmulroy |
+
+### マーケティング
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| marketingskills | 23+のSEO・コピーライティング | coreyhaines31 |
+| competitive-ads-extractor | 競合広告分析 | ComposioHQ |
+
+### コンテキストエンジニアリング
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| context-fundamentals | コンテキストの基礎理解 | muratcankoylan |
+| context-compression | 長期セッション圧縮戦略 | muratcankoylan |
+| context-optimization | 最適化（圧縮、キャッシュ） | muratcankoylan |
+| multi-agent-patterns | マルチエージェントアーキテクチャ | muratcankoylan |
+
+### モバイル・ネイティブ
+
+| スキル | 内容 | ソース |
+|--------|------|--------|
+| react-native-best-practices | React Nativeパフォーマンス最適化 | callstackincubator |
+| swiftui-expert-skill | SwiftUIベスプラ | AvdLee |
+| ios-simulator-skill | iOSシミュレータ制御 | conorluddy |
+
+---
+
+## 情報ソース
+
+| リポジトリ | 特徴 |
+|-----------|------|
+| [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | クロスプラットフォーム最大規模300+ |
+| [BehiSecc/awesome-claude-skills](https://github.com/BehiSecc/awesome-claude-skills) | カテゴリ整理が秀逸 |
+| [sickn33/antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | Antigravity特化700+ |
+| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 実用的な独自Skill（939個） |
+| [anthropics/skills](https://github.com/anthropics/skills) | Anthropic公式 |
+| [obra/superpowers](https://github.com/obra/superpowers) | 開発ワークフロー系の宝庫（14スキル） |
+| [sanjay3290/ai-skills](https://github.com/sanjay3290/ai-skills) | 汎用AI Skills |
+
+---
+
+## スキル管理コマンド
+
+```bash
+# スキル検索
+npx skills find [キーワード]
+
+# インストール
+npx skills add <owner/repo@skill> -g -y
+
+# アップデート確認
+npx skills check
+
+# 全スキルアップデート
+npx skills update
+```
+
+---
+
 ## 変更ログ
+
+### 2026-02-20: v3.3 一覧+カタログ統合
+- **統合**: Claude-Code-Skills一覧.md と Claude-Code-Skills-カタログ.md を1ファイルに統合
+  - 未インストール・カタログ（Anthropic公式残り、Stripe/Vercel/Sentry、Microsoft、開発・品質、PM、ドキュメント、AI画像、セキュリティ、インフラ、マーケティング、コンテキストエンジニアリング、モバイル）を追加
+  - 情報ソースセクションを追加
+  - 削除済みスキル一覧を追加
+  - HOLD/REJECTを両ファイルからマージ（カタログのsanjay3290/postgresをREJECTにも追加）
 
 ### 2026-02-15: v3.2 HOLD再評価 + Differentiation改善
 - **HOLD再評価**: 7スキルを再評価
@@ -272,22 +448,11 @@ React/Next.js作業時はvercel-react-best-practices（136行）+ nextjs-app-rou
 
 ---
 
-## スキル管理コマンド
+## 関連ノート
 
-```bash
-# スキル検索
-npx skills find [キーワード]
-
-# インストール
-npx skills add <owner/repo@skill> -g -y
-
-# アップデート確認
-npx skills check
-
-# 全スキルアップデート
-npx skills update
-```
+- [[自作Skills一覧]] — 自作24スキルの詳細（Tier分類・レビュー結果・セットアップ手順）
+- [[Skills-49個スキャンレポート]] — v2.7時点の品質スキャン結果（仕様違反・重複・改善候補）
 
 ---
 
-_最終更新: 2026-02-14_
+_最終更新: 2026-02-20_

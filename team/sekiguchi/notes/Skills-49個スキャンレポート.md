@@ -6,6 +6,10 @@ status: active
 
 # Skills スキャンレポート（v2.7時点・49個）
 
+> [!tip] 関連ノート
+> - [[Claude-Code-Skills一覧]] — 全Skills統合リスト（インストール済み55個＋HOLD＋未インストールカタログ）
+> - [[自作Skills一覧]] — 自作24スキルの詳細（Tier分類・レビュー結果・セットアップ手順）
+
 v2.7時点（49個）のインストール済みSkillsを一括スキャンし、仕様違反・品質問題・改善候補を洗い出した。v3.0で全54個の再レビュー＋最適化を実施済み（2026-02-14）。追加5個（vercel-react-best-practices 136行、nextjs-app-router-patterns 543行、tailwind-design-system 874行、api-design-principles 528行、natural-japanese-writing 176行）は全て500行以内の仕様準拠。tailwind-design-systemは874行で仕様超過だが外部リポジトリ製のため維持。
 
 ---
