@@ -1,0 +1,17 @@
+{
+  "name": "monthly-sheet-optimizer",
+  "version": "1.0.0",
+  "description": "月別スプレッドシート数式最適化ツール (clasp + GAS)",
+  "scripts": {
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "watch": "clasp push --watch",
+    "open": "clasp open",
+    "deploy": "clasp push && echo '✅ Deployed to Apps Script'"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2",
+    "@types/google-apps-script": "^1.0.83",
+    "typescript": "^5.3.3"
+  }
+}
