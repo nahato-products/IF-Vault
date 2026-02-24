@@ -18,8 +18,8 @@
  *   7. 「✅ 全体検証」で最終確認
  *
  * 注意:
- *   - CONFIG.cvKeyColumn を実際の ◆CV シートのキー列に変更すること
- *   - CONFIG.dryRun = true で変更を適用せずプレビューできる
+ *   - MSO_CONFIG.cvKeyColumn を実際の ◆CV シートのキー列に変更すること
+ *   - MSO_CONFIG.dryRun = true で変更を適用せずプレビューできる
  *
  * ============================================================
  */
@@ -28,7 +28,7 @@
 // 設定
 // ============================================================
 
-const CONFIG = {
+const MSO_CONFIG = {
   // --- シート名 ---
   monthlySheet:   '2026年01月',
   masterSheet:    'マスター原本',
@@ -88,7 +88,7 @@ function onOpen() {
 // ============================================================
 
 function buildFormulas_() {
-  const c = CONFIG;
+  const c = MSO_CONFIG;
   const s = c.dataStartRow;
   const e = c.dataEndRow;
   const ae = c.aggregateEndRow;
@@ -206,10 +206,10 @@ function preflight() {
 
   // 必要なシートの存在確認
   const requiredSheets = [
-    CONFIG.monthlySheet,
-    CONFIG.masterSheet,
-    CONFIG.cvSheet,
-    CONFIG.listSheet,
+    MSO_CONFIG.monthlySheet,
+    MSO_CONFIG.masterSheet,
+    MSO_CONFIG.cvSheet,
+    MSO_CONFIG.listSheet,
   ];
   for (const name of requiredSheets) {
     if (!ss.getSheetByName(name)) {
@@ -218,11 +218,11 @@ function preflight() {
   }
 
   // 月別シートの構造チェック
-  const monthly = ss.getSheetByName(CONFIG.monthlySheet);
+  const monthly = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   if (monthly) {
     const lastRow = monthly.getLastRow();
-    if (lastRow < CONFIG.dataEndRow) {
-      issues.push(`⚠️ データ行が想定より少ない（最終行: ${lastRow}、想定: ${CONFIG.dataEndRow}）`);
+    if (lastRow < MSO_CONFIG.dataEndRow) {
+      issues.push(`⚠️ データ行が想定より少ない（最終行: ${lastRow}、想定: ${MSO_CONFIG.dataEndRow}）`);
     }
 
     // ArrayFormula セルの存在確認
@@ -235,16 +235,16 @@ function preflight() {
     }
 
     // BQ列（検索キー用）が空いているか
-    const bqValues = monthly.getRange(`${CONFIG.searchKeyColumn}${CONFIG.dataStartRow}:${CONFIG.searchKeyColumn}${CONFIG.dataEndRow}`).getValues();
+    const bqValues = monthly.getRange(`${MSO_CONFIG.searchKeyColumn}${MSO_CONFIG.dataStartRow}:${MSO_CONFIG.searchKeyColumn}${MSO_CONFIG.dataEndRow}`).getValues();
     const hasData = bqValues.some(row => row[0] !== '');
     if (hasData) {
-      issues.push(`⚠️ ${CONFIG.searchKeyColumn}列にデータがあります（CV検索キー用に使う予定）`);
+      issues.push(`⚠️ ${MSO_CONFIG.searchKeyColumn}列にデータがあります（CV検索キー用に使う予定）`);
     }
   }
 
   // 【自動】マスター参照 シートの重複チェック
-  if (ss.getSheetByName(CONFIG.cacheSheet)) {
-    issues.push(`⚠️ シート「${CONFIG.cacheSheet}」が既に存在します（Step 2 で上書きされます）`);
+  if (ss.getSheetByName(MSO_CONFIG.cacheSheet)) {
+    issues.push(`⚠️ シート「${MSO_CONFIG.cacheSheet}」が既に存在します（Step 2 で上書きされます）`);
   }
 
   // 結果表示
@@ -267,15 +267,15 @@ function preflight() {
  */
 function takeSnapshot() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const monthly = ss.getSheetByName(CONFIG.monthlySheet);
-  if (!monthly) throw new Error(`シート「${CONFIG.monthlySheet}」が見つかりません`);
+  const monthly = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  if (!monthly) throw new Error(`シート「${MSO_CONFIG.monthlySheet}」が見つかりません`);
 
   // 既存の _snapshot を削除
-  const existing = ss.getSheetByName(CONFIG.snapshotSheet);
+  const existing = ss.getSheetByName(MSO_CONFIG.snapshotSheet);
   if (existing) ss.deleteSheet(existing);
 
   // 月別シートの全値をコピー（数式ではなく値として）
-  const snapshot = ss.insertSheet(CONFIG.snapshotSheet);
+  const snapshot = ss.insertSheet(MSO_CONFIG.snapshotSheet);
 
   // Row 2（集計行）
   const row2Range = monthly.getRange('A2:BQ2');
@@ -286,14 +286,14 @@ function takeSnapshot() {
   snapshot.getRange('A3:BD3').setValues(row3Range.getValues());
 
   // Rows 5-169（データ行）
-  const s = CONFIG.dataStartRow;
-  const e = CONFIG.dataEndRow;
+  const s = MSO_CONFIG.dataStartRow;
+  const e = MSO_CONFIG.dataEndRow;
   const dataRange = monthly.getRange(`A${s}:BQ${e}`);
   snapshot.getRange(`A${s}:BQ${e}`).setValues(dataRange.getValues());
 
   // Rows 170-200（集計セクション）
-  const aggRange = monthly.getRange('A170:BQ' + CONFIG.aggregateEndRow);
-  snapshot.getRange('A170:BQ' + CONFIG.aggregateEndRow).setValues(aggRange.getValues());
+  const aggRange = monthly.getRange('A170:BQ' + MSO_CONFIG.aggregateEndRow);
+  snapshot.getRange('A170:BQ' + MSO_CONFIG.aggregateEndRow).setValues(aggRange.getValues());
 
   // 非表示にする
   snapshot.hideSheet();
@@ -326,18 +326,18 @@ function takeSnapshot() {
  */
 function applyStep_(stepKey, stepDef, preAction) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const ui = SpreadsheetApp.getUi();
   const props = PropertiesService.getScriptProperties();
 
   // スナップショット存在確認
-  if (!ss.getSheetByName(CONFIG.snapshotSheet)) {
+  if (!ss.getSheetByName(MSO_CONFIG.snapshotSheet)) {
     ui.alert('エラー', '❌ スナップショットが見つかりません。\n先に「📸 スナップショット取得」を実行してください。', ui.ButtonSet.OK);
     return false;
   }
 
   // ドライラン確認
-  if (CONFIG.dryRun) {
+  if (MSO_CONFIG.dryRun) {
     const preview = Object.entries(stepDef.formulas)
       .map(([cell, formula]) => {
         const current = sheet.getRange(cell).getFormula() || '(値のみ)';
@@ -347,7 +347,7 @@ function applyStep_(stepKey, stepDef, preAction) {
       .join('\n\n');
     ui.alert(
       `[DRY RUN] ${stepDef.name}`,
-      `以下の変更をプレビューします（実際には適用されません）:\n\n${preview}\n\n※ CONFIG.dryRun = false に変更して再実行すると適用されます。`,
+      `以下の変更をプレビューします（実際には適用されません）:\n\n${preview}\n\n※ MSO_CONFIG.dryRun = false に変更して再実行すると適用されます。`,
       ui.ButtonSet.OK
     );
     return true;
@@ -417,8 +417,8 @@ function applyStep_(stepKey, stepDef, preAction) {
  */
 function validateStep_(stepKey, stepDef) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
-  const snapshot = ss.getSheetByName(CONFIG.snapshotSheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  const snapshot = ss.getSheetByName(MSO_CONFIG.snapshotSheet);
   const mismatches = [];
 
   // 1. 個別セルの検証（Row 2 集計セル等）
@@ -434,8 +434,8 @@ function validateStep_(stepKey, stepDef) {
 
   // 2. 列全体の検証（ArrayFormula のデータ行）
   if (stepDef.validateColumns) {
-    const s = CONFIG.dataStartRow;
-    const e = CONFIG.dataEndRow;
+    const s = MSO_CONFIG.dataStartRow;
+    const e = MSO_CONFIG.dataEndRow;
     for (const col of stepDef.validateColumns) {
       const expectedVals = snapshot.getRange(`${col}${s}:${col}${e}`).getValues();
       const actualVals = sheet.getRange(`${col}${s}:${col}${e}`).getValues();
@@ -470,7 +470,7 @@ function valuesMatch_(a, b) {
   // 両方数値
   if (typeof a === 'number' && typeof b === 'number') {
     if (a === 0 && b === 0) return true;
-    return Math.abs(a - b) <= CONFIG.tolerance;
+    return Math.abs(a - b) <= MSO_CONFIG.tolerance;
   }
   // 日付
   if (a instanceof Date && b instanceof Date) {
@@ -489,7 +489,7 @@ function valuesMatch_(a, b) {
  */
 function rollbackStep_(stepKey) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const props = PropertiesService.getScriptProperties();
 
   const backupJson = props.getProperty(`backup_${stepKey}`);
@@ -506,15 +506,15 @@ function rollbackStep_(stepKey) {
 
   // Step 2 の場合は 【自動】マスター参照 シートも削除
   if (stepKey === 'step2') {
-    const cache = ss.getSheetByName(CONFIG.cacheSheet);
+    const cache = ss.getSheetByName(MSO_CONFIG.cacheSheet);
     if (cache) ss.deleteSheet(cache);
   }
 
   // Step 3 の場合は BQ 列もクリア
   if (stepKey === 'step3') {
-    const bqAddr = `${CONFIG.searchKeyColumn}5`;
+    const bqAddr = `${MSO_CONFIG.searchKeyColumn}5`;
     if (!oldFormulas[bqAddr]) {
-      sheet.getRange(`${CONFIG.searchKeyColumn}${CONFIG.dataStartRow}:${CONFIG.searchKeyColumn}${CONFIG.dataEndRow}`).clearContent();
+      sheet.getRange(`${MSO_CONFIG.searchKeyColumn}${MSO_CONFIG.dataStartRow}:${MSO_CONFIG.searchKeyColumn}${MSO_CONFIG.dataEndRow}`).clearContent();
     }
   }
 
@@ -566,11 +566,11 @@ function applyStep2() {
   const defs = buildFormulas_();
   applyStep_('step2', defs.step2, function createCacheSheet(ss) {
     // 既存の 【自動】マスター参照 を削除
-    const existing = ss.getSheetByName(CONFIG.cacheSheet);
+    const existing = ss.getSheetByName(MSO_CONFIG.cacheSheet);
     if (existing) ss.deleteSheet(existing);
 
     // 【自動】マスター参照 シート作成
-    const cache = ss.insertSheet(CONFIG.cacheSheet);
+    const cache = ss.insertSheet(MSO_CONFIG.cacheSheet);
     cache.getRange('A5').setFormula(defs.step2.cacheFormula);
 
     // 再計算を待つ（XLOOKUP の展開に時間がかかる）
@@ -628,7 +628,7 @@ function applyAll() {
 
   for (const step of steps) {
     const success = step.fn();
-    if (!success && !CONFIG.dryRun) {
+    if (!success && !MSO_CONFIG.dryRun) {
       ui.alert('一括適用 中断', `${step.name} で検証に失敗したため停止しました。`, ui.ButtonSet.OK);
       return;
     }
@@ -646,8 +646,8 @@ function applyAll() {
  */
 function validateAll() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
-  const snapshot = ss.getSheetByName(CONFIG.snapshotSheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  const snapshot = ss.getSheetByName(MSO_CONFIG.snapshotSheet);
   const ui = SpreadsheetApp.getUi();
 
   if (!snapshot) {
@@ -655,8 +655,8 @@ function validateAll() {
     return;
   }
 
-  const s = CONFIG.dataStartRow;
-  const e = CONFIG.dataEndRow;
+  const s = MSO_CONFIG.dataStartRow;
+  const e = MSO_CONFIG.dataEndRow;
   const mismatches = [];
 
   // 1. Row 2 全集計セル
@@ -718,7 +718,7 @@ function validateAll() {
  */
 function measurePerformance() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const ui = SpreadsheetApp.getUi();
 
   // 再計算を強制するため、ダミーの値変更 → 元に戻す
@@ -772,7 +772,7 @@ function measurePerformance() {
  */
 function detectBN5Column() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const ui = SpreadsheetApp.getUi();
 
   const formula = sheet.getRange('BN5').getFormula();
@@ -806,7 +806,7 @@ function detectBN5Column() {
   const cacheCol = indexToCol_(masterOffset);
 
   const cacheMapping = `BN5 → マスター原本!${masterCol}列 → 【自動】マスター参照!${cacheCol}列`;
-  const referenceFormula = `=ArrayFormula('${CONFIG.cacheSheet}'!${cacheCol}${CONFIG.dataStartRow}:${cacheCol}${CONFIG.dataEndRow})`;
+  const referenceFormula = `=ArrayFormula('${MSO_CONFIG.cacheSheet}'!${cacheCol}${MSO_CONFIG.dataStartRow}:${cacheCol}${MSO_CONFIG.dataEndRow})`;
 
   ui.alert(
     'BN5 検出結果',
@@ -827,12 +827,12 @@ function detectBN5Column() {
  */
 function validateSummarySheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const monthly = ss.getSheetByName(CONFIG.monthlySheet);
-  const summary = ss.getSheetByName(CONFIG.summarySheet);
+  const monthly = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  const summary = ss.getSheetByName(MSO_CONFIG.summarySheet);
   const ui = SpreadsheetApp.getUi();
 
   if (!summary) {
-    ui.alert('まとめシート検証', `シート「${CONFIG.summarySheet}」が見つかりません。`, ui.ButtonSet.OK);
+    ui.alert('まとめシート検証', `シート「${MSO_CONFIG.summarySheet}」が見つかりません。`, ui.ButtonSet.OK);
     return;
   }
 
@@ -900,7 +900,7 @@ function cleanup() {
   if (confirm !== ui.Button.YES) return;
 
   // シート削除
-  for (const name of [CONFIG.snapshotSheet]) {
+  for (const name of [MSO_CONFIG.snapshotSheet]) {
     const s = ss.getSheetByName(name);
     if (s) ss.deleteSheet(s);
   }

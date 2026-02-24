@@ -119,7 +119,7 @@ function testFormulaStructure() {
   // Step 2: 【自動】マスター参照 参照式がシート名を含むこと
   for (const [cell, formula] of Object.entries(defs.step2.formulas)) {
     if (cell === 'I5') continue; // I5 は特殊
-    if (!formula.includes(CONFIG.cacheSheet)) {
+    if (!formula.includes(MSO_CONFIG.cacheSheet)) {
       errors.push(`Step2 ${cell}: 【自動】マスター参照 シート参照がない: ${formula}`);
     }
   }
@@ -191,17 +191,17 @@ function ceilAwayFromZero_(n) {
  */
 function testSpotCheck() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
-  const snapshot = ss.getSheetByName(CONFIG.snapshotSheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  const snapshot = ss.getSheetByName(MSO_CONFIG.snapshotSheet);
 
   if (!snapshot) {
     return { passed: false, message: 'スナップショットが見つかりません' };
   }
 
-  const s = CONFIG.dataStartRow;
-  const e = CONFIG.dataEndRow;
+  const s = MSO_CONFIG.dataStartRow;
+  const e = MSO_CONFIG.dataEndRow;
   const totalRows = e - s + 1;
-  const checkCount = Math.min(CONFIG.spotCheckCount, totalRows);
+  const checkCount = Math.min(MSO_CONFIG.spotCheckCount, totalRows);
 
   // ランダム行を選択（重複なし）
   const rows = [];
@@ -240,14 +240,14 @@ function testSpotCheck() {
  */
 function testCacheIntegrity() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const cache = ss.getSheetByName(CONFIG.cacheSheet);
+  const cache = ss.getSheetByName(MSO_CONFIG.cacheSheet);
 
   if (!cache) {
     return { passed: true, message: '【自動】マスター参照 シートが未作成（Step 2 未適用）— スキップ' };
   }
 
-  const s = CONFIG.dataStartRow;
-  const e = CONFIG.dataEndRow;
+  const s = MSO_CONFIG.dataStartRow;
+  const e = MSO_CONFIG.dataEndRow;
 
   // 【自動】マスター参照 の A列（= マスター原本 C列 = IF名称）が空でないことを確認
   const col_a = cache.getRange(`A${s}:A${e}`).getValues();
@@ -262,7 +262,7 @@ function testCacheIntegrity() {
   const colCount = headerRow.filter(v => v !== '' && v != null).length;
 
   // マスター原本の行数と 【自動】マスター参照 の有効行数が合理的であることを確認
-  const monthly = ss.getSheetByName(CONFIG.monthlySheet);
+  const monthly = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const eCol = monthly.getRange(`E${s}:E${e}`).getValues();
   const monthlyNonEmpty = eCol.filter(row => row[0] !== '' && row[0] != null).length;
 
@@ -285,10 +285,10 @@ function testCacheIntegrity() {
  */
 function testSummarySheetImpact() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const summary = ss.getSheetByName(CONFIG.summarySheet);
+  const summary = ss.getSheetByName(MSO_CONFIG.summarySheet);
 
   if (!summary) {
-    return { passed: true, message: `シート「${CONFIG.summarySheet}」が見つかりません — スキップ` };
+    return { passed: true, message: `シート「${MSO_CONFIG.summarySheet}」が見つかりません — スキップ` };
   }
 
   const props = PropertiesService.getScriptProperties();
@@ -328,7 +328,7 @@ function testSummarySheetImpact() {
  */
 function testPerformanceComparison() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
   const runs = 5;
   const times = [];
 
@@ -380,9 +380,9 @@ function testPerformanceComparison() {
  */
 function testFormulaDependencies() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(CONFIG.monthlySheet);
-  const s = CONFIG.dataStartRow;
-  const e = CONFIG.dataEndRow;
+  const sheet = ss.getSheetByName(MSO_CONFIG.monthlySheet);
+  const s = MSO_CONFIG.dataStartRow;
+  const e = MSO_CONFIG.dataEndRow;
   const errors = [];
 
   // 主要な数式セルのエラーチェック
