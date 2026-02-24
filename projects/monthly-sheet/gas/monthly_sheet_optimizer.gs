@@ -30,13 +30,13 @@
 
 const CONFIG = {
   // --- シート名 ---
-  monthlySheet:   '2026年02月',
+  monthlySheet:   '2026年01月',
   masterSheet:    'マスター原本',
   cacheSheet:     '【自動】マスター参照',
   cvSheet:        '◆CV',
   listSheet:      '◆list',
   snapshotSheet:  '_snapshot',
-  summarySheet:   '2026年02月まとめ', // まとめシート（検証で使用）
+  summarySheet:   '2026年01月まとめ', // まとめシート（検証で使用）
 
   // --- データ範囲 ---
   dataStartRow:     5,
