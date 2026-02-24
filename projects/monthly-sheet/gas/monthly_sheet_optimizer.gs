@@ -285,15 +285,26 @@ function takeSnapshot() {
   const row3Range = monthly.getRange('A3:BD3');
   snapshot.getRange('A3:BD3').setValues(row3Range.getValues());
 
-  // Rows 5-169（データ行）
+  // Rows 5-169（データ行）— チャンク分割でタイムアウト回避
   const s = MSO_CONFIG.dataStartRow;
   const e = MSO_CONFIG.dataEndRow;
-  const dataRange = monthly.getRange(`A${s}:BQ${e}`);
-  snapshot.getRange(`A${s}:BQ${e}`).setValues(dataRange.getValues());
+  const CHUNK = 30;
+  for (let r = s; r <= e; r += CHUNK) {
+    const end = Math.min(r + CHUNK - 1, e);
+    const vals = monthly.getRange(`A${r}:BQ${end}`).getValues();
+    snapshot.getRange(`A${r}:BQ${end}`).setValues(vals);
+    SpreadsheetApp.flush();
+  }
 
-  // Rows 170-200（集計セクション）
-  const aggRange = monthly.getRange('A170:BQ' + MSO_CONFIG.aggregateEndRow);
-  snapshot.getRange('A170:BQ' + MSO_CONFIG.aggregateEndRow).setValues(aggRange.getValues());
+  // Rows 170-200（集計セクション）— 同様にチャンク分割
+  const aggStart = 170;
+  const aggEnd = MSO_CONFIG.aggregateEndRow;
+  for (let r = aggStart; r <= aggEnd; r += CHUNK) {
+    const end = Math.min(r + CHUNK - 1, aggEnd);
+    const vals = monthly.getRange(`A${r}:BQ${end}`).getValues();
+    snapshot.getRange(`A${r}:BQ${end}`).setValues(vals);
+    SpreadsheetApp.flush();
+  }
 
   // 非表示にする
   snapshot.hideSheet();
@@ -331,7 +342,7 @@ function applyStep_(stepKey, stepDef, preAction) {
   const props = PropertiesService.getScriptProperties();
 
   // スナップショット存在確認
-  if (!ss.getSheetByName(MSO_CONFIG.snapshotSheet)) {
+  if (!MSO_CONFIG.dryRun && !ss.getSheetByName(MSO_CONFIG.snapshotSheet)) {
     ui.alert('エラー', '❌ スナップショットが見つかりません。\n先に「📸 スナップショット取得」を実行してください。', ui.ButtonSet.OK);
     return false;
   }
