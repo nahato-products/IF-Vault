@@ -24,7 +24,7 @@ const SUB_SECTION_END = 200;
 const MASTER_SHEET_NAME = 'マスター原本';
 
 /** キャッシュシート名（Step 2で作成） */
-const CACHE_SHEET_NAME = '_cache';
+const CACHE_SHEET_NAME = '【自動】マスター参照';
 
 // ═══════════════════════════════════════════════
 // 2. Step 1: オープンレンジ閉鎖
@@ -63,7 +63,7 @@ const SUM_CELLS_CLOSED: string[] = ['BO2'];
 // ═══════════════════════════════════════════════
 
 interface XlookupMapping {
-  /** _cache シート上の列（A, B, C...） */
+  /** 【自動】マスター参照 シート上の列（A, B, C...） */
   cacheCol: string;
   /** 月別シート上のセル（H5, AB5...） */
   targetCell: string;
@@ -89,7 +89,7 @@ const XLOOKUP_MAPPINGS: XlookupMapping[] = [
   { cacheCol: 'Q', targetCell: 'BC5', masterCol: 'S', description: '口座番号' },
 ];
 
-/** I5用 SNS分岐マッピング（_cache B〜F列 = マスター原本 D〜H列） */
+/** I5用 SNS分岐マッピング（【自動】マスター参照 B〜F列 = マスター原本 D〜H列） */
 const SNS_CACHE_MAPPING = {
   instagram: 'B',  // マスター原本 D列
   youtube:   'C',  // マスター原本 E列

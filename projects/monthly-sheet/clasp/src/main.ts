@@ -17,8 +17,8 @@ function onOpen() {
     .addSeparator()
     .addItem('③ 負荷テスト実行', 'menuLoadTest')
     .addSeparator()
-    .addItem('④ _cache シート削除（ロールバック）', 'menuDeleteCache')
-    .addItem('⑤ _cache シート保護設定', 'menuProtectCache')
+    .addItem('④ 【自動】マスター参照 シート削除（ロールバック）', 'menuDeleteCache')
+    .addItem('⑤ 【自動】マスター参照 シート保護設定', 'menuProtectCache')
     .addToUi();
 }
 
@@ -53,7 +53,7 @@ function menuDryRun() {
   ui.alert(
     'dryRun 完了',
     `Step 1（範囲閉鎖）: ${step1Changed}セル変更予定\n` +
-    `Step 2（XLOOKUP集約）: ${step2Cells}セル + _cacheシート作成\n` +
+    `Step 2（XLOOKUP集約）: ${step2Cells}セル + 【自動】マスター参照シート作成\n` +
     `Step 3（CV検索キー）: ${step3Cells}セル\n` +
     `Step 4（LETキャッシュ）: ${step4Cells}セル\n` +
     `Step 5（源泉簡約）: ${step5Cells}セル（⚠️要全行検算）\n` +
@@ -95,7 +95,7 @@ function menuOptimize() {
       '次のステップ:\n' +
       '1. 合計値（S2, T2等）が正しいか確認\n' +
       '2. 負荷テストで速度改善を確認\n' +
-      '3. 問題があれば「_cache シート削除」でロールバック',
+      '3. 問題があれば「【自動】マスター参照 シート削除」でロールバック',
       ui.ButtonSet.OK
     );
   } catch (e: any) {
@@ -139,19 +139,19 @@ function menuLoadTest() {
 }
 
 /**
- * ④ _cache シート削除（ロールバック）
+ * ④ 【自動】マスター参照 シート削除（ロールバック）
  */
 function menuDeleteCache() {
   const ui = SpreadsheetApp.getUi();
 
   if (!cacheSheetExists()) {
-    ui.alert('_cache シートは存在しません。');
+    ui.alert('【自動】マスター参照 シートは存在しません。');
     return;
   }
 
   const confirm = ui.alert(
-    '⚠️ _cache シート削除',
-    '_cache シートを削除します。\n' +
+    '⚠️ 【自動】マスター参照 シート削除',
+    '【自動】マスター参照 シートを削除します。\n' +
     'Step 2 の最適化が無効になります。\n\n' +
     '※ 月別シートの参照式（H5, AB5等）は\n' +
     '  手動で元のXLOOKUP式に戻す必要があります。\n\n' +
@@ -161,21 +161,21 @@ function menuDeleteCache() {
 
   if (confirm === ui.Button.YES) {
     deleteCacheSheet();
-    ui.alert('_cache シートを削除しました。');
+    ui.alert('【自動】マスター参照 シートを削除しました。');
   }
 }
 
 /**
- * ⑤ _cache シート保護設定
+ * ⑤ 【自動】マスター参照 シート保護設定
  */
 function menuProtectCache() {
   if (!cacheSheetExists()) {
-    SpreadsheetApp.getUi().alert('_cache シートが存在しません。先に最適化を実行してください。');
+    SpreadsheetApp.getUi().alert('【自動】マスター参照 シートが存在しません。先に最適化を実行してください。');
     return;
   }
 
   protectCacheSheet();
-  SpreadsheetApp.getUi().alert('_cache シートを非表示＋保護に設定しました。');
+  SpreadsheetApp.getUi().alert('【自動】マスター参照 シートを非表示＋保護に設定しました。');
 }
 
 // ═══════════════════════════════════════════════

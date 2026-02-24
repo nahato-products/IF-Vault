@@ -1,11 +1,11 @@
 /**
- * 月別シート最適化 — _cache シート管理
+ * 月別シート最適化 — 【自動】マスター参照 シート管理
  *
  * Step 2 で使用するキャッシュシートの作成・検証・削除。
  */
 
 /**
- * _cache シートが存在するか確認
+ * 【自動】マスター参照 シートが存在するか確認
  */
 function cacheSheetExists(): boolean {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -13,7 +13,7 @@ function cacheSheetExists(): boolean {
 }
 
 /**
- * _cache シートを作成し、XLOOKUP数式を配置
+ * 【自動】マスター参照 シートを作成し、XLOOKUP数式を配置
  */
 function createCacheSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -26,7 +26,7 @@ function createCacheSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   // 既存チェック
   let cacheSheet = ss.getSheetByName(cacheName);
   if (cacheSheet) {
-    Logger.log(`_cache シートは既に存在します。再利用します。`);
+    Logger.log(`【自動】マスター参照 シートは既に存在します。再利用します。`);
     return cacheSheet;
   }
 
@@ -43,19 +43,19 @@ function createCacheSheet(): GoogleAppsScript.Spreadsheet.Sheet {
   cacheSheet.getRange(`A${startRow}`).setFormula(formula);
   SpreadsheetApp.flush();
 
-  Logger.log(`_cache シート作成完了。A${startRow}に数式配置済み。`);
+  Logger.log(`【自動】マスター参照 シート作成完了。A${startRow}に数式配置済み。`);
   return cacheSheet;
 }
 
 /**
- * _cache シートを非表示＋保護に設定
+ * 【自動】マスター参照 シートを非表示＋保護に設定
  */
 function protectCacheSheet(): void {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const cacheSheet = ss.getSheetByName(CONFIG.cacheSheetName);
 
   if (!cacheSheet) {
-    Logger.log('_cache シートが見つかりません。');
+    Logger.log('【自動】マスター参照 シートが見つかりません。');
     return;
   }
 
@@ -67,18 +67,18 @@ function protectCacheSheet(): void {
   protection.setDescription('自動生成キャッシュ — 編集不可');
   protection.setWarningOnly(true);
 
-  Logger.log('_cache シートを非表示＋保護に設定しました。');
+  Logger.log('【自動】マスター参照 シートを非表示＋保護に設定しました。');
 }
 
 /**
- * _cache シートを削除（ロールバック用）
+ * 【自動】マスター参照 シートを削除（ロールバック用）
  */
 function deleteCacheSheet(): boolean {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const cacheSheet = ss.getSheetByName(CONFIG.cacheSheetName);
 
   if (!cacheSheet) {
-    Logger.log('_cache シートは存在しません。');
+    Logger.log('【自動】マスター参照 シートは存在しません。');
     return false;
   }
 
@@ -88,12 +88,12 @@ function deleteCacheSheet(): boolean {
   }
   ss.deleteSheet(cacheSheet);
 
-  Logger.log('_cache シートを削除しました。');
+  Logger.log('【自動】マスター参照 シートを削除しました。');
   return true;
 }
 
 /**
- * _cache シートのデータ検証
+ * 【自動】マスター参照 シートのデータ検証
  * マスター原本から正しくデータが取得できているか確認
  */
 function validateCacheSheet(): { valid: boolean; errors: string[] } {
@@ -103,7 +103,7 @@ function validateCacheSheet(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!cacheSheet) {
-    return { valid: false, errors: ['_cache シートが存在しません'] };
+    return { valid: false, errors: ['【自動】マスター参照 シートが存在しません'] };
   }
   if (!targetSheet) {
     return { valid: false, errors: [`${CONFIG.targetSheetName} シートが存在しません`] };
@@ -120,7 +120,7 @@ function validateCacheSheet(): { valid: boolean; errors: string[] } {
     if (row[0] === '' || row[0] === null) emptyCount++;
   }
 
-  // E列にデータがある行で _cache が空なら問題
+  // E列にデータがある行で 【自動】マスター参照 が空なら問題
   const eValues = targetSheet.getRange(`E${startRow}:E${endRow}`).getValues();
   let eFilledCount = 0;
   for (const row of eValues) {
@@ -128,10 +128,10 @@ function validateCacheSheet(): { valid: boolean; errors: string[] } {
   }
 
   if (emptyCount === dataRows) {
-    errors.push('_cache のA列が全て空です。数式がエラーの可能性があります。');
+    errors.push('【自動】マスター参照 のA列が全て空です。数式がエラーの可能性があります。');
   }
 
-  Logger.log(`_cache 検証: データ${dataRows}行中、空セル${emptyCount}行, E列データ${eFilledCount}行`);
+  Logger.log(`【自動】マスター参照 検証: データ${dataRows}行中、空セル${emptyCount}行, E列データ${eFilledCount}行`);
 
   return {
     valid: errors.length === 0,

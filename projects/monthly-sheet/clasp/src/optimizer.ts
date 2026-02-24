@@ -104,7 +104,7 @@ function step1_closeOpenRanges(
 }
 
 // ─────────────────────────────────────────────
-// Step 2: XLOOKUP集約（_cacheシート方式）
+// Step 2: XLOOKUP集約（【自動】マスター参照シート方式）
 // ─────────────────────────────────────────────
 
 interface Step2Result {
@@ -130,15 +130,15 @@ function step2_consolidateXlookup(
   const masterName = CONFIG.masterSheetName;
   const cacheName = CONFIG.cacheSheetName;
 
-  // 2-1. _cache シートの作成
-  _log('Step2', '_cache シート作成');
+  // 2-1. 【自動】マスター参照 シートの作成
+  _log('Step2', '【自動】マスター参照 シート作成');
   const cacheFormula =
     `=ArrayFormula(IFERROR(XLOOKUP(` +
     `'${sheetName}'!E${startRow}:E${endRow}&'${sheetName}'!BB${startRow}:BB${endRow},` +
     `'${masterName}'!B2:B&TEXT('${masterName}'!R2:R,"0000000"),` +
     `'${masterName}'!C2:S2)))`;
 
-  _log('Step2', `_cache!A${startRow} = ${cacheFormula}`);
+  _log('Step2', `【自動】マスター参照!A${startRow} = ${cacheFormula}`);
 
   if (!dryRun) {
     let cacheSheet = ss.getSheetByName(cacheName);
@@ -152,7 +152,7 @@ function step2_consolidateXlookup(
     result.cacheCreated = true;
   }
 
-  // 2-3. 月別シートの各セルを _cache 参照に置換
+  // 2-3. 月別シートの各セルを 【自動】マスター参照 参照に置換
   for (const mapping of CONFIG.step2.xlookupMappings) {
     const newFormula = `=ArrayFormula('${cacheName}'!${mapping.cacheCol}${startRow}:${mapping.cacheCol}${endRow})`;
     _log('Step2', `${mapping.targetCell}: → ${newFormula} (${mapping.description})`);

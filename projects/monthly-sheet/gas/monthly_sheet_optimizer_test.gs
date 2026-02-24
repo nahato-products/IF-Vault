@@ -11,7 +11,7 @@
  *   1. 数学的等価性テスト（Step 5 の源泉徴収）
  *   2. スポットチェック（ランダム行の全列突合）
  *   3. 列ごとの詳細比較
- *   4. _cache シートの整合性チェック
+ *   4. 【自動】マスター参照 シートの整合性チェック
  *   5. まとめシートへの影響検証
  *   6. パフォーマンス改善度の計測
  *
@@ -33,7 +33,7 @@ function onOpen_test() {
     .addSeparator()
     .addItem('源泉徴収 数学的等価性テスト',     'testStep5MathEquivalence')
     .addItem('スポットチェック（ランダム10行）', 'testSpotCheck')
-    .addItem('_cache 整合性チェック',           'testCacheIntegrity')
+    .addItem('【自動】マスター参照 整合性チェック',           'testCacheIntegrity')
     .addItem('まとめシート影響テスト',          'testSummarySheetImpact')
     .addItem('パフォーマンス比較テスト',        'testPerformanceComparison')
     .addItem('数式構造テスト',                 'testFormulaStructure')
@@ -55,7 +55,7 @@ function runAllTests() {
     { name: '数式構造テスト',           fn: testFormulaStructure },
     { name: '源泉徴収 等価性テスト',     fn: testStep5MathEquivalence },
     { name: 'スポットチェック',          fn: testSpotCheck },
-    { name: '_cache 整合性チェック',     fn: testCacheIntegrity },
+    { name: '【自動】マスター参照 整合性チェック',     fn: testCacheIntegrity },
     { name: 'まとめシート影響テスト',    fn: testSummarySheetImpact },
   ];
 
@@ -116,11 +116,11 @@ function testFormulaStructure() {
     }
   }
 
-  // Step 2: _cache 参照式がシート名を含むこと
+  // Step 2: 【自動】マスター参照 参照式がシート名を含むこと
   for (const [cell, formula] of Object.entries(defs.step2.formulas)) {
     if (cell === 'I5') continue; // I5 は特殊
     if (!formula.includes(CONFIG.cacheSheet)) {
-      errors.push(`Step2 ${cell}: _cache シート参照がない: ${formula}`);
+      errors.push(`Step2 ${cell}: 【自動】マスター参照 シート参照がない: ${formula}`);
     }
   }
 
@@ -235,33 +235,33 @@ function testSpotCheck() {
 }
 
 /**
- * テスト4: _cache シートの整合性チェック
- * _cache の値がマスター原本の XLOOKUP 結果と一致するか
+ * テスト4: 【自動】マスター参照 シートの整合性チェック
+ * 【自動】マスター参照 の値がマスター原本の XLOOKUP 結果と一致するか
  */
 function testCacheIntegrity() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const cache = ss.getSheetByName(CONFIG.cacheSheet);
 
   if (!cache) {
-    return { passed: true, message: '_cache シートが未作成（Step 2 未適用）— スキップ' };
+    return { passed: true, message: '【自動】マスター参照 シートが未作成（Step 2 未適用）— スキップ' };
   }
 
   const s = CONFIG.dataStartRow;
   const e = CONFIG.dataEndRow;
 
-  // _cache の A列（= マスター原本 C列 = IF名称）が空でないことを確認
+  // 【自動】マスター参照 の A列（= マスター原本 C列 = IF名称）が空でないことを確認
   const col_a = cache.getRange(`A${s}:A${e}`).getValues();
   const nonEmpty = col_a.filter(row => row[0] !== '' && row[0] != null).length;
 
   if (nonEmpty === 0) {
-    return { passed: false, message: '_cache!A列が全て空です。XLOOKUP が正しく展開されていない可能性があります。' };
+    return { passed: false, message: '【自動】マスター参照!A列が全て空です。XLOOKUP が正しく展開されていない可能性があります。' };
   }
 
-  // _cache の列数が 17（C〜S列 = 17列）であることを確認
+  // 【自動】マスター参照 の列数が 17（C〜S列 = 17列）であることを確認
   const headerRow = cache.getRange(`A${s}:Q${s}`).getValues()[0];
   const colCount = headerRow.filter(v => v !== '' && v != null).length;
 
-  // マスター原本の行数と _cache の有効行数が合理的であることを確認
+  // マスター原本の行数と 【自動】マスター参照 の有効行数が合理的であることを確認
   const monthly = ss.getSheetByName(CONFIG.monthlySheet);
   const eCol = monthly.getRange(`E${s}:E${e}`).getValues();
   const monthlyNonEmpty = eCol.filter(row => row[0] !== '' && row[0] != null).length;
@@ -269,12 +269,12 @@ function testCacheIntegrity() {
   return {
     passed: nonEmpty > 0,
     message: [
-      `_cache データ行: ${nonEmpty}/${e - s + 1}行にデータあり`,
-      `_cache 列数: ${colCount}列（期待: 最大17列）`,
+      `【自動】マスター参照 データ行: ${nonEmpty}/${e - s + 1}行にデータあり`,
+      `【自動】マスター参照 列数: ${colCount}列（期待: 最大17列）`,
       `月別シート E列 データ行: ${monthlyNonEmpty}行`,
       nonEmpty >= monthlyNonEmpty * 0.8
         ? '✅ データ充足率は十分'
-        : `⚠️ _cache のデータが月別シートより少ない（${nonEmpty} < ${monthlyNonEmpty}）`,
+        : `⚠️ 【自動】マスター参照 のデータが月別シートより少ない（${nonEmpty} < ${monthlyNonEmpty}）`,
     ].join('\n'),
   };
 }

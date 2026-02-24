@@ -32,7 +32,7 @@ const CONFIG = {
   // --- シート名 ---
   monthlySheet:   '2026年02月',
   masterSheet:    'マスター原本',
-  cacheSheet:     '_cache',
+  cacheSheet:     '【自動】マスター参照',
   cvSheet:        '◆CV',
   listSheet:      '◆list',
   snapshotSheet:  '_snapshot',
@@ -242,7 +242,7 @@ function preflight() {
     }
   }
 
-  // _cache シートの重複チェック
+  // 【自動】マスター参照 シートの重複チェック
   if (ss.getSheetByName(CONFIG.cacheSheet)) {
     issues.push(`⚠️ シート「${CONFIG.cacheSheet}」が既に存在します（Step 2 で上書きされます）`);
   }
@@ -321,7 +321,7 @@ function takeSnapshot() {
  *
  * @param {string} stepKey - ステップ識別子（例: 'step1'）
  * @param {Object} stepDef - buildFormulas_() で定義されたステップ定義
- * @param {Function} [preAction] - 数式適用前に実行するフック（例: _cache シート作成）
+ * @param {Function} [preAction] - 数式適用前に実行するフック（例: 【自動】マスター参照 シート作成）
  * @return {boolean} 成功なら true
  */
 function applyStep_(stepKey, stepDef, preAction) {
@@ -360,7 +360,7 @@ function applyStep_(stepKey, stepDef, preAction) {
   }
   props.setProperty(`backup_${stepKey}`, JSON.stringify(oldFormulas));
 
-  // フック実行（Step 2 の _cache 作成など）
+  // フック実行（Step 2 の 【自動】マスター参照 作成など）
   if (preAction) preAction(ss);
 
   // 数式適用
@@ -504,7 +504,7 @@ function rollbackStep_(stepKey) {
     }
   }
 
-  // Step 2 の場合は _cache シートも削除
+  // Step 2 の場合は 【自動】マスター参照 シートも削除
   if (stepKey === 'step2') {
     const cache = ss.getSheetByName(CONFIG.cacheSheet);
     if (cache) ss.deleteSheet(cache);
@@ -565,11 +565,11 @@ function applyStep1() {
 function applyStep2() {
   const defs = buildFormulas_();
   applyStep_('step2', defs.step2, function createCacheSheet(ss) {
-    // 既存の _cache を削除
+    // 既存の 【自動】マスター参照 を削除
     const existing = ss.getSheetByName(CONFIG.cacheSheet);
     if (existing) ss.deleteSheet(existing);
 
-    // _cache シート作成
+    // 【自動】マスター参照 シート作成
     const cache = ss.insertSheet(CONFIG.cacheSheet);
     cache.getRange('A5').setFormula(defs.step2.cacheFormula);
 
@@ -768,7 +768,7 @@ function measurePerformance() {
 
 /**
  * BN5 の XLOOKUP 数式を解析し、マスター原本のどの列を参照しているか特定する。
- * → _cache のどの列に対応するかを表示する。
+ * → 【自動】マスター参照 のどの列に対応するかを表示する。
  */
 function detectBN5Column() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -801,16 +801,16 @@ function detectBN5Column() {
     return;
   }
 
-  // C列を起点として _cache 列を計算
+  // C列を起点として 【自動】マスター参照 列を計算
   const masterOffset = colToIndex_(masterCol) - colToIndex_('C');
   const cacheCol = indexToCol_(masterOffset);
 
-  const cacheMapping = `BN5 → マスター原本!${masterCol}列 → _cache!${cacheCol}列`;
+  const cacheMapping = `BN5 → マスター原本!${masterCol}列 → 【自動】マスター参照!${cacheCol}列`;
   const referenceFormula = `=ArrayFormula('${CONFIG.cacheSheet}'!${cacheCol}${CONFIG.dataStartRow}:${cacheCol}${CONFIG.dataEndRow})`;
 
   ui.alert(
     'BN5 検出結果',
-    `✅ BN5 の参照先を特定しました。\n\n${cacheMapping}\n\n_cache 参照式:\n${referenceFormula}\n\n※ この式を BN5 に設定すると _cache 経由の参照に切り替わります。`,
+    `✅ BN5 の参照先を特定しました。\n\n${cacheMapping}\n\n【自動】マスター参照 参照式:\n${referenceFormula}\n\n※ この式を BN5 に設定すると 【自動】マスター参照 経由の参照に切り替わります。`,
     ui.ButtonSet.OK
   );
 
@@ -894,7 +894,7 @@ function cleanup() {
 
   const confirm = ui.alert(
     'クリーンアップ',
-    '以下のシートを削除します:\n- _snapshot\n- _log\n\n※ _cache は残ります（本番で使用中）\n※ Script Properties のバックアップも削除されます\n\n続行しますか？',
+    '以下のシートを削除します:\n- _snapshot\n- _log\n\n※ 【自動】マスター参照 は残ります（本番で使用中）\n※ Script Properties のバックアップも削除されます\n\n続行しますか？',
     ui.ButtonSet.YES_NO
   );
   if (confirm !== ui.Button.YES) return;

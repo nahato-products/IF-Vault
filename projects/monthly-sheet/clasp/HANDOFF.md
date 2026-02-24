@@ -34,7 +34,7 @@ monthly-sheet-optimizer/
     ├── config.ts        # 全設定値を一元管理（シート名、行範囲、マッピング等）
     ├── optimizer.ts     # 6つの最適化ステップ（step1〜step6）
     ├── validator.ts     # before/afterスナップショット比較
-    ├── cache.ts         # _cacheシートの作成・保護・削除
+    ├── cache.ts         # 【自動】マスター参照シートの作成・保護・削除
     ├── loadTest.ts      # 負荷テスト実行・比較レポート生成
     └── main.ts          # onOpen()メニュー + 各ステップのランナー関数
 ```
@@ -44,7 +44,7 @@ monthly-sheet-optimizer/
 | Step | 内容 | 関数 |
 |------|------|------|
 | 1 | SUM範囲クローズ（開放範囲→固定範囲） | `step1_closeOpenRanges()` |
-| 2 | XLOOKUP統合（14本→_cacheシート経由で1本） | `step2_consolidateXlookup()` |
+| 2 | XLOOKUP統合（14本→【自動】マスター参照シート経由で1本） | `step2_consolidateXlookup()` |
 | 3 | ◆CVサーチキー統合（BQ5で生成→U/V/W参照） | `step3_cvKeyConsolidation()` |
 | 4 | LETキャッシュ（T5/Z5/AA5の重複計算排除） | `step4_letCaching()` |
 | 5 | 税計算簡略化（AE5/AG5）※ズレたら自動ロールバック | `step5_taxSimplification()` |
@@ -93,4 +93,4 @@ npx clasp push
 - `config.ts` の `TARGET_SHEET_NAME` を変えれば別の月タブにも適用可能
 - dryRun=trueで実行すると変更せずログだけ出る
 - Step 5（税計算）は値がズレたら自動でロールバックする
-- _cacheシートは非表示+保護で作成される
+- 【自動】マスター参照シートは非表示+保護で作成される
