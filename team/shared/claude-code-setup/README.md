@@ -11,24 +11,51 @@ bash team/shared/claude-code-setup/install.sh
 
 確認プロンプトが出るので `y` で続行。既存ファイルは上書きしない（差分がある hooks のみバックアップ＆更新）。
 
-### オプション
+### コマンド一覧
+
+| コマンド | 説明 |
+|---------|------|
+| `bash install.sh` | フルインストール（全52スキル + hooks + settings） |
+| `bash install.sh -y` | 確認プロンプトをスキップ（CI・自動実行向け） |
+| `bash install.sh --dry-run` | 実際には変更せず内容をプレビュー |
+| `bash install.sh --list` | 利用可能なスキル一覧（インストール済み状態も表示） |
+| `bash install.sh --verify` | ヘルスチェック（スキル数・hooks・settings を確認） |
+| `bash install.sh --skill=スキル名` | 指定スキルだけ追加（既存はスキップ） |
+| `bash install.sh --update=スキル名` | 指定スキルを強制上書き更新 |
+| `bash install.sh --community` | コミュニティスキル11個を一括インストール |
+| `bash install.sh --help` | ヘルプ表示 |
+
+### 使い方の例
 
 ```bash
-# ヘルスチェック（インストール後の検証）
+# 初回セットアップ（推奨）
+bash team/shared/claude-code-setup/install.sh
+
+# CI や自動実行（確認スキップ）
+bash team/shared/claude-code-setup/install.sh -y
+
+# 何がインストールされるか事前確認
+bash team/shared/claude-code-setup/install.sh --dry-run
+
+# インストール済みスキルの一覧確認
+bash team/shared/claude-code-setup/install.sh --list
+
+# ヘルスチェック
 bash team/shared/claude-code-setup/install.sh --verify
 
-# コミュニティスキル一括インストール
-bash team/shared/claude-code-setup/install.sh --community
-
-# 指定スキルだけインストール
+# playwright だけ追加
 bash team/shared/claude-code-setup/install.sh --skill=playwright
-bash team/shared/claude-code-setup/install.sh --skill=deep-research
 
-# 両方同時
-bash team/shared/claude-code-setup/install.sh --verify --community
+# deep-research を最新版に更新
+bash team/shared/claude-code-setup/install.sh --update=deep-research
+
+# コミュニティスキル追加
+bash team/shared/claude-code-setup/install.sh --community
 ```
 
-Claude に読ませて個別インストールする場合は「`--skill=スキル名` で playwright だけ入れて」と伝えるだけでOK。
+### Claude に読ませて使う場合
+
+install.sh を Claude に読ませて「`--skill=playwright` で playwright だけ入れて」と伝えるだけで個別インストールできます。
 
 ### ロール別クイックスタート
 
@@ -67,7 +94,7 @@ settings.json に登録される破壊的コマンドのブロックリスト:
 - `git reset --hard` / `git clean -fd`
 - `git checkout .` / `git restore .`
 
-### Skills（50個）
+### Skills（52個）
 
 **フロントエンド / UI（13個）**
 
@@ -87,11 +114,12 @@ settings.json に登録される破壊的コマンドのブロックリスト:
 | vercel-react-best-practices | Core Web Vitals / バンドル最適化 |
 | web-design-guidelines | WCAG 2.2 / セマンティックHTML |
 
-**バックエンド / DB（7個）**
+**バックエンド / DB（8個）**
 
 | スキル | 用途 |
 |--------|------|
 | api-design-patterns | RESTful API 設計・OpenAPI |
+| ansem-db-patterns | ANSEM プロジェクト DB 設計パターン |
 | docker-expert | Dockerfile / docker-compose 最適化 |
 | error-handling-logging | エラー境界・構造化ログ・Sentry |
 | observability | OpenTelemetry / SLI/SLO 計装 |
@@ -144,10 +172,11 @@ settings.json に登録される破壊的コマンドのブロックリスト:
 | transcribe-and-update | 録音 → 既存議事録更新 |
 | transcribe-to-minutes | 録音 → 新規議事録作成 |
 
-**コンテンツ / 特化（5個）**
+**コンテンツ / 特化（6個）**
 
 | スキル | 用途 |
 |--------|------|
+| chrome-extension-dev | Chrome 拡張機能開発 |
 | dashboard-data-viz | KPI ダッシュボード・TanStack Table |
 | deep-research | Gemini 使用の深掘りリサーチ ※2 |
 | line-bot-dev | LINE Bot / LIFF 開発 |
@@ -298,5 +327,5 @@ Git参加者に新しいzipをもらい、再度 `bash install.sh` を実行。�
 
 | バージョン | 日付 | スキル数 | 主な変更 |
 |-----------|------|---------|---------|
-| v1.0.0 | 2026-02-25 | 50個 | 31スキル追加（セキュリティ・議事録・品質系を大幅拡充）。スタンドアロン配布対応 |
+| v1.0.0 | 2026-02-25 | 52個 | 31スキル追加（セキュリティ・議事録・品質系を大幅拡充）。ansem-db-patterns・chrome-extension-dev 追加。スタンドアロン配布対応 |
 | v0 | 2026-02 | 19個 | 初期リリース |
