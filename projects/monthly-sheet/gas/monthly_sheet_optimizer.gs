@@ -97,14 +97,17 @@ function autoDetectEndRows_() {
   const monthly = ss.getSheetByName(OPT_CFG.monthlySheet);
   if (!monthly) return;
 
+  // dataEndRow: データがある最終行を使用
   const lastRow = monthly.getLastRow();
   if (lastRow > OPT_CFG.dataEndRow) {
     Logger.log(`📊 dataEndRow を自動更新: ${OPT_CFG.dataEndRow} → ${lastRow}`);
     OPT_CFG.dataEndRow = lastRow;
   }
-  if (lastRow > OPT_CFG.aggregateEndRow) {
-    Logger.log(`📊 aggregateEndRow を自動更新: ${OPT_CFG.aggregateEndRow} → ${lastRow}`);
-    OPT_CFG.aggregateEndRow = lastRow;
+  // aggregateEndRow: シートの全行数を使用（オープンレンジと同等の動作にする）
+  const maxRows = monthly.getMaxRows();
+  if (maxRows > OPT_CFG.aggregateEndRow) {
+    Logger.log(`📊 aggregateEndRow を自動更新: ${OPT_CFG.aggregateEndRow} → ${maxRows}（シート全行数）`);
+    OPT_CFG.aggregateEndRow = maxRows;
   }
 }
 
