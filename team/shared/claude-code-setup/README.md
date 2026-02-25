@@ -111,7 +111,58 @@ install.sh は既存環境を壊さない設計。
 └── debug/                     # デバッグログ
 ```
 
+## Git非参加者への配布（スタンドアロン版）
+
+Git リポジトリにアクセスできないメンバーにも、同じ環境を配布できる。
+
+### 配布フロー
+
+```
+① Git参加者がビルド
+  $ bash team/shared/claude-code-setup/build-package.sh 1.0.0
+  → dist/claude-code-setup-v1.0.0.zip 生成
+
+② zip を配布（Slack / Google Drive / AirDrop 等）
+
+③ 受取側が実行
+  $ unzip claude-code-setup-v1.0.0.zip
+  $ cd claude-code-setup-v1.0.0
+  $ bash install.sh
+```
+
+### Git版との違い
+
+| 項目 | Git版 (install.sh) | スタンドアロン版 |
+|------|-------------------|-----------------|
+| Skills 配置方式 | シンボリックリンク（リポに追従） | コピー（独立） |
+| スキル更新 | `git pull` で自動 | 新しいzipで再インストール |
+| 前提条件 | IF-Vault clone 済み | Claude Code のみ |
+| 対象 | Git参加メンバー | 外部メンバー・一時利用者 |
+
+### バージョン指定
+
+```bash
+# バージョン番号を指定（推奨）
+bash build-package.sh 1.0.0
+
+# 省略すると日付が使われる（例: 20260221）
+bash build-package.sh
+```
+
+生成された zip には `VERSION` ファイルが含まれ、ビルド日時・スキル数が記録される。
+
+### ヘルスチェック・コミュニティスキル
+
+スタンドアロン版でも同じオプションが使える:
+
+```bash
+bash install.sh --verify      # ヘルスチェック
+bash install.sh --community   # コミュニティスキル追加
+```
+
 ## 更新方法
+
+### Git参加者
 
 ```bash
 git pull
@@ -120,3 +171,7 @@ git pull
 シンボリックリンク経由なので `git pull` だけで全メンバーの共有スキルが更新される。再リンク不要。
 
 hooks に更新がある場合は再度 `install.sh` を実行すれば差分のみ更新。既存の skills や CLAUDE.md は上書きされない。
+
+### スタンドアロン版利用者
+
+Git参加者に新しいzipをもらい、再度 `bash install.sh` を実行。既存の skills・CLAUDE.md は上書きされないため、hooks と settings.json の差分のみ反映される。

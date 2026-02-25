@@ -10,3 +10,6 @@ Thumbs.db
 .obsidian/workspace.json
 .obsidian/appearance.json
 *.DS_Store
+
+# Claude Code ローカル設定（個人のdenyルール等）
+.claude/settings.local.json
