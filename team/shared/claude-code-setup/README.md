@@ -20,9 +20,15 @@ bash team/shared/claude-code-setup/install.sh --verify
 # コミュニティスキル一括インストール
 bash team/shared/claude-code-setup/install.sh --community
 
+# 指定スキルだけインストール
+bash team/shared/claude-code-setup/install.sh --skill=playwright
+bash team/shared/claude-code-setup/install.sh --skill=deep-research
+
 # 両方同時
 bash team/shared/claude-code-setup/install.sh --verify --community
 ```
+
+Claude に読ませて個別インストールする場合は「`--skill=スキル名` で playwright だけ入れて」と伝えるだけでOK。
 
 ### ロール別クイックスタート
 
@@ -30,11 +36,13 @@ bash team/shared/claude-code-setup/install.sh --verify --community
 
 | ロール | 説明 | 重点スキル |
 |--------|------|-----------|
-| 全員共通 | 全27スキルをインストール | Tier 1〜4 全部 |
+| 全員共通 | 全スキルをインストール | Tier 1〜4 全部 |
 | フロントエンド | UI/UX・React・デザイン系を優先表示 | react-component-patterns, tailwind-design-system, design-token-system 等 |
-| バックエンド | DB・API・インフラ系を優先表示 | ansem-db-patterns, supabase-postgres-best-practices, docker-expert 等 |
+| バックエンド | DB・API・インフラ系を優先表示 | supabase-postgres-best-practices, docker-expert 等 |
 
 ※ どのロールでも全スキルがインストールされる。推奨表示は参考情報。
+
+---
 
 ## 何がインストールされるか
 
@@ -59,15 +67,95 @@ settings.json に登録される破壊的コマンドのブロックリスト:
 - `git reset --hard` / `git clean -fd`
 - `git checkout .` / `git restore .`
 
-### Skills（24個 共有 + 3個 メタ = 27個）
+### Skills（50個）
 
-`team/shared/skills/` の 24 スキルを **シンボリックリンク** で `~/.claude/skills/` にインストール。加えてメタスキル 3 個（claude-env-optimizer, context-economy, skill-forge）をリンク。
+**フロントエンド / UI（13個）**
 
-一覧:
+| スキル | 用途 |
+|--------|------|
+| baseline-ui | Tailwind/Radix UI アンチパターン防止 |
+| design-brief | UI実装前のデザインブリーフ強制 |
+| design-token-system | Tailwind v4 デザイントークン設計 |
+| micro-interaction-patterns | Framer Motion マイクロインタラクション |
+| mobile-first-responsive | LIFF/PWA モバイルファースト実装 |
+| nextjs-app-router-patterns | Next.js 15/16 App Router パターン |
+| react-component-patterns | React コンポーネント設計パターン |
+| style-reference-db | デザインスタイル参照プリセット |
+| tailwind-design-system | Tailwind CSS v4 設定・移行 |
+| ux-psychology | UX心理学原則（Nielsen/Gestalt等） |
+| vercel-ai-sdk | Vercel AI SDK AI機能実装 |
+| vercel-react-best-practices | Core Web Vitals / バンドル最適化 |
+| web-design-guidelines | WCAG 2.2 / セマンティックHTML |
 
-**共有スキル (24個):** ansem-db-patterns, chrome-extension-dev, ci-cd-deployment, dashboard-data-viz, design-token-system, docker-expert, error-handling-logging, line-bot-dev, micro-interaction-patterns, mobile-first-responsive, natural-japanese-writing, nextjs-app-router-patterns, obsidian-power-user, react-component-patterns, security-review, supabase-auth-patterns, supabase-postgres-best-practices, systematic-debugging, tailwind-design-system, testing-strategy, typescript-best-practices, ux-psychology, vercel-react-best-practices, web-design-guidelines
+**バックエンド / DB（7個）**
 
-**メタスキル (3個):** claude-env-optimizer, context-economy, skill-forge
+| スキル | 用途 |
+|--------|------|
+| api-design-patterns | RESTful API 設計・OpenAPI |
+| docker-expert | Dockerfile / docker-compose 最適化 |
+| error-handling-logging | エラー境界・構造化ログ・Sentry |
+| observability | OpenTelemetry / SLI/SLO 計装 |
+| supabase-auth-patterns | Supabase Auth + RLS 認証設計 |
+| supabase-postgres-best-practices | Postgres パフォーマンス最適化 |
+| typescript-best-practices | 高度な TypeScript パターン |
+
+**品質 / テスト / セキュリティ（9個）**
+
+| スキル | 用途 |
+|--------|------|
+| code-refactoring | リファクタリング・SOLID原則適用 |
+| code-review | 多段階コードレビュー |
+| playwright | ブラウザ自動化・UI テスト ※1 |
+| security-arsenal | Red/Blue セキュリティ操作 |
+| security-best-practices | OWASP Top 10 防御実装 |
+| security-review | 脆弱性検出・トリアージ |
+| security-threat-model | 脅威モデル作成 |
+| systematic-debugging | 根本原因デバッグ |
+| testing-strategy | Vitest / Playwright テスト戦略 |
+
+**開発効率 / CI（8個）**
+
+| スキル | 用途 |
+|--------|------|
+| brainstorming | 機能設計・要件整理の壁打ち |
+| ci-cd-deployment | GitHub Actions / Vercel CI/CD |
+| claude-env-optimizer | Claude Code 環境診断・最適化 |
+| cognitive-load-optimizer | 認知負荷低減・フロー維持 |
+| context-economy | トークン消費最適化 |
+| duckdb-csv | CSV を SQL で分析 |
+| skill-forge | スキル作成・評価・最適化 |
+| skill-loader | 非アクティブスキルのオンデマンド復元 |
+
+**SEO / マーケ（2個）**
+
+| スキル | 用途 |
+|--------|------|
+| lazy-user-ux-review | 最も怠惰なユーザー視点 UI/UX スコアリング |
+| seo | 技術的 SEO・構造化データ |
+
+**議事録 / ドキュメント（6個）**
+
+| スキル | 用途 |
+|--------|------|
+| create-minutes | Notion 議事録テンプレ自動生成 |
+| fill-external-minutes | 社外向け議事録生成 |
+| notion-pdf | Notion ページ PDF 変換 |
+| share-minutes | 議事録 PDF → メール添付 |
+| transcribe-and-update | 録音 → 既存議事録更新 |
+| transcribe-to-minutes | 録音 → 新規議事録作成 |
+
+**コンテンツ / 特化（5個）**
+
+| スキル | 用途 |
+|--------|------|
+| dashboard-data-viz | KPI ダッシュボード・TanStack Table |
+| deep-research | Gemini 使用の深掘りリサーチ ※2 |
+| line-bot-dev | LINE Bot / LIFF 開発 |
+| natural-japanese-writing | AI 文体を排除した自然な日本語 |
+| obsidian-power-user | Obsidian Vault 構築・自動化 |
+
+> ※1 **playwright**: Playwright のインストールが必要（`npx playwright install`）
+> ※2 **deep-research**: `skills/deep-research/.env` に `GEMINI_API_KEY` の設定が必要
 
 ### コミュニティスキル（11個・`--community` でインストール）
 
@@ -79,9 +167,11 @@ baseline-ui, deep-research, docx, ffmpeg, find-skills, finishing-a-development-b
 
 `~/.claude/CLAUDE.md` が存在しない場合のみインストール。チーム共通のベースルール（日本語応対、セキュリティ、Git運用）を含む。**インストール後に自分の好みにカスタマイズすること。**
 
-## 安全性
+---
 
-install.sh は既存環境を壊さない設計。
+## 安全性・既存環境への影響
+
+### install.sh の上書き防止設計
 
 | 対象 | 既存がある場合の動作 |
 |------|---------------------|
@@ -90,7 +180,26 @@ install.sh は既存環境を壊さない設計。
 | settings.json | Python マージで deny 追加のみ。既存 allow は保持 |
 | CLAUDE.md | **スキップ**（上書きしない） |
 
-`--verify` / `--community` はオプション引数。デフォルト動作は変わらない。
+### v1.0.0 リリース時の新規スキル（31個）が既存環境に与える影響
+
+v1.0.0 では既存の 19 スキルに**一切変更を加えていない**（git diff で確認済み）。新スキルは全て追加のみ。
+
+- **名前の競合なし**: 31 個の新スキル名は全て既存スキルと異なる
+- **既存スキルへの変更なし**: v0 からの既存 19 スキルのファイルは無変更
+- **install.sh はスキップ設計**: すでにスキルをインストール済みのメンバーが再実行しても、既存スキルは上書きされず新スキルのみ追加される
+- **settings.json の deny list**: 新スキルに関連する deny 追加はなし。既存設定に変化なし
+
+### 実行ファイルを含むスキル
+
+以下のスキルはスクリプトを含むが、Claude が明示的に呼び出した場合にのみ実行される。自動起動や副作用はない。
+
+| スキル | ファイル | 備考 |
+|--------|---------|------|
+| playwright | `scripts/playwright_cli.sh` | Playwright インストール済み環境が必要 |
+| systematic-debugging | `find-polluter.sh` | git bisect ヘルパー。git 環境のみで動作 |
+| deep-research | `scripts/research.py` | Gemini API キーが必要（`.env` に設定） |
+
+---
 
 ## セットアップ後にやること
 
@@ -98,6 +207,9 @@ install.sh は既存環境を壊さない設計。
 2. Claude Code を再起動（`claude` コマンドを再実行）
 3. `bash install.sh --verify` でヘルスチェック
 4. `bash install.sh --community` でコミュニティスキルをインストール
+5. deep-research を使う場合は `~/.claude/skills/deep-research/.env` に Gemini API キーを設定（`.env.example` を参照）
+
+---
 
 ## ディレクトリ構成
 
@@ -106,10 +218,12 @@ install.sh は既存環境を壊さない設計。
 ├── CLAUDE.md                  # 個人設定（テンプレートから作成）
 ├── settings.json              # hooks + deny list
 ├── hooks/                     # 8スクリプト
-├── skills/                    # 27+ スキル（共有24 + メタ3 + コミュニティ）
+├── skills/                    # 50+ スキル
 ├── session-env/               # セッション状態保存
 └── debug/                     # デバッグログ
 ```
+
+---
 
 ## Git非参加者への配布（スタンドアロン版）
 
@@ -160,6 +274,8 @@ bash install.sh --verify      # ヘルスチェック
 bash install.sh --community   # コミュニティスキル追加
 ```
 
+---
+
 ## 更新方法
 
 ### Git参加者
@@ -175,3 +291,12 @@ hooks に更新がある場合は再度 `install.sh` を実行すれば差分の
 ### スタンドアロン版利用者
 
 Git参加者に新しいzipをもらい、再度 `bash install.sh` を実行。既存の skills・CLAUDE.md は上書きされないため、hooks と settings.json の差分のみ反映される。
+
+---
+
+## リリース履歴
+
+| バージョン | 日付 | スキル数 | 主な変更 |
+|-----------|------|---------|---------|
+| v1.0.0 | 2026-02-25 | 50個 | 31スキル追加（セキュリティ・議事録・品質系を大幅拡充）。スタンドアロン配布対応 |
+| v0 | 2026-02 | 19個 | 初期リリース |

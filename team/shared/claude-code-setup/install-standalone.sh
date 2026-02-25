@@ -7,8 +7,9 @@
 #
 # 使い方: bash install.sh
 # オプション:
-#   --verify     インストール後ヘルスチェック
-#   --community  コミュニティスキル一括インストール
+#   --verify          インストール後ヘルスチェック
+#   --community       コミュニティスキル一括インストール
+#   --skill=スキル名  指定スキルだけインストール
 # ============================================================
 
 set -euo pipefail
@@ -30,19 +31,26 @@ header(){ printf "\n${CYAN}--- %s ---${NC}\n" "$1"; }
 # --- 引数パース ---
 FLAG_VERIFY=false
 FLAG_COMMUNITY=false
+FLAG_SKILL=""
 
 for arg in "$@"; do
   case "$arg" in
     --verify)    FLAG_VERIFY=true ;;
     --community) FLAG_COMMUNITY=true ;;
+    --skill=*)   FLAG_SKILL="${arg#--skill=}" ;;
     --help|-h)
-      echo "使い方: bash install.sh [--verify] [--community]"
+      echo "使い方: bash install.sh [--verify] [--community] [--skill=スキル名]"
       echo ""
       echo "オプション:"
-      echo "  (なし)       チーム環境フルインストール"
-      echo "  --verify     ヘルスチェックのみ実行"
-      echo "  --community  コミュニティスキル(11個)を一括インストール"
-      echo "  --help       このヘルプを表示"
+      echo "  (なし)             チーム環境フルインストール"
+      echo "  --verify           ヘルスチェックのみ実行"
+      echo "  --community        コミュニティスキル(11個)を一括インストール"
+      echo "  --skill=スキル名   指定スキルだけインストール"
+      echo "  --help             このヘルプを表示"
+      echo ""
+      echo "例:"
+      echo "  bash install.sh --skill=playwright      # playwright だけ追加"
+      echo "  bash install.sh --skill=deep-research   # deep-research だけ追加"
       exit 0
       ;;
     *) error "不明なオプション: $arg (--help でヘルプ表示)"; exit 1 ;;
@@ -98,10 +106,10 @@ run_verify() {
   if [ -d "$SKILLS_DIR" ]; then
     skill_count=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -o -type l | wc -l | tr -d ' ')
   fi
-  if [ "$skill_count" -ge 24 ]; then
+  if [ "$skill_count" -ge 50 ]; then
     ok "Skills: ${skill_count}個 インストール済み"
   else
-    warn "Skills: ${skill_count}個 (期待: 24個以上)"
+    warn "Skills: ${skill_count}個 (期待: 50個以上)"
     issues=$((issues + 1))
   fi
 
@@ -262,8 +270,49 @@ run_community() {
 }
 
 # ============================================================
+# 個別スキルインストール関数（--skill で使用）
+# ============================================================
+run_skill() {
+  local skill_name="$1"
+  local src="${BUNDLED_SKILLS_DIR}/${skill_name}"
+  local dest="${SKILLS_DIR}/${skill_name}"
+
+  echo ""
+  echo "========================================="
+  echo "  スキル個別インストール: ${skill_name}"
+  echo "========================================="
+  echo ""
+
+  if [ ! -d "$src" ]; then
+    error "スキルが見つかりません: ${skill_name}"
+    echo ""
+    echo "利用可能なスキル一覧:"
+    ls "$BUNDLED_SKILLS_DIR" | sed 's/^/  /'
+    exit 1
+  fi
+
+  if [ -d "$dest" ] || [ -L "$dest" ]; then
+    ok "${skill_name}: 既にインストール済み（スキップ）"
+    echo "  → 再インストールしたい場合は手動で ~/.claude/skills/${skill_name} を削除してください"
+    exit 0
+  fi
+
+  mkdir -p "$SKILLS_DIR"
+  cp -r "$src" "$dest"
+  ok "${skill_name}: インストール完了 → ~/.claude/skills/${skill_name}"
+  echo ""
+  echo "Claude Code を再起動して有効化してください"
+  echo ""
+}
+
+# ============================================================
 # フラグのみの場合 → 該当処理だけ実行して終了
 # ============================================================
+if [[ -n "$FLAG_SKILL" ]]; then
+  run_skill "$FLAG_SKILL"
+  exit 0
+fi
+
 if [[ "$FLAG_VERIFY" == true ]] || [[ "$FLAG_COMMUNITY" == true ]]; then
   [[ "$FLAG_VERIFY" == true ]]    && run_verify
   [[ "$FLAG_COMMUNITY" == true ]] && run_community
