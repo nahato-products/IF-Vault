@@ -1,0 +1,51 @@
+name: Claude PR レビュー
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # ドキュメント・ノート変更のみを対象（コードレビューは不要なPRを除外）
+    paths-ignore:
+      - "**/*.md"
+      - "assets/**"
+      - "templates/**"
+
+jobs:
+  claude-review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude Code PR レビュー
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # code-reviewer エージェントに相当するプロンプト
+          direct_prompt: |
+            このPRを4パスでレビューしてください。
+
+            ## Pass 1: セキュリティ
+            - 機密情報のハードコード（APIキー・パスワード）
+            - パス・コマンドインジェクションリスク
+            - 権限・認証の抜け
+
+            ## Pass 2: 品質
+            - 命名の一貫性（kebab-case / camelCase 等）
+            - 重複コード・マジックナンバー
+            - エラーハンドリングの抜け
+
+            ## Pass 3: 整合性
+            - CLAUDE.md の規約に沿っているか
+            - 既存コードのパターンと一致しているか
+
+            ## Pass 4: 改善提案
+            - パフォーマンス・保守性の観点で1〜3件
+
+            結果は日本語で、severity（🔴 CRITICAL / 🟡 WARNING / 🟢 SUGGESTION）付きで出力してください。
+          allowed_tools: "Read,Glob,Grep,Bash"
