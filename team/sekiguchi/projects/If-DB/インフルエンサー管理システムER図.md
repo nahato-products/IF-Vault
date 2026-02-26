@@ -20,6 +20,8 @@
 | ログ系（`t_*_logs`） | `t_agent_logs`, `t_influencer_logs` | 追記専用。更新しない。`created_at` のみ持つ |
 | セキュリティ系（`t_*_security`） | `t_agent_security`, `t_influencer_security` | `created_by` 不要（主キー = 本人）。`created_at` / `updated_at` のみ持つ |
 | 集計系（`t_daily_*`） | `t_daily_performance_details`, `t_daily_click_details` | バッチ処理で自動生成。`created_by` / `updated_by` は不要。`created_at` / `updated_at` のみ持つ |
+| 監査ログ系 | `t_audit_logs` | 追記専用。`operated_at` で管理。`created_by` / `updated_by` 不要 |
+| バッチログ系 | `ingestion_logs` | `finished_at` で管理。ジョブ専用テーブル。`created_by` / `updated_by` 不要 |
 
 > [!NOTE]
 > `created_by` / `updated_by` は `t_agents.agent_id` を参照するが、監査用途のため Mermaid ER図のリレーション定義には記載しない（全テーブルに引くと図が煩雑になるため）。実装時は FK 制約ではなくアプリ側で保証する。
@@ -77,6 +79,7 @@ ER図では表現できないが、実装時に必ず設定する制約。
 | `t_sns_platforms` | `UNIQUE (platform_key)` | 識別キーの重複防止 |
 | `t_influencer_sns_accounts` | `UNIQUE (influencer_id, platform_id) WHERE is_primary = true` | プラットフォームごとにメインアカウントは1件のみ |
 | `t_account_categories` | `UNIQUE (account_id) WHERE is_primary = true` | SNSアカウントごとにメインカテゴリは1件のみ |
+| `t_group_billing_info` | `UNIQUE (group_id) WHERE is_primary = true` | メイン請求先は1グループに1件のみ |
 
 ### インデックス戦略
 
@@ -216,11 +219,16 @@ WHERE id = ? AND version = ?
 
 ## 📊 概要
 
-**4つの主要領域**:
+**8つの主要領域**:
+0. 共通マスタ (Common)
 1. 社内組織 (Internal)
 2. インフルエンサー (Influencer Domain)
+2b. グループ (Group Domain)
 3. パートナー・広告主 (Business)
-4. 広告配信・成果 (Ad Delivery & Performance)
+4. 広告配信 (Ad Delivery)
+5. 成果・集計 (Performance)
+6. 請求確定 (Billing)
+7. ユーティリティ (Utility)
 
 **リレーション表記**:
 - **実線**: 物理的な外部キー制約（システムで強制される繋がり）
@@ -232,6 +240,28 @@ WHERE id = ? AND version = ?
 
 ```mermaid
 erDiagram
+    %% ==========================================
+    %% 0. 共通マスタ (Common)
+    %% ==========================================
+
+    t_countries {
+        SMALLINT country_id PK
+        TEXT country_name
+        TEXT country_code "ISO 3166-1 alpha-2"
+        TEXT country_code3 "ISO 3166-1 alpha-3"
+        TEXT currency_code "通貨コード"
+        TEXT phone_prefix "国際電話プレフィックス"
+        BOOLEAN is_active
+        INTEGER display_order
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    %% リレーション
+    t_countries ||--o{ t_influencers : "国籍・活動拠点"
+
     %% ==========================================
     %% 1. 社内組織 (Internal)
     %% ==========================================
@@ -268,6 +298,12 @@ erDiagram
         TEXT password_salt
         TIMESTAMPTZ last_login_at
         SMALLINT login_failure_count
+        TEXT session_token "セッショントークン"
+        TIMESTAMPTZ session_expires_at "セッション有効期限"
+        TIMESTAMPTZ password_changed_at "パスワード変更日時"
+        TEXT password_reset_token "リセットトークン"
+        TIMESTAMPTZ reset_token_expires_at "リセット有効期限"
+        TIMESTAMPTZ locked_until "ロック解除日時"
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
@@ -296,6 +332,7 @@ erDiagram
         TEXT login_id
         SMALLINT status_id "仮登録→本登録"
         BOOLEAN compliance_check
+        SMALLINT country_id FK "国籍・活動拠点"
         BIGINT created_by FK "作成者agent_id"
         BIGINT updated_by FK "更新者agent_id"
         TIMESTAMPTZ created_at
@@ -307,6 +344,13 @@ erDiagram
         TEXT password_hash
         TEXT password_salt
         TIMESTAMPTZ last_login_at
+        SMALLINT login_failure_count
+        TEXT session_token "セッショントークン"
+        TIMESTAMPTZ session_expires_at "セッション有効期限"
+        TIMESTAMPTZ password_changed_at "パスワード変更日時"
+        TEXT password_reset_token "リセットトークン"
+        TIMESTAMPTZ reset_token_expires_at "リセット有効期限"
+        TIMESTAMPTZ locked_until "ロック解除日時"
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
@@ -444,6 +488,23 @@ erDiagram
         TIMESTAMPTZ updated_at
     }
 
+    t_group_billing_info {
+        BIGINT billing_info_id PK
+        BIGINT group_id FK
+        TEXT billing_name "請求先名称"
+        SMALLINT billing_type_id "1:請求書, 2:適格請求書"
+        TEXT invoice_tax_id "適格請求書番号"
+        SMALLINT purchase_order_status_id "発注書ステータス"
+        BOOLEAN is_primary
+        BOOLEAN is_active
+        DATE valid_from "適用開始日"
+        DATE valid_to "適用終了日"
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
     %% リレーション
     t_influencers ||--|| t_influencer_security : "1:1 認証"
     t_influencers ||--o{ t_influencer_sns_accounts : "SNS(1:N)"
@@ -459,6 +520,7 @@ erDiagram
     t_influencer_groups ||--o{ t_group_addresses : "住所"
     t_influencer_groups ||--o{ t_group_bank_accounts : "口座"
     t_influencer_groups |o--o{ t_partners : "パートナー紐付け"
+    t_influencer_groups ||--o{ t_group_billing_info : "請求先"
 
     %% ==========================================
     %% 3. パートナー・広告主 (Business)
@@ -615,11 +677,130 @@ erDiagram
     t_ad_contents ||--o{ t_daily_performance_details : "集計"
 
     t_partner_sites ||--o{ t_daily_click_details : "クリック集計"
+
+    %% ==========================================
+    %% 6. 請求確定 (Billing)
+    %% ==========================================
+
+    t_billing_runs {
+        BIGINT billing_run_id PK
+        DATE billing_period_from "請求期間開始"
+        DATE billing_period_to "請求期間終了"
+        JSONB filter_conditions "抽出条件スナップショット"
+        BIGINT confirmed_by FK "確定エージェント"
+        TIMESTAMPTZ confirmed_at
+        BOOLEAN is_cancelled
+        BIGINT cancelled_by FK
+        TIMESTAMPTZ cancelled_at
+        TEXT notes
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    t_billing_line_items {
+        BIGINT line_item_id PK
+        BIGINT billing_run_id FK
+        DATE action_date
+        BIGINT partner_id FK
+        BIGINT site_id FK
+        BIGINT client_id FK
+        BIGINT ad_content_id FK
+        TEXT partner_name "スナップショット"
+        TEXT site_name "スナップショット"
+        TEXT client_name "スナップショット"
+        TEXT content_name "スナップショット"
+        INTEGER cv_count
+        DECIMAL unit_price
+        DECIMAL amount
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    %% リレーション
+    t_billing_runs ||--o{ t_billing_line_items : "明細"
+    t_agents ||--o{ t_billing_runs : "確定"
+    t_partners ||--o{ t_billing_line_items : "請求対象"
+    t_partner_sites ||--o{ t_billing_line_items : "サイト"
+    t_clients ||--o{ t_billing_line_items : "クライアント"
+    t_ad_contents ||--o{ t_billing_line_items : "広告"
+
+    %% ==========================================
+    %% 7. ユーティリティ (Utility)
+    %% ==========================================
+
+    t_files {
+        BIGINT file_id PK
+        SMALLINT entity_type "1:influencer,2:group,3:partner,4:agent,5:content"
+        BIGINT entity_id "対象レコードID"
+        TEXT file_category "ファイル種別"
+        TEXT file_name
+        TEXT storage_path "Cloud Storage パス"
+        TEXT mime_type
+        BIGINT file_size_bytes
+        SMALLINT sort_order
+        BOOLEAN is_primary
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    t_notifications {
+        BIGINT notification_id PK
+        BIGINT user_id "通知先ID"
+        SMALLINT user_type "1:agent, 2:influencer"
+        TEXT notification_type "通知種別"
+        TEXT title
+        TEXT message
+        TEXT link_url
+        BOOLEAN is_read
+        TIMESTAMPTZ read_at
+        BIGINT created_by FK
+        BIGINT updated_by FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    t_audit_logs {
+        BIGINT log_id PK
+        TEXT table_name "操作対象テーブル"
+        BIGINT record_id "操作対象レコードID"
+        TEXT action_type "INSERT/UPDATE/DELETE"
+        JSONB old_value "変更前の値"
+        JSONB new_value "変更後の値"
+        SMALLINT operator_type "1:agent, 2:influencer"
+        BIGINT operator_id "操作者ID"
+        TEXT operator_ip
+        TIMESTAMPTZ operated_at "月次パーティション"
+    }
+
+    ingestion_logs {
+        BIGINT ingestion_id PK
+        TEXT job_type "バッチジョブ種別"
+        TIMESTAMPTZ target_from "取り込み対象期間開始"
+        TIMESTAMPTZ target_to "取り込み対象期間終了"
+        JSONB parameters
+        TEXT status "RUNNING/SUCCESS/FAILED"
+        INTEGER records_count
+        TEXT error_message
+        TIMESTAMPTZ started_at
+        TIMESTAMPTZ finished_at
+    }
+
 ```
 
 ---
 
 ## 📋 テーブル一覧
+
+### 0. 共通マスタ (Common)
+| テーブル名 | 説明 |
+|-----------|------|
+| **t_countries** | 国マスタ（国際対応） |
 
 ### 1. 社内組織 (Internal)
 | テーブル名 | 説明 |
@@ -648,6 +829,7 @@ erDiagram
 | **t_group_members** | グループ↔インフルエンサー中間テーブル（多対多） |
 | **t_group_addresses** | グループ住所（複数対応） |
 | **t_group_bank_accounts** | グループ口座（複数対応） |
+| **t_group_billing_info** | グループ請求先情報（複数対応） |
 
 ### 3. パートナー・広告主 (Business)
 | テーブル名 | 説明 |
@@ -669,6 +851,20 @@ erDiagram
 |-----------|------|
 | **t_daily_performance_details** | 日次CV成果（パーティション） |
 | **t_daily_click_details** | 日次クリック数（パーティション） |
+
+### 6. 請求確定 (Billing)
+| テーブル名 | 説明 |
+|-----------|------|
+| **t_billing_runs** | 請求確定バッチ（確定・取消管理） |
+| **t_billing_line_items** | 請求明細（スナップショット付き） |
+
+### 7. ユーティリティ (Utility)
+| テーブル名 | 説明 |
+|-----------|------|
+| **t_files** | ファイル管理（ポリモーフィック） |
+| **t_notifications** | ユーザー通知 |
+| **t_audit_logs** | 共通監査ログ（月次パーティション） |
+| **ingestion_logs** | BQ取り込みログ |
 
 ---
 
@@ -777,8 +973,8 @@ t_daily_performance_details {
 
 #### 4. グループ概念（導入済み）
 インフルエンサーの上位概念としてグループ（活動単位）を正式導入。
-4テーブル（`t_influencer_groups` / `t_group_members` / `t_group_addresses` / `t_group_bank_accounts`）を新設。
-請求・住所・口座はグループに紐づく設計に変更済み。
+5テーブル（`t_influencer_groups` / `t_group_members` / `t_group_addresses` / `t_group_bank_accounts` / `t_group_billing_info`）を新設。
+請求先・住所・口座はグループに紐づく設計に変更済み。
 
 ---
 
@@ -871,6 +1067,7 @@ ORDER BY total_cost DESC;
 | 2026-02-26 | DBレビュー対応。口座暗号化方針・インデックス戦略・group_id NULLガード を設計思想に追記。t_daily_click_details サロゲートキー化。start_at/end_at を DATE 型に統一（t_influencer_groups / t_group_members）。person_id コメント補足 |
 | 2026-02-26 | 100点対応。t_daily_performance_details の site_id / content_id に FK追加・rejection_reason カラム追加。delivery_status にコメント追加。t_campaigns に UNIQUE制約追加 |
 | 2026-02-26 | SNSアカウント設計を固定カラム1:1（t_sns_accounts）から1:N構成に刷新。t_sns_platforms・t_influencer_sns_accounts・t_categories・t_account_categories を新設 |
+| 2026-02-26 | 実装者版との統合（v7.0.0）。t_countries / t_group_billing_info / t_billing_runs / t_billing_line_items / t_files / t_notifications / t_audit_logs / ingestion_logs を追加。t_agent_security・t_influencer_security に認証カラム（session管理・パスワードリセット・ロックアウト）を追加 |
 
 **作成者**: sekiguchi
 **タグ**: #database #er図 #設計 #インフルエンサー #project
