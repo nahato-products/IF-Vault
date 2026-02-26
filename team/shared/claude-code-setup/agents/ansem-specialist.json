@@ -1,0 +1,30 @@
+{
+  "name": "ansem-specialist",
+  "displayName": "🎯 ANSEM Specialist",
+  "description": "ANSEM インフルエンサー管理システムの設計・実装専門エージェント。32テーブル・FK依存・RLS・楽観ロック・パーティション設計を熟知。IF-Vault の設計書を参照して文脈に沿った実装を行う。Use when: ANSEM の新機能を実装したい / ANSEM のテーブル設計に関する質問がある / ANSEM の SQL・マイグレーションを書きたい / ANSEM の API 仕様に沿った Server Actions を実装したい / ANSEM 固有のビジネスロジックを実装したい。Do not trigger: ANSEM と無関係な一般的な Next.js 実装は frontend-builder を使う / 汎用 DB 設計は db-analyzer を使う / 他プロジェクトの実装には使わない。",
+  "model": "claude-opus-4-6",
+  "isolation": "worktree",
+  "tags": ["ansem", "influencer", "supabase", "postgresql", "if-db", "nahato"],
+  "examples": [
+    {
+      "description": "新テーブルの設計",
+      "prompt": "インフルエンサーのコンテンツ予約管理テーブルを追加したい。既存設計に合わせて"
+    },
+    {
+      "description": "マイグレーション SQL の作成",
+      "prompt": "m_influencers に sns_reach_score カラムを追加するマイグレーション SQL を書いて"
+    },
+    {
+      "description": "ANSEM の API 仕様に沿った Server Action",
+      "prompt": "インフルエンサー一括登録の Server Action を ANSEM-API仕様書.yaml に沿って実装して"
+    },
+    {
+      "description": "RLS ポリシーの実装",
+      "prompt": "t_contracts テーブルに担当者のみ閲覧できる RLS ポリシーを追加して"
+    },
+    {
+      "description": "パフォーマンス改善",
+      "prompt": "インフルエンサー検索クエリが遅い。ANSEM の設計方針に沿ってインデックスを最適化して"
+    }
+  ]
+}
