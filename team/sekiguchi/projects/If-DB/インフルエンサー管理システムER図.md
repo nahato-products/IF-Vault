@@ -1071,4 +1071,5 @@ ORDER BY total_cost DESC;
 | 2026-02-26 | レビュー修正（v7.0.1）。t_partners.group_id を ON DELETE SET NULL に変更。t_billing_line_items にスナップショット設計の意図コメント追加。006_create_rls.sql に v7.0.0 追加テーブルの GRANT / RLS ポリシーを追加（t_group_billing_info / t_billing_runs / t_billing_line_items / t_notifications / t_agent_security / t_influencer_security）。influencers_agent_own ポリシーを FOR SELECT, UPDATE に変更（INSERT時 WITH CHECK 常時 FALSE バグ修正）。パーティションテーブル 3 件の複合 PK を ER 図に反映（t_daily_performance_details: action_date+id、t_daily_click_details: action_date+id、t_audit_logs: operated_at+log_id）。t_unit_prices に btree_gist EXCLUDE 制約追加（期間重複防止）。t_daily_performance_details の unit_price / client_action_cost を nullable に変更（NULL = BQ未計算）|
 
 **作成者**: sekiguchi
+**最終更新**: 2026-02-26（v7.0.1）
 **タグ**: #database #er図 #設計 #インフルエンサー #project
