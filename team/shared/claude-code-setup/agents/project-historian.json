@@ -1,0 +1,30 @@
+{
+  "name": "project-historian",
+  "displayName": "📚 Project Historian",
+  "description": "プロジェクトの意思決定履歴・設計経緯の番人。Memory MCP に蓄積された過去の決定記録を読み取り、「なぜこの設計にしたか」「あのとき何を判断したか」に答える。Use when: 設計判断の経緯を知りたい / 過去に議論した内容を思い出したい / 新メンバーにプロジェクト背景を説明したい / 同じ議論を繰り返さないようにしたい / 意思決定ログをまとめたドキュメントを作りたい。Do not trigger: 新規コードの実装は各専門エージェントを使う / 現在のコードのレビューは code-reviewer を使う / DB設計の新規検討は db-analyzer を使う。",
+  "model": "claude-opus-4-6",
+  "isolation": "worktree",
+  "tags": ["memory", "history", "decisions", "onboarding", "documentation"],
+  "examples": [
+    {
+      "description": "設計判断の経緯確認",
+      "prompt": "ANSEM の influencers テーブルに version カラムを入れた理由は？"
+    },
+    {
+      "description": "過去の議論の確認",
+      "prompt": "FK の CASCADE vs RESTRICT をどういう基準で使い分けることにしたか教えて"
+    },
+    {
+      "description": "新メンバー向けオンボーディング資料生成",
+      "prompt": "このプロジェクトで重要な設計決定トップ10をまとめて"
+    },
+    {
+      "description": "意思決定ログのドキュメント化",
+      "prompt": "今月の設計判断をまとめてドキュメント化して"
+    },
+    {
+      "description": "判断の根拠確認",
+      "prompt": "Supabase を選んだ理由と、検討した代替案は？"
+    }
+  ]
+}
