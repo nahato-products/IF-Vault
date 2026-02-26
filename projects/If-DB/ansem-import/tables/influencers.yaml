@@ -1,0 +1,89 @@
+table: m_influencers
+display_name: インフルエンサー
+columns:
+  - csv: マスター名
+    db: influencer_name
+    required: true
+  - csv: 区分
+    db: affiliation_type_id
+    type: dropdown
+    mapping:
+      事務所所属: 1
+      フリーランス: 2
+      企業専属: 3
+  - csv: コンプラチェック
+    db: compliance_check
+    type: boolean
+    mapping:
+      "○": true
+      "×": false
+  - csv: 所属名(正式名称)
+    db: affiliation_name
+  - csv: 様/御中
+    db: honorific
+    type: dropdown
+    mapping:
+      様: "様"
+      御中: "御中"
+      さん: "さん"
+  - csv: メールアドレス
+    db: email_address
+    format: email
+
+related_tables:
+  - table: t_influencer_sns_accounts
+    columns:
+      - csv: Instagram
+        db: account_url
+        extra: { platform_id: 1 }
+      - csv: YouTube
+        db: account_url
+        extra: { platform_id: 2 }
+      - csv: Twitter/X
+        db: account_url
+        extra: { platform_id: 3 }
+      - csv: TikTok
+        db: account_url
+        extra: { platform_id: 4 }
+      - csv: その他SNS
+        db: account_url
+        extra: { platform_id: 5 }
+
+  - table: t_bank_accounts
+    columns:
+      - csv: 銀行名
+        db: bank_name
+      - csv: 支店名
+        db: branch_name
+      - csv: 口座種別
+        db: account_type
+        type: dropdown
+        mapping:
+          普通: 1
+          当座: 2
+          貯蓄: 3
+      - csv: 口座番号
+        db: account_number
+        format: "digits:7"
+      - csv: 口座名義
+        db: account_holder_name
+
+  - table: t_billing_info
+    columns:
+      - csv: 適格請求書番号
+        db: invoice_registration_number
+      - csv: 請求先名
+        db: billing_name
+      - csv: 請求部署名
+        db: billing_department
+
+  - table: t_addresses
+    columns:
+      - csv: 郵便番号
+        db: postal_code
+      - csv: 住所
+        db: address_line1
+      - csv: 届け先名称
+        db: recipient_name
+      - csv: 電話番号
+        db: phone_number
