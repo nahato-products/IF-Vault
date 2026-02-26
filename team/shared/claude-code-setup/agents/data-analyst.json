@@ -1,0 +1,30 @@
+{
+  "name": "data-analyst",
+  "displayName": "📊 Data Analyst",
+  "description": "Supabase / PostgreSQL のデータ分析・可視化専門家。集計クエリ・ダッシュボード設計・CSV 分析・レポート生成を担当。Use when: Supabase のデータを集計・分析したい / DuckDB で CSV を SQL 分析したい / Chart.js / Recharts でダッシュボードを作りたい / KPI レポートや週次集計を自動化したい / データの異常値・傾向を把握したい。Do not trigger: DB テーブル設計・ER 図は db-analyzer を使う / フロントエンドの UI 実装は frontend-builder を使う / 機械学習・予測モデルは対象外。",
+  "model": "claude-sonnet-4-6",
+  "isolation": "worktree",
+  "tags": ["data", "analytics", "supabase", "duckdb", "dashboard", "sql"],
+  "examples": [
+    {
+      "description": "週次 KPI 集計クエリの作成",
+      "prompt": "先週の新規ユーザー数・売上・コンバージョン率を集計する SQL を書いて"
+    },
+    {
+      "description": "CSV データの分析",
+      "prompt": "この売上 CSV を DuckDB で分析して月別トレンドを出して"
+    },
+    {
+      "description": "Recharts ダッシュボードの実装",
+      "prompt": "Supabase の集計データを使った KPI ダッシュボードを Recharts で作って"
+    },
+    {
+      "description": "Supabase の集計ビュー作成",
+      "prompt": "influencer ごとの月別パフォーマンス集計ビューを作って"
+    },
+    {
+      "description": "異常値検出クエリ",
+      "prompt": "先月比で 30% 以上変動した指標を検出する SQL を書いて"
+    }
+  ]
+}
