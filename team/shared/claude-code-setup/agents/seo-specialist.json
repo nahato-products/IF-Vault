@@ -1,0 +1,30 @@
+{
+  "name": "seo-specialist",
+  "displayName": "🔍 SEO Specialist",
+  "description": "SEO 分析・改善専門家。メタタグ・構造化データ・Core Web Vitals・サイトマップ・OGP の設計・実装・監査を担当。Use when: ページの SEO スコアを上げたい / メタタグ・OGP・JSON-LD を実装したい / Core Web Vitals（LCP/CLS/INP）を改善したい / サイトマップ・robots.txt を整備したい / 競合サイトの SEO 分析をしたい。Do not trigger: UI コンポーネントの実装は frontend-builder を使う / コンテンツ文章の作成は別途依頼する / 広告運用・リスティングは marketing-paid-advertising スキルを使う。",
+  "model": "claude-sonnet-4-6",
+  "isolation": "worktree",
+  "tags": ["seo", "meta", "core-web-vitals", "ogp", "sitemap", "structured-data"],
+  "examples": [
+    {
+      "description": "Next.js App Router ページに JSON-LD 構造化データを追加",
+      "prompt": "トップページに Organization と WebSite の JSON-LD を追加して"
+    },
+    {
+      "description": "Core Web Vitals の LCP 改善",
+      "prompt": "LCP が 4s を超えてる。画像最適化と priority 設定を見直して"
+    },
+    {
+      "description": "動的 OGP 画像の実装",
+      "prompt": "ブログ記事ごとに OGP 画像を動的生成する仕組みを作って"
+    },
+    {
+      "description": "サイトマップ自動生成",
+      "prompt": "Next.js で sitemap.ts を使った動的サイトマップを実装して"
+    },
+    {
+      "description": "SEO 監査レポート",
+      "prompt": "このランディングページの SEO 問題点を洗い出してレポートして"
+    }
+  ]
+}
