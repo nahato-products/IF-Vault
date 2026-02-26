@@ -15,11 +15,14 @@
 
 **対象外テーブルと理由**:
 
-| テーブル | 理由 |
-|---------|------|
-| ログ系（`t_*_logs`） | 追記専用。更新しない |
-| セキュリティ系（`t_*_security`） | `created_by` 不要（主キー = 本人）。`created_at` / `updated_at` のみ持つ |
-| 集計系（`t_daily_*`） | バッチ処理で自動生成。`created_by` / `updated_by` は不要。`created_at` / `updated_at` のみ持つ |
+| テーブル | 具体例 | 理由 |
+|---------|-------|------|
+| ログ系（`t_*_logs`） | `t_agent_logs`, `t_influencer_logs` | 追記専用。更新しない。`created_at` のみ持つ |
+| セキュリティ系（`t_*_security`） | `t_agent_security`, `t_influencer_security` | `created_by` 不要（主キー = 本人）。`created_at` / `updated_at` のみ持つ |
+| 集計系（`t_daily_*`） | `t_daily_performance_details`, `t_daily_click_details` | バッチ処理で自動生成。`created_by` / `updated_by` は不要。`created_at` / `updated_at` のみ持つ |
+
+> [!NOTE]
+> `created_by` / `updated_by` は `t_agents.agent_id` を参照するが、監査用途のため Mermaid ER図のリレーション定義には記載しない（全テーブルに引くと図が煩雑になるため）。実装時は FK 制約ではなくアプリ側で保証する。
 
 ### カラム命名規則
 
@@ -30,7 +33,9 @@
 | 期間開始 | `start_at` | 適用開始・参加日・活動開始日・配信開始日 |
 | 期間終了 | `end_at` | 適用終了・脱退日・活動終了日・配信終了日 |
 | 恒常（無期限） | `end_at = '2999-12-31'` | 実質無期限を表すセンチネル値 |
+| 型の使い分け | DATE / TIMESTAMPTZ | 活動期間・参加日など「日付で管理するもの」はDATE。配信開始・担当割当など「時刻が意味を持つもの」はTIMESTAMPTZ。テーブルの業務性質に応じて選択する |
 | 論理削除 | `status_id = 9` | 全テーブル共通。9 = 無効・削除 |
+| 論理削除の例外 | `t_ad_contents.delivery_status` | 広告コンテンツのみ配信ライフサイクルを表す `delivery_status`（1:配信前, 2:配信中, 3:配信終了, 9:停止）を使用。`9:停止` が論理削除相当 |
 | 現在有効判定 | `end_at > NOW()` | NULLチェック不要 |
 | 配信中判定 | `start_at <= NOW() AND end_at > NOW() AND status_id = 1` | `end_at` 単独では不十分。`status_id` と必ず併用 |
 
@@ -65,10 +70,13 @@ ER図では表現できないが、実装時に必ず設定する制約。
 | `t_group_members` | `UNIQUE (group_id, influencer_id)` | 同じインフルエンサーが同じグループに2重登録されない |
 | `t_group_addresses` | `UNIQUE (group_id) WHERE is_primary = true` | メイン住所は1グループに1件のみ |
 | `t_group_bank_accounts` | `UNIQUE (group_id) WHERE is_primary = true` | メイン口座は1グループに1件のみ |
-| `t_daily_performance_details` | `UNIQUE (action_date, partner_id, site_id, client_id, content_id)` | 同日・同組み合わせの重複登録を防ぐ（業務キー） |
+| `t_daily_performance_details` | `UNIQUE (action_date, partner_id, site_id, client_id, ad_content_id)` | 同日・同組み合わせの重複登録を防ぐ（業務キー） |
 | `t_daily_click_details` | `UNIQUE (action_date, site_id)` | 同日・同サイトの重複登録を防ぐ（業務キー） |
 | `t_campaigns` | `UNIQUE (site_id, platform_type, reward_type, price_type)` | 同一サイトに同条件のキャンペーンが重複しない |
 | `t_account_categories` | `UNIQUE (account_id, category_id)` | 同じSNSアカウントに同じカテゴリを重複登録しない |
+| `t_sns_platforms` | `UNIQUE (platform_key)` | 識別キーの重複防止 |
+| `t_influencer_sns_accounts` | `UNIQUE (influencer_id, platform_id) WHERE is_primary = true` | プラットフォームごとにメインアカウントは1件のみ |
+| `t_account_categories` | `UNIQUE (account_id) WHERE is_primary = true` | SNSアカウントごとにメインカテゴリは1件のみ |
 
 ### インデックス戦略
 
@@ -83,6 +91,7 @@ ER図では表現できないが、実装時に必ず設定する制約。
 | `t_unit_prices` | `(site_id, start_at, end_at, status_id)` | 適用単価の期間検索 |
 | `t_partners` | `(group_id)` | group_id経由JOINが多発 |
 | `t_daily_performance_details` | `(action_date, partner_id, status_id)` | 日次集計の主要検索パターン |
+| `t_daily_performance_details` | `(group_id, action_date)` | グループ別成果集計・RLSフィルタ |
 | `t_daily_click_details` | `(action_date, site_id)` | 日次クリック集計 |
 | `t_influencer_sns_accounts` | `(influencer_id, status_id)` | インフルエンサー別SNSアカウント絞り込み |
 | `t_influencer_sns_accounts` | `(platform_id)` | プラットフォーム別絞り込み |
@@ -147,6 +156,57 @@ BQデータ取り込み（Cloud Run）と同様に、単価系のビジネスロ
 
 > [!TIP]
 > ロジックをPythonで管理することでGit管理・テスト・デバッグがしやすくなる。DBにビジネスロジックを持たせない。
+
+### 楽観ロック（version カラム）
+
+金額・配信設定に直結するテーブルには `version` カラムを導入し、上書き事故を防ぐ。
+
+| テーブル | 理由 |
+|---------|------|
+| `t_unit_prices` | 単価の上書きは請求ミスに直結。必須 |
+| `t_campaigns` | キャンペーン設定の同時変更は配信・報酬体系に影響 |
+
+```sql
+-- 更新時の楽観ロック例（バックエンド実装）
+UPDATE t_unit_prices
+SET unit_price = ?, version = version + 1
+WHERE id = ? AND version = ?
+-- 0件更新 = 他のユーザーが先に変更済み → アプリ側でエラー返却
+```
+
+> [!WARNING]
+> フロントエンドは `version` の値を取得・保持し、更新リクエスト時に必ず送信すること。
+
+---
+
+### SMALLINTコード値の方針
+
+`role_type`, `platform_type`, `billing_type_id` 等のコード値は**マスタテーブル化しない**。
+
+| 理由 | 内容 |
+|------|------|
+| テーブル数の抑制 | コード値ごとにマスタを作ると管理対象が増えすぎる |
+| 変更頻度が低い | プラットフォーム種別・報酬体系は業務上ほぼ固定 |
+| アプリ側で管理 | enum / 定数として定義し、バックエンドで一元管理 |
+
+> [!NOTE]
+> 追加・変更はバックエンドのenum定義とDBのコメントを同時に更新すること。
+
+---
+
+### サロゲートキーの命名方針
+
+テーブルによってPKカラム名が異なるが、以下の方針で統一されている。
+
+| パターン | 対象テーブル例 | 理由 |
+|---------|-------------|------|
+| `{テーブル略称}_id`（例: `group_id`） | 他のテーブルからFKとして参照される主要マスタ | 参照側で `group_id` と書くだけで直感的に理解できる |
+| `id`（サロゲートキー） | `t_group_members`, `t_group_bank_accounts`, `t_unit_prices`, `t_campaigns`, `t_daily_*` 等 | 他テーブルから直接FK参照されない中間・集計・履歴テーブルでは汎用的な `id` を使用 |
+
+> [!NOTE]
+> 業務キー（一意性）は UNIQUE 制約で別途保証する。PKはあくまでも行の物理識別子。
+
+---
 
 ### @deprecated カラムの削除方針
 
@@ -389,6 +449,7 @@ erDiagram
     t_influencers ||--o{ t_influencer_sns_accounts : "SNS(1:N)"
     t_sns_platforms ||--o{ t_influencer_sns_accounts : "プラットフォーム"
     t_influencer_sns_accounts ||--o{ t_account_categories : "カテゴリ紐付け"
+    t_categories ||--o{ t_categories : "階層構造"
     t_categories ||--o{ t_account_categories : "カテゴリ"
     t_influencers ||--o{ t_influencer_logs : "履歴"
     t_influencers ||--o{ t_influencer_agent_assignments : "割当"
@@ -440,6 +501,8 @@ erDiagram
 
     %% リレーション
     t_partners ||--o{ t_partner_sites : "運営"
+    %% ※ t_clients と t_partners は直接FK関係なし（意図的）
+    %% ナハト社が仲介するため、2者は t_ad_contents / t_daily_performance_details を経由してのみ関係する
 
     %% ==========================================
     %% 4. 広告配信 (Ad Delivery)
@@ -448,6 +511,7 @@ erDiagram
     t_ad_groups {
         BIGINT ad_group_id PK
         TEXT ad_group_name "グループ名(案件名)"
+        SMALLINT status_id "1:有効, 9:無効"
         BIGINT created_by FK "作成者agent_id"
         BIGINT updated_by FK "更新者agent_id"
         TIMESTAMPTZ created_at
@@ -478,6 +542,7 @@ erDiagram
         TIMESTAMPTZ start_at "適用開始日"
         TIMESTAMPTZ end_at "適用終了日"
         SMALLINT status_id
+        INTEGER version "楽観ロック用（DEFAULT 1）"
         BIGINT created_by FK "作成者agent_id"
         BIGINT updated_by FK "更新者agent_id"
         TIMESTAMPTZ created_at
@@ -491,6 +556,7 @@ erDiagram
         SMALLINT reward_type "1:固定/CPA, 2:成果/CPC"
         SMALLINT price_type "1:Gross, 2:Net"
         SMALLINT status_id
+        INTEGER version "楽観ロック用（DEFAULT 1）"
         BIGINT created_by FK "作成者agent_id"
         BIGINT updated_by FK "更新者agent_id"
         TIMESTAMPTZ created_at
@@ -515,9 +581,10 @@ erDiagram
         BIGINT id PK
         DATE action_date "Partition Key"
         BIGINT partner_id FK
+        BIGINT group_id "スナップショット（partner.group_idをコピー）"
         BIGINT site_id FK
         BIGINT client_id FK
-        BIGINT content_id FK
+        BIGINT ad_content_id FK
         SMALLINT status_id "1:未承認,2:承認,9:否認"
         TEXT rejection_reason "否認理由（status_id=9のとき使用）"
         TEXT partner_name "スナップショット"
@@ -534,7 +601,7 @@ erDiagram
     t_daily_click_details {
         BIGINT id PK
         DATE action_date "Partition Key"
-        BIGINT site_id
+        BIGINT site_id FK
         TEXT site_name "スナップショット"
         INTEGER click_count
         TIMESTAMPTZ created_at
@@ -704,7 +771,7 @@ t_daily_performance_details {
     ...
     status_id SMALLINT  -- PKから外れた → UPDATEで変更可能に
 }
--- UNIQUE (action_date, partner_id, site_id, client_id, content_id) で一意性保証
+-- UNIQUE (action_date, partner_id, site_id, client_id, ad_content_id) で一意性保証
 -- INDEX (action_date, partner_id, status_id) で検索最適化
 ```
 
@@ -766,7 +833,7 @@ SELECT
     ROUND(AVG(d.unit_price), 0) as avg_unit_price
 FROM t_clients c
 JOIN t_daily_performance_details d ON c.client_id = d.client_id
-LEFT JOIN t_ad_contents ac ON d.content_id = ac.ad_content_id
+LEFT JOIN t_ad_contents ac ON d.ad_content_id = ac.ad_content_id
 WHERE d.action_date >= CURRENT_DATE - INTERVAL '90 days'
   AND d.status_id = 2
 GROUP BY c.client_id, c.client_name, c.industry
