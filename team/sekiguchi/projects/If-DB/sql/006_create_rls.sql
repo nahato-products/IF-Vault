@@ -117,6 +117,55 @@ TO app_batch;
 
 GRANT INSERT, UPDATE ON t_daily_click_details TO app_batch;
 
+-- ----------------------------------------------------------------------------
+-- v7.0.0 追加テーブルへの権限付与
+-- （app_admin は GRANT ALL ON ALL TABLES で対応済みのため除外）
+-- ----------------------------------------------------------------------------
+
+-- t_countries（国マスタ）: 全ロール参照
+GRANT SELECT ON t_countries TO app_agent, app_manager, app_influencer, app_batch;
+
+-- t_group_billing_info（グループ請求先）
+GRANT SELECT, INSERT, UPDATE ON t_group_billing_info TO app_agent;
+GRANT ALL ON t_group_billing_info TO app_manager;
+GRANT SELECT ON t_group_billing_info TO app_influencer;
+
+-- t_billing_runs（請求確定）
+GRANT SELECT ON t_billing_runs TO app_agent;
+GRANT ALL ON t_billing_runs TO app_manager;
+GRANT INSERT, UPDATE ON t_billing_runs TO app_batch;
+
+-- t_billing_line_items（請求明細）
+GRANT SELECT ON t_billing_line_items TO app_agent;
+GRANT ALL ON t_billing_line_items TO app_manager;
+GRANT SELECT ON t_billing_line_items TO app_influencer;
+GRANT INSERT, UPDATE ON t_billing_line_items TO app_batch;
+
+-- t_files（ファイル管理）
+GRANT SELECT, INSERT, UPDATE ON t_files TO app_agent;
+GRANT ALL ON t_files TO app_manager;
+GRANT SELECT ON t_files TO app_influencer;
+
+-- t_notifications（通知）
+GRANT SELECT, UPDATE ON t_notifications TO app_agent;
+GRANT ALL ON t_notifications TO app_manager;
+GRANT SELECT, UPDATE ON t_notifications TO app_influencer;
+GRANT INSERT ON t_notifications TO app_batch;
+
+-- t_audit_logs（監査ログ）: SELECT は admin/manager のみ、INSERT は batch
+GRANT SELECT ON t_audit_logs TO app_manager;
+GRANT INSERT ON t_audit_logs TO app_batch;
+
+-- t_ingestion_logs（BQ取り込みジョブログ）
+GRANT SELECT ON t_ingestion_logs TO app_manager;
+GRANT INSERT, UPDATE ON t_ingestion_logs TO app_batch;
+
+-- t_agent_security / t_influencer_security（認証情報）: agent のみ自己更新
+GRANT SELECT, UPDATE ON t_agent_security TO app_agent;
+GRANT ALL ON t_agent_security TO app_manager;
+GRANT SELECT, UPDATE ON t_influencer_security TO app_influencer;
+GRANT ALL ON t_influencer_security TO app_manager;
+
 
 -- =============================================================================
 -- RLS 有効化
@@ -134,6 +183,21 @@ ALTER TABLE t_influencer_groups          FORCE ROW LEVEL SECURITY;
 ALTER TABLE t_group_members              FORCE ROW LEVEL SECURITY;
 ALTER TABLE t_partners                   FORCE ROW LEVEL SECURITY;
 ALTER TABLE t_daily_performance_details  FORCE ROW LEVEL SECURITY;
+
+-- v7.0.0 追加テーブルの RLS 有効化
+ALTER TABLE t_group_billing_info  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE t_billing_runs        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE t_billing_line_items  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE t_notifications       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE t_agent_security      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE t_influencer_security ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE t_group_billing_info  FORCE ROW LEVEL SECURITY;
+ALTER TABLE t_billing_runs        FORCE ROW LEVEL SECURITY;
+ALTER TABLE t_billing_line_items  FORCE ROW LEVEL SECURITY;
+ALTER TABLE t_notifications       FORCE ROW LEVEL SECURITY;
+ALTER TABLE t_agent_security      FORCE ROW LEVEL SECURITY;
+ALTER TABLE t_influencer_security FORCE ROW LEVEL SECURITY;
 
 
 -- =============================================================================
@@ -197,11 +261,29 @@ CREATE POLICY influencers_manager_all
     USING (true)
     WITH CHECK (true);
 
--- agent: 自分が担当中（is_active=true）のインフルエンサーのみ
+-- agent: 自分が担当中（is_active=true）のインフルエンサーのみ参照・更新
+-- 【重要】FOR ALL ではなく FOR SELECT, UPDATE に限定する。
+--   新規インフルエンサーの INSERT 時点では t_influencer_agent_assignments に
+--   レコードが存在しないため、WITH CHECK が常に FALSE になり INSERT が失敗する。
+--   インフルエンサーの新規登録は manager/admin のみが行う運用とする。
 CREATE POLICY influencers_agent_own
     ON t_influencers
     AS PERMISSIVE
-    FOR ALL
+    FOR SELECT
+    TO app_agent
+    USING (
+        influencer_id IN (
+            SELECT influencer_id
+            FROM t_influencer_agent_assignments
+            WHERE agent_id = rls_current_agent_id()
+              AND is_active = true
+        )
+    );
+
+CREATE POLICY influencers_agent_update
+    ON t_influencers
+    AS PERMISSIVE
+    FOR UPDATE
     TO app_agent
     USING (
         influencer_id IN (
@@ -515,6 +597,125 @@ CREATE POLICY dpd_batch_update
     TO app_batch
     USING (true)
     WITH CHECK (true);
+
+
+-- =============================================================================
+-- t_group_billing_info ポリシー
+-- =============================================================================
+
+CREATE POLICY group_billing_admin_all ON t_group_billing_info AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY group_billing_manager_all ON t_group_billing_info AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+
+CREATE POLICY group_billing_agent_own
+    ON t_group_billing_info AS PERMISSIVE FOR ALL TO app_agent
+    USING (group_id IN (
+        SELECT gm.group_id FROM t_group_members gm
+        JOIN t_influencer_agent_assignments iaa ON gm.influencer_id = iaa.influencer_id
+        WHERE iaa.agent_id = rls_current_agent_id() AND iaa.is_active = true AND gm.is_active = true
+    ))
+    WITH CHECK (group_id IN (
+        SELECT gm.group_id FROM t_group_members gm
+        JOIN t_influencer_agent_assignments iaa ON gm.influencer_id = iaa.influencer_id
+        WHERE iaa.agent_id = rls_current_agent_id() AND iaa.is_active = true AND gm.is_active = true
+    ));
+
+CREATE POLICY group_billing_influencer_own
+    ON t_group_billing_info AS PERMISSIVE FOR SELECT TO app_influencer
+    USING (group_id IN (
+        SELECT group_id FROM t_group_members
+        WHERE influencer_id = rls_current_influencer_id() AND is_active = true
+    ));
+
+
+-- =============================================================================
+-- t_billing_runs ポリシー
+-- =============================================================================
+
+CREATE POLICY billing_runs_admin_all ON t_billing_runs AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY billing_runs_manager_all ON t_billing_runs AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+-- agent/influencer: 請求確定レコードは参照のみ（全件可：自分の担当分か確認は billing_line_items 側で絞る）
+CREATE POLICY billing_runs_agent_select ON t_billing_runs AS PERMISSIVE FOR SELECT TO app_agent USING (true);
+CREATE POLICY billing_runs_batch_write ON t_billing_runs AS PERMISSIVE FOR INSERT TO app_batch WITH CHECK (true);
+CREATE POLICY billing_runs_batch_update ON t_billing_runs AS PERMISSIVE FOR UPDATE TO app_batch USING (true) WITH CHECK (true);
+
+
+-- =============================================================================
+-- t_billing_line_items ポリシー
+-- =============================================================================
+
+CREATE POLICY billing_items_admin_all ON t_billing_line_items AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY billing_items_manager_all ON t_billing_line_items AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+
+-- agent: 担当グループに紐づくパートナーの請求明細のみ
+CREATE POLICY billing_items_agent_own
+    ON t_billing_line_items AS PERMISSIVE FOR SELECT TO app_agent
+    USING (partner_id IN (
+        SELECT p.partner_id FROM t_partners p
+        JOIN t_group_members gm ON p.group_id = gm.group_id
+        JOIN t_influencer_agent_assignments iaa ON gm.influencer_id = iaa.influencer_id
+        WHERE iaa.agent_id = rls_current_agent_id() AND iaa.is_active = true AND gm.is_active = true
+    ));
+
+-- influencer: 自分のグループのパートナーの請求明細のみ
+CREATE POLICY billing_items_influencer_own
+    ON t_billing_line_items AS PERMISSIVE FOR SELECT TO app_influencer
+    USING (partner_id IN (
+        SELECT p.partner_id FROM t_partners p
+        JOIN t_group_members gm ON p.group_id = gm.group_id
+        WHERE gm.influencer_id = rls_current_influencer_id() AND gm.is_active = true
+    ));
+
+CREATE POLICY billing_items_batch_write ON t_billing_line_items AS PERMISSIVE FOR INSERT TO app_batch WITH CHECK (true);
+CREATE POLICY billing_items_batch_update ON t_billing_line_items AS PERMISSIVE FOR UPDATE TO app_batch USING (true) WITH CHECK (true);
+
+
+-- =============================================================================
+-- t_notifications ポリシー
+-- =============================================================================
+-- user_type: 1=agent, 2=influencer
+
+CREATE POLICY notifications_admin_all ON t_notifications AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY notifications_manager_all ON t_notifications AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+
+CREATE POLICY notifications_agent_own
+    ON t_notifications AS PERMISSIVE FOR ALL TO app_agent
+    USING (user_type = 1 AND user_id = rls_current_agent_id())
+    WITH CHECK (user_type = 1 AND user_id = rls_current_agent_id());
+
+CREATE POLICY notifications_influencer_own
+    ON t_notifications AS PERMISSIVE FOR ALL TO app_influencer
+    USING (user_type = 2 AND user_id = rls_current_influencer_id())
+    WITH CHECK (user_type = 2 AND user_id = rls_current_influencer_id());
+
+CREATE POLICY notifications_batch_insert ON t_notifications AS PERMISSIVE FOR INSERT TO app_batch WITH CHECK (true);
+
+
+-- =============================================================================
+-- t_agent_security ポリシー
+-- =============================================================================
+
+CREATE POLICY agent_security_admin_all ON t_agent_security AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY agent_security_manager_all ON t_agent_security AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+
+-- agent: 自分のレコードのみ
+CREATE POLICY agent_security_self
+    ON t_agent_security AS PERMISSIVE FOR ALL TO app_agent
+    USING (agent_id = rls_current_agent_id())
+    WITH CHECK (agent_id = rls_current_agent_id());
+
+
+-- =============================================================================
+-- t_influencer_security ポリシー
+-- =============================================================================
+
+CREATE POLICY influencer_security_admin_all ON t_influencer_security AS PERMISSIVE FOR ALL TO app_admin USING (true) WITH CHECK (true);
+CREATE POLICY influencer_security_manager_all ON t_influencer_security AS PERMISSIVE FOR ALL TO app_manager USING (true) WITH CHECK (true);
+
+-- influencer: 自分のレコードのみ
+CREATE POLICY influencer_security_self
+    ON t_influencer_security AS PERMISSIVE FOR ALL TO app_influencer
+    USING (influencer_id = rls_current_influencer_id())
+    WITH CHECK (influencer_id = rls_current_influencer_id());
 
 
 -- =============================================================================

@@ -7,7 +7,7 @@
 -- 実行順序: 001 → 002 → 003 → 004 → 005
 -- 除外テーブル:
 --   t_audit_logs    — operated_at で管理。UPDATEされない前提（追記のみ）。
---   ingestion_logs  — finished_at で管理。ジョブ専用テーブル。
+--   t_ingestion_logs — finished_at で管理。ジョブ専用テーブル。
 --   t_agent_logs    — 追記のみ
 --   t_influencer_logs — 追記のみ
 -- ============================================================

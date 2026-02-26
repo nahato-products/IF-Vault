@@ -21,7 +21,7 @@
 | セキュリティ系（`t_*_security`） | `t_agent_security`, `t_influencer_security` | `created_by` 不要（主キー = 本人）。`created_at` / `updated_at` のみ持つ |
 | 集計系（`t_daily_*`） | `t_daily_performance_details`, `t_daily_click_details` | バッチ処理で自動生成。`created_by` / `updated_by` は不要。`created_at` / `updated_at` のみ持つ |
 | 監査ログ系 | `t_audit_logs` | 追記専用。`operated_at` で管理。`created_by` / `updated_by` 不要 |
-| バッチログ系 | `ingestion_logs` | `finished_at` で管理。ジョブ専用テーブル。`created_by` / `updated_by` 不要 |
+| バッチログ系 | `t_ingestion_logs` | `finished_at` で管理。ジョブ専用テーブル。`created_by` / `updated_by` 不要 |
 
 > [!NOTE]
 > `created_by` / `updated_by` は `t_agents.agent_id` を参照するが、監査用途のため Mermaid ER図のリレーション定義には記載しない（全テーブルに引くと図が煩雑になるため）。実装時は FK 制約ではなくアプリ側で保証する。
@@ -640,8 +640,8 @@ erDiagram
     %% ==========================================
 
     t_daily_performance_details {
-        BIGINT id PK
-        DATE action_date "Partition Key"
+        BIGINT id "PK（複合PK: action_date + id）"
+        DATE action_date "PK兼パーティションキー（RANGE年次）"
         BIGINT partner_id FK
         BIGINT group_id "スナップショット（partner.group_idをコピー）"
         BIGINT site_id FK
@@ -653,16 +653,16 @@ erDiagram
         TEXT site_name "スナップショット"
         TEXT client_name "スナップショット"
         TEXT content_name "スナップショット"
-        INTEGER cv_count
-        DECIMAL client_action_cost "報酬総額"
-        DECIMAL unit_price "平均単価"
+        INTEGER cv_count "NOT NULL（BQ取り込み時確定）"
+        DECIMAL client_action_cost "報酬総額 NULL=BQ未計算"
+        DECIMAL unit_price "平均単価 NULL=BQ未計算"
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
 
     t_daily_click_details {
-        BIGINT id PK
-        DATE action_date "Partition Key"
+        BIGINT id "PK（複合PK: action_date + id）"
+        DATE action_date "PK兼パーティションキー（RANGE年次）"
         BIGINT site_id FK
         TEXT site_name "スナップショット"
         INTEGER click_count
@@ -766,7 +766,7 @@ erDiagram
     }
 
     t_audit_logs {
-        BIGINT log_id PK
+        BIGINT log_id "PK（複合PK: operated_at + log_id）"
         TEXT table_name "操作対象テーブル"
         BIGINT record_id "操作対象レコードID"
         TEXT action_type "INSERT/UPDATE/DELETE"
@@ -775,10 +775,10 @@ erDiagram
         SMALLINT operator_type "1:agent, 2:influencer"
         BIGINT operator_id "操作者ID"
         TEXT operator_ip
-        TIMESTAMPTZ operated_at "月次パーティション"
+        TIMESTAMPTZ operated_at "PK兼パーティションキー（RANGE月次）"
     }
 
-    ingestion_logs {
+    t_ingestion_logs {
         BIGINT ingestion_id PK
         TEXT job_type "バッチジョブ種別"
         TIMESTAMPTZ target_from "取り込み対象期間開始"
@@ -864,7 +864,7 @@ erDiagram
 | **t_files** | ファイル管理（ポリモーフィック） |
 | **t_notifications** | ユーザー通知 |
 | **t_audit_logs** | 共通監査ログ（月次パーティション） |
-| **ingestion_logs** | BQ取り込みログ |
+| **t_ingestion_logs** | BQ取り込みログ |
 
 ---
 
@@ -1067,7 +1067,8 @@ ORDER BY total_cost DESC;
 | 2026-02-26 | DBレビュー対応。口座暗号化方針・インデックス戦略・group_id NULLガード を設計思想に追記。t_daily_click_details サロゲートキー化。start_at/end_at を DATE 型に統一（t_influencer_groups / t_group_members）。person_id コメント補足 |
 | 2026-02-26 | 100点対応。t_daily_performance_details の site_id / content_id に FK追加・rejection_reason カラム追加。delivery_status にコメント追加。t_campaigns に UNIQUE制約追加 |
 | 2026-02-26 | SNSアカウント設計を固定カラム1:1（t_sns_accounts）から1:N構成に刷新。t_sns_platforms・t_influencer_sns_accounts・t_categories・t_account_categories を新設 |
-| 2026-02-26 | 実装者版との統合（v7.0.0）。t_countries / t_group_billing_info / t_billing_runs / t_billing_line_items / t_files / t_notifications / t_audit_logs / ingestion_logs を追加。t_agent_security・t_influencer_security に認証カラム（session管理・パスワードリセット・ロックアウト）を追加 |
+| 2026-02-26 | 実装者版との統合（v7.0.0）。t_countries / t_group_billing_info / t_billing_runs / t_billing_line_items / t_files / t_notifications / t_audit_logs / t_ingestion_logs を追加。t_agent_security・t_influencer_security に認証カラム（session管理・パスワードリセット・ロックアウト）を追加 |
+| 2026-02-26 | レビュー修正（v7.0.1）。t_partners.group_id を ON DELETE SET NULL に変更。t_billing_line_items にスナップショット設計の意図コメント追加。006_create_rls.sql に v7.0.0 追加テーブルの GRANT / RLS ポリシーを追加（t_group_billing_info / t_billing_runs / t_billing_line_items / t_notifications / t_agent_security / t_influencer_security）。influencers_agent_own ポリシーを FOR SELECT, UPDATE に変更（INSERT時 WITH CHECK 常時 FALSE バグ修正）。パーティションテーブル 3 件の複合 PK を ER 図に反映（t_daily_performance_details: action_date+id、t_daily_click_details: action_date+id、t_audit_logs: operated_at+log_id）。t_unit_prices に btree_gist EXCLUDE 制約追加（期間重複防止）。t_daily_performance_details の unit_price / client_action_cost を nullable に変更（NULL = BQ未計算）|
 
 **作成者**: sekiguchi
 **タグ**: #database #er図 #設計 #インフルエンサー #project

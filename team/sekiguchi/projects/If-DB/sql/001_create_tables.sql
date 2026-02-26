@@ -6,6 +6,9 @@
 -- 更新日: 2026-02-26
 -- ============================================================
 
+-- 期間重複排他制約に必要（Cloud SQL for PostgreSQL 15 でサポート済み）
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+
 BEGIN;
 
 -- ============================================================
@@ -488,7 +491,7 @@ CREATE TABLE t_partners (
     CONSTRAINT fk_partner_group
         FOREIGN KEY (group_id)
         REFERENCES t_influencer_groups(group_id)
-        ON DELETE RESTRICT
+        ON DELETE SET NULL  -- グループ削除時もパートナー履歴は保持する
 );
 
 -- ------------------------------------------------------------
@@ -569,7 +572,15 @@ CREATE TABLE t_unit_prices (
     CONSTRAINT chk_unit_price_non_negative
         CHECK (unit_price >= 0),
 
-    CONSTRAINT chk_unit_prices_version CHECK (version >= 1)
+    CONSTRAINT chk_unit_prices_version CHECK (version >= 1),
+
+    -- 同一サイトで有効期間が重複する単価の登録を防ぐ
+    -- '[)' = 開始を含み終了を含まない（2026-06-30 23:59まで有効 → 2026-07-01 00:00 開始と重複しない）
+    CONSTRAINT excl_unit_price_no_overlap
+        EXCLUDE USING gist (
+            site_id WITH =,
+            tstzrange(start_at, end_at, '[)') WITH &&
+        )
 );
 
 -- ------------------------------------------------------------
@@ -623,9 +634,13 @@ CREATE TABLE t_daily_performance_details (
     client_name      TEXT,
     content_name     TEXT,
     -- 集計値
+    -- cv_count: BQ取り込み時点で確定。NOT NULL。
+    -- unit_price / client_action_cost: BQで単価JOIN後に計算してセット。
+    --   NULL = BQ未計算（集計バッチ未実行 or 集計エラー）。
+    --   請求処理は NULL のレコードを除外すること。
     cv_count             INTEGER  NOT NULL DEFAULT 0,
-    client_action_cost   DECIMAL  NOT NULL DEFAULT 0,
-    unit_price           DECIMAL  NOT NULL DEFAULT 0,
+    client_action_cost   DECIMAL,
+    unit_price           DECIMAL,
     -- 監査（バッチ生成のため created_by / updated_by なし）
     created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -781,6 +796,13 @@ CREATE TABLE t_billing_runs (
 -- ------------------------------------------------------------
 -- 29. t_billing_line_items（請求明細）
 -- ------------------------------------------------------------
+-- 【設計メモ】
+--   t_daily_performance_details（パーティションテーブル）への FK は意図的に持たない。
+--   請求確定時点の集計値を action_date + partner_id + site_id + client_id + ad_content_id
+--   の組み合わせでスナップショット保存する設計のため、FK制約は不要。
+--   PostgreSQL はパーティション親テーブルへの FK 参照をサポートしていないという
+--   技術的制約もある。
+-- ------------------------------------------------------------
 CREATE TABLE t_billing_line_items (
     line_item_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     billing_run_id  BIGINT NOT NULL,
@@ -896,9 +918,9 @@ CREATE TABLE t_audit_logs (
 ) PARTITION BY RANGE (operated_at);
 
 -- ------------------------------------------------------------
--- 33. ingestion_logs（BQ取り込みログ）
+-- 33. t_ingestion_logs（BQ取り込みログ）
 -- ------------------------------------------------------------
-CREATE TABLE ingestion_logs (
+CREATE TABLE t_ingestion_logs (
     ingestion_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     job_type       TEXT  NOT NULL,
     target_from    TIMESTAMPTZ NOT NULL,
