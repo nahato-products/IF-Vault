@@ -2,6 +2,7 @@
 # TokenGuardian Hook: Suggest read_smart for large files
 # Trigger: PreToolUse (Read)
 # Non-blocking — advisory only
+set -euo pipefail
 
 input=$(cat)
 

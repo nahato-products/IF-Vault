@@ -3,6 +3,7 @@
 #
 # 【仕様制約】Stop hook は additionalContext をサポートしない。
 # 【方針】stderr でターミナル通知 + ファイル書き出し
+set -euo pipefail
 
 # stdin を消費
 cat >/dev/null 2>&1

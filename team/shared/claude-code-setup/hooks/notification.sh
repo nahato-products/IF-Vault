@@ -1,13 +1,14 @@
 #!/bin/bash
 # Notification: macOS notification when Claude needs attention
+set -euo pipefail
 input=$(cat)
 message=$(printf '%s\n' "$input" | python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
     msg = data.get('message', '') or data.get('title', '') or '確認が必要です'
-    # Sanitize for AppleScript: remove backslashes and double quotes
-    msg = msg[:100].replace('\\\\', '').replace('\"', '')
+    # Sanitize for AppleScript: remove chars that could break osascript
+    msg = msg[:100].replace('\\', '').replace('"', '').replace("'", '').replace('\n', ' ').replace('\r', '')
     print(msg)
 except (json.JSONDecodeError, ValueError):
     print('確認が必要です')

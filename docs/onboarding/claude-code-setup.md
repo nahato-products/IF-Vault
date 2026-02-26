@@ -22,10 +22,17 @@ npm install -g @anthropic-ai/claude-code
 
 ### 2. チーム環境を一括セットアップ（推奨）
 
+IF-Vault を clone 済みの場合（通常はこちら）:
+
 ```bash
-git clone https://github.com/zenntouyou-yabai/team-claude-skills
-cd team-claude-skills
-./setup.sh
+bash ~/Documents/Obsidian\ Vault/team/shared/claude-code-setup/setup.sh
+```
+
+まだ clone していない場合:
+
+```bash
+git clone https://github.com/nahato-Inc/IF-Vault.git ~/Documents/Obsidian\ Vault
+bash ~/Documents/Obsidian\ Vault/team/shared/claude-code-setup/setup.sh
 ```
 
 カテゴリごとに Y/n で選択しながら進む。インストールされるもの:
@@ -144,15 +151,16 @@ rm ~/.claude/skills/スキル名
 ## 環境を最新に保つ
 
 ```bash
-cd team-claude-skills
-git pull && ./setup.sh
+cd ~/Documents/Obsidian\ Vault
+git pull
+bash team/shared/claude-code-setup/setup.sh
 ```
 
 ## 困ったら
 
 - 環境全体レポート: `team/sekiguchi/notes/Claude Code環境最適化レポート 2026-02-26.md`
 - Skills カタログ: `team/sekiguchi/notes/Claude-Code-Skills-カタログ.md`
-- リポジトリ: https://github.com/zenntouyou-yabai/team-claude-skills
+- セットアップスクリプト: `team/shared/claude-code-setup/setup.sh`
 
 ---
 

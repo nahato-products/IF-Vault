@@ -1,16 +1,11 @@
 #!/bin/bash
 # Hook B: PostToolUse (Edit|Write) — ファイル変更後セキュリティチェック
 # ブロックせず警告のみ（additionalContext）
+set -euo pipefail
+source "$(dirname "$0")/_common.sh"
 
 input=$(cat)
-
-file_path=$(printf '%s\n' "$input" | python3 -c "
-import sys, json
-try:
-    print(json.load(sys.stdin).get('tool_input',{}).get('file_path',''))
-except (json.JSONDecodeError, ValueError):
-    pass
-" 2>/dev/null)
+file_path=$(extract_file_path "$input")
 
 if [ -z "$file_path" ]; then
   exit 0
@@ -30,7 +25,7 @@ esac
 if [ -f "$file_path" ]; then
   real_matches=$(head -1000 -- "$file_path" 2>/dev/null \
     | grep -inE '(api_key|api_secret|secret_key|password|access_token|private_key|token)\s*[:=]' \
-    | grep -ivE '(process\.env|os\.environ|env\(|getenv|import|require|from|type|interface|//|#|NEXT_PUBLIC_|placeholder|example|TODO)' \
+    | grep -ivE '(process\.env|os\.environ|env\(|getenv|\$\{|import|require|from|type|interface|//|#|NEXT_PUBLIC_|placeholder|example|TODO)' \
     | wc -l | tr -d ' ')
   if [ -n "$real_matches" ] && [ "$real_matches" -gt 0 ]; then
     if [ -n "$warnings" ]; then

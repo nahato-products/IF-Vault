@@ -1,9 +1,13 @@
 #!/bin/bash
 # Hook D: PostToolUseFailure — ツール失敗ログ蓄積 + 連続失敗検出
+set -euo pipefail
+source "$(dirname "$0")/_common.sh"
 
 input=$(cat)
 
 LOG_FILE="${HOME:?}/.claude/debug/tool-failures.jsonl"
+MAX_LINES=1000
+KEEP_LINES=500
 mkdir -p "$(dirname "$LOG_FILE")"
 
 export TG_LOG_FILE="$LOG_FILE"
@@ -24,31 +28,21 @@ tool = data.get('tool_name', 'unknown')
 error = str(data.get('error', ''))[:200]
 ts = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 
-# 1回のファイル読み込みで全処理
+# Append new entry
+new_entry = json.dumps({'ts': ts, 'tool': tool, 'error': error}, ensure_ascii=False)
 try:
-    with open(log_file, 'r') as f:
-        lines = f.readlines()
-except FileNotFoundError:
-    lines = []
-except OSError:
-    lines = []
-
-# 新エントリ追加
-new_entry = json.dumps({'ts': ts, 'tool': tool, 'error': error}, ensure_ascii=False) + '\n'
-lines.append(new_entry)
-
-# ローテーション（1000行超 → 500行に切り詰め）
-if len(lines) > 1000:
-    lines = lines[-500:]
-
-# 書き戻し（1回の書き込み）
-try:
-    with open(log_file, 'w') as f:
-        f.writelines(lines)
+    with open(log_file, 'a') as f:
+        f.write(new_entry + '\n')
 except OSError:
     sys.exit(0)
 
-# 同一ツール3回連続失敗チェック
+# Consecutive failure check (read last 3 lines)
+try:
+    with open(log_file, 'r') as f:
+        lines = f.readlines()
+except (FileNotFoundError, OSError):
+    sys.exit(0)
+
 if len(lines) >= 3:
     recent_tools = []
     for line in lines[-3:]:
@@ -65,5 +59,8 @@ if len(lines) >= 3:
             }
         }, ensure_ascii=False))
 " 2>/dev/null
+
+# Log rotation (shared function from _common.sh)
+rotate_log "$LOG_FILE" "$MAX_LINES" "$KEEP_LINES"
 
 exit 0
