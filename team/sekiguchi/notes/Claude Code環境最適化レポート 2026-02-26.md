@@ -125,6 +125,42 @@ preset → skill-ranks → workflow-audit → env-orchestrator
 
 ---
 
+## 6. 環境全体レビュー（200点化対応）
+
+### 発見した問題と修正
+
+環境全体の品質診断を実施し、5件の問題を修正した。
+
+| # | ファイル | 問題 | 修正 |
+|---|---|---|---|
+| 1 | `generate-skill-combos.py` | `/Users/sekiguchiyuki/` 絶対パスがハードコード | `Path.home()` + フォールバックに変更 |
+| 2 | `_skill_utils.py` | `AGENTS_DIR` が guchi 専用の `~/.agents/skills/` 固定 | `~/.agents/skills/` → `~/.claude/skills/` フォールバック追加 |
+| 3 | `agent-audit-check.py` | 同上（他メンバーで ImportError になりフックがスキップされる） | フォールバック付きパス解決に変更 |
+| 4 | `patch-settings.py` | 6フックのみ登録していた | 全27フック・11イベント対応に拡張 |
+| 5 | `team-claude-skills/hooks/` | 6本しか配布されていなかった | 全35本を追加 |
+
+### 修正後の team-claude-skills 構成
+
+```
+hooks/     35本（全フック）
+agents/    10体（全エージェント）
+scripts/
+  patch-settings.py  → 全27フック・11イベントを settings.json に登録
+setup.sh   → git pull && ./setup.sh で完全同環境を再現
+```
+
+### 診断チェック結果
+
+| チェック項目 | 結果 |
+|---|---|
+| エージェント品質スコア（10体） | 全員 100/100 ✅ |
+| エージェントセキュリティ vetting | CRITICAL 問題なし ✅ |
+| settings.json フック登録（27本） | 全件登録済み ✅ |
+| ハードコードパス | 修正済み ✅ |
+| team-claude-skills 同期 | 完全同期 ✅ |
+
+---
+
 ## 関連リンク
 
 - team-claude-skills: https://github.com/zenntouyou-yabai/team-claude-skills
