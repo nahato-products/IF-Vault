@@ -1,16 +1,16 @@
 ---
-date: 2026-02-20
+date: 2026-02-26
 tags: [Claude Code, オンボーディング, setup, Skills]
 status: active
 ---
 
 # Claude Code セットアップガイド
 
-nahato チーム向けのClaude Code導入・Skills活用ガイド。
+nahato チーム向けの Claude Code 導入・環境構築ガイド。
 
-## Claude Codeとは
+## Claude Code とは
 
-ターミナルで動くAIコーディングアシスタント。ファイル読み書き、Git操作、コード生成をAIが代行してくれる。Skillsを入れると特定分野の知識が自動で適用される。
+ターミナルで動く AI コーディングアシスタント。ファイル読み書き・Git 操作・コード生成を AI が代行する。Skills を入れると特定分野の知識が自動で適用され、エージェントに委譲すれば複雑なタスクを並列実行できる。
 
 ## 初期セットアップ
 
@@ -22,29 +22,24 @@ npm install -g @anthropic-ai/claude-code
 
 ### 2. チーム環境を一括セットアップ（推奨）
 
-IF-Vault リポジトリのルートで以下を実行するだけ。Hooks・Skills・設定ファイルが全て自動でインストールされる。
-
 ```bash
-bash team/shared/claude-code-setup/install.sh
+git clone https://github.com/zenntouyou-yabai/team-claude-skills
+cd team-claude-skills
+./setup.sh
 ```
 
-インストールされるもの:
-- **Hooks** (8個): セキュリティ・効率化スクリプト
-- **Skills** (24共有 + 3メタ = 27個): チーム共有スキル（シンボリックリンク）
-- **settings.json**: 破壊的コマンドの deny list + hooks 登録
-- **CLAUDE.md**: グローバル設定テンプレート
+カテゴリごとに Y/n で選択しながら進む。インストールされるもの:
 
-セットアップ後にヘルスチェック:
-
-```bash
-bash team/shared/claude-code-setup/install.sh --verify
-```
+| 種別 | 数 | 内容 |
+|---|---|---|
+| **Skills** | 164個 | 開発・セキュリティ・UI・マーケ・議事録 等 |
+| **エージェント** | 10体 | タスク専門 AI（code-reviewer / frontend-builder 等）|
+| **フック** | 35本 | 安全ガード・自動化・品質監視 |
+| **settings.json** | — | 全フック（27本・11イベント）を自動登録 |
 
 ### 3. CLAUDE.md をカスタマイズ
 
-`~/.claude/CLAUDE.md` を開いて、自分の口調・スタイル・よく使う技術を追加する。
-
-中身の例:
+`~/.claude/CLAUDE.md` を開いて自分の口調・スタイル・よく使う技術を追加する。
 
 ```markdown
 # 基本方針
@@ -53,146 +48,112 @@ bash team/shared/claude-code-setup/install.sh --verify
 
 # よく使う技術
 - TypeScript / Next.js
-- PostgreSQL
-- Tailwind CSS
+- PostgreSQL / Supabase
+- Tailwind CSS v4
 ```
 
-### 4. プロジェクトCLAUDE.md
+### 4. プロジェクト CLAUDE.md
 
-リポジトリのルートに `.claude/CLAUDE.md` を置くと、そのプロジェクト固有の指示ができる。IF-Vaultには既に設定済み。
+リポジトリのルートに `.claude/CLAUDE.md` を置くとプロジェクト固有の指示ができる。IF-Vault には既に設定済み。
 
-### 5. コミュニティスキルを追加（任意）
+## Skills の使い方
 
-```bash
-bash team/shared/claude-code-setup/install.sh --community
-```
+### Skills とは
 
-11個のコミュニティスキル（deep-research, pdf, docx 等）が一括でインストールされる。
+特定分野の知識パック。関連する作業をすると自動で適用（自動発火型）か、`/スキル名` で明示的に呼び出す（手動起動型）。
 
-## Skillsの使い方
+### ロール別おすすめ Skills
 
-### Skillsとは
-
-特定分野の知識パック。インストールすると、関連する作業をしたときに自動で知識が適用される。UXの原則、セキュリティチェック、DBの設計パターンなどがある。
-
-### ロール別おすすめSkills
-
-install.sh で全スキルが入るが、特に注力すべきスキルはロールによって異なる。
-
-#### 全員必須（Tier 1）
+#### 全員必須
 
 | スキル | 効果 |
 |--------|------|
-| ux-psychology | UI/UXの認知心理学ベース設計 |
-| natural-japanese-writing | AI臭を排除した自然な日本語 |
-| ansem-db-patterns | PostgreSQL本番スキーマ設計 |
-| typescript-best-practices | 型安全パターンと実装ルール |
-| systematic-debugging | 根本原因調査の4段階プロセス |
-| error-handling-logging | エラー分類とログ構造化設計 |
+| `ux-psychology` | UI/UX の認知心理学ベース設計 |
+| `natural-japanese-writing` | AI 臭を排除した自然な日本語 |
+| `systematic-debugging` | 根本原因調査の4段階プロセス |
+| `typescript-best-practices` | 型安全パターンと実装ルール |
+| `ansem-db-patterns` | PostgreSQL 本番スキーマ設計 |
+| `error-handling-logging` | エラー分類とログ構造化設計 |
 
 #### フロントエンド担当
 
 | スキル | 効果 |
 |--------|------|
-| react-component-patterns | React合成・CVA・SC/CC設計 |
-| tailwind-design-system | Tailwind v4 CSS-first設定 |
-| nextjs-app-router-patterns | App Router ルーティング・キャッシュ |
-| vercel-react-best-practices | ランタイムパフォーマンス最適化 |
-| design-token-system | トークン階層・OKLCH色・ダークモード |
-| micro-interaction-patterns | ローディング・トースト・フォームUX |
-| web-design-guidelines | WCAG・セマンティックHTML・SEO |
-| mobile-first-responsive | LIFF/PWA・モバイルファースト |
+| `react-component-patterns` | React 合成・CVA・SC/CC 設計 |
+| `tailwind-design-system` | Tailwind v4 CSS-first 設定 |
+| `nextjs-app-router-patterns` | App Router ルーティング・キャッシュ |
+| `vercel-react-best-practices` | ランタイムパフォーマンス最適化 |
+| `design-token-system` | トークン階層・OKLCH 色・ダークモード |
+| `mobile-first-responsive` | LIFF/PWA・モバイルファースト |
 
 #### DB・バックエンド担当
 
 | スキル | 効果 |
 |--------|------|
-| supabase-auth-patterns | Auth・RLS・セッション管理 |
-| supabase-postgres-best-practices | クエリ最適化・接続プール |
-| security-review | 脆弱性検出・セキュリティ監査 |
-| docker-expert | Docker最適化・Compose・セキュア化 |
-| ci-cd-deployment | GitHub Actions・Vercel自動化 |
-| testing-strategy | TDD・テスト品質分析フロー |
+| `supabase-postgres-best-practices` | クエリ最適化・接続プール |
+| `supabase-auth-patterns` | Auth・RLS・セッション管理 |
+| `security-review` | 脆弱性検出・セキュリティ監査 |
+| `backend-builder`（エージェント） | Server Actions / Supabase CRUD の実装委譲 |
 
-### 個別にスキルを追加/削除したい場合
+### 主なスラッシュコマンド
 
-install.sh を使わず手動で管理したい場合は、シンボリックリンクを使う。
+| コマンド | 動作 |
+|---------|------|
+| `/skill-forge` | Skills 作成・評価ツール |
+| `/agent-importer` | コミュニティエージェントの取り込み |
+| `/code-review` | コードレビュー |
+| `/context-economy` | トークン最適化 |
+| `/claude-env-optimizer` | 環境ヘルスチェック |
 
-```bash
-# 追加（IF-Vault ルートで実行）
-ln -s "$(pwd)/team/shared/skills/スキル名" ~/.claude/skills/スキル名
-
-# 削除
-rm ~/.claude/skills/スキル名
-```
-
-詳細は `team/shared/skills/README.md` を参照。
-
-### コミュニティスキル（手動インストール）
+### スキルの無効化
 
 ```bash
-# 検索
-npx skills find [キーワード]
-
-# インストール（グローバル）
-npx skills add <owner/repo@skill> -g -y
-
-# アップデート
-npx skills update
-```
-
-### 自動発火 vs 手動起動
-
-スキルには2種類ある。
-
-- **自動発火型**: 関連する作業をすると勝手に適用される（例: ux-psychology はUI作業時に自動発火）
-- **手動起動型**: コマンドで明示的に呼ぶ（例: `/skill-forge` でSkill管理ツールを起動）
-
-### 無効化したいとき
-
-```bash
-# 一時的に無効化（フォルダ名を変える）
-mv ~/.claude/skills/ux-psychology ~/.claude/skills/_ux-psychology
+# 一時的に無効化
+mv ~/.claude/skills/スキル名 ~/.claude/skills/_スキル名
 
 # 完全削除
 rm ~/.claude/skills/スキル名
 ```
 
-## 便利な使い方
+## エージェントの使い方
 
-### Slashコマンド
+複雑なタスクは専門エージェントに委譲できる。指示するだけで worktree 分離された環境で自動実行される。
 
-手動起動型のスキルはスラッシュコマンドで呼べる。
+| エージェント | モデル | 担当 |
+|---|---|---|
+| `code-reviewer` | Opus | 4パスコードレビュー |
+| `frontend-builder` | Sonnet | Next.js UI 実装 |
+| `backend-builder` | Sonnet | Server Actions / Supabase |
+| `test-engineer` | Sonnet | Vitest / Playwright |
+| `db-analyzer` | Opus | ER図・SQL 最適化 |
+| `team-collaborator` | Sonnet | Notion 議事録・進捗レポート |
 
-| コマンド | 動作 |
-|---------|------|
-| `/skill-forge` | Skills作成・検索・評価ツール |
-| `/claude-env-optimizer` | 環境ヘルスチェック・メンテナンス |
-| `/context-economy` | トークン最適化 |
-| `/baseline-ui` | UIの基本チェック |
+## 自動で動くフック（主なもの）
 
-### ヘルスチェック
+普通に使っているだけで裏側が動く。
+
+| フック | タイミング | 効果 |
+|---|---|---|
+| `command-shield` | コマンド実行前 | `rm -rf` 等を 🔴 表示で警告 |
+| `security-post-edit` | ファイル保存後 | 機密情報・脆弱性を自動スキャン |
+| `lint-on-edit` | ファイル保存後 | ESLint 自動実行 |
+| `session-start-context` | セッション開始時 | 前回の状態・Git 差分を自動注入 |
+| `agent-audit-check` | セッション開始時 | 全エージェントの品質スコアを監視 |
+| `lessons-recorder` | 修正指摘時 | パターンを記録して同じミスを防ぐ |
+
+## 環境を最新に保つ
 
 ```bash
-bash team/shared/claude-code-setup/install.sh --verify
+cd team-claude-skills
+git pull && ./setup.sh
 ```
-
-Skills数・SKILL.md有無・Hooks実行権限・settings.json deny数をチェックする。
-
-## 注意点
-
-- Skillsは毎回コンテキストにロードされるため、入れすぎるとトークン消費が増える
-- 重いスキルが同時発火すると応答が遅くなることがある
-- シンボリックリンク経由なので `git pull` で全メンバーに最新が反映される
-- 機密情報（APIキーなど）はCLAUDE.mdに書かない
 
 ## 困ったら
 
-- Skills一覧: `team/shared/skills/README.md`
-- セットアップ詳細: `team/shared/claude-code-setup/README.md`
-- Skills品質レポート: `team/sekiguchi/notes/Skills-49個スキャンレポート.md`
-- 自作Skills詳細: `team/sekiguchi/notes/自作Skills一覧.md`
+- 環境全体レポート: `team/sekiguchi/notes/Claude Code環境最適化レポート 2026-02-26.md`
+- Skills カタログ: `team/sekiguchi/notes/Claude-Code-Skills-カタログ.md`
+- リポジトリ: https://github.com/zenntouyou-yabai/team-claude-skills
 
 ---
 
-_最終更新: 2026-02-20_
+_最終更新: 2026-02-26_
