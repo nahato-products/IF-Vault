@@ -1,0 +1,28 @@
+# 機密情報
+.env
+*.env
+*_TOKEN*
+*token*
+*secret*
+
+# MCP Server
+mcp-server/qiita-mcp-server/node_modules/
+mcp-server/qiita-mcp-server/.env
+mcp-server/qiita-mcp-server/*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

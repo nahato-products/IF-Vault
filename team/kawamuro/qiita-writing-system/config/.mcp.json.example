@@ -1,0 +1,8 @@
+{
+  "qiita": {
+    "command": "node",
+    "args": [
+      "/Users/kawamurohirokazu/Documents/Obsidian Vault/11_Qiita/qiita-mcp-server/index.js"
+    ]
+  }
+}
