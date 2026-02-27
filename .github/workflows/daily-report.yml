@@ -1,0 +1,40 @@
+name: Daily Report Generator
+
+on:
+  schedule:
+    # JST 19:00 = UTC 10:00
+    - cron: '0 10 * * *'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  create-daily-report:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Generate date
+        id: date
+        run: |
+          # JSTの日付を取得
+          echo "jst_date=$(TZ=Asia/Tokyo date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "jst_date_ja=$(TZ=Asia/Tokyo date +'%Y年%m月%d日')" >> $GITHUB_OUTPUT
+
+      - name: Create daily report issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --repo ${{ github.repository }} \
+            --title "日報 ${{ steps.date.outputs.jst_date }}" \
+            --label "daily-report" \
+            --body "# 日報 ${{ steps.date.outputs.jst_date_ja }}
+
+          ## 📚 学んだこと / 気づき
+
+          - [ ]
+
+          ---
+
+          _この日報は GitHub Actions により自動生成されました_"
