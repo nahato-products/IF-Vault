@@ -1,0 +1,70 @@
+# Qiita記事執筆設定ファイル
+
+# AIっぽい表現のパターン（これらを検出して警告）
+ai_like_patterns:
+  # 堅苦しい説明調
+  - pattern: "〜について説明します"
+    suggestion: "〜を見ていきましょう" or "〜を紹介します"
+  - pattern: "〜することができます"
+    suggestion: "〜できます" or "〜します"
+  - pattern: "〜していきたいと思います"
+    suggestion: "〜します" or "〜していきます"
+  - pattern: "〜について理解することができました"
+    suggestion: "〜がわかりました" or "〜を理解しました"
+
+  # 形式的すぎる表現
+  - pattern: "本記事では"
+    suggestion: "この記事では" or "今回は"
+  - pattern: "以下の通りです"
+    suggestion: "こんな感じです" or "こうなります"
+  - pattern: "ご覧ください"
+    suggestion: "見てみてください" or "チェックしてみてください"
+
+  # 完璧すぎる文章
+  - pattern: "詳細に説明いたします"
+    suggestion: "詳しく見ていきます" or "説明します"
+  - pattern: "ご参考になれば幸いです"
+    suggestion: "参考になれば嬉しいです" or "役に立つと嬉しいです"
+
+# 推奨する表現（カジュアル・ラフな文体）
+recommended_expressions:
+  - "〜してみました"
+  - "〜だと思います"
+  - "〜ですね"
+  - "〜ってことです"
+  - "ちょっと〜"
+  - "けっこう〜"
+  - "実際〜"
+  - "正直〜"
+  - "個人的には〜"
+
+# 記事のネタ探索対象ディレクトリ
+source_directories:
+  - "05_Daily Notes"
+  - "04_Archives"
+  - "06_Knowledge"
+  - "01_Projects"
+
+# デフォルトタグ候補
+default_tags:
+  - "技術"
+  - "プログラミング"
+  - "初心者"
+  - "ポエム"
+
+# Qiita Organization設定
+organization:
+  # デフォルトで記事を紐付けるOrganization（空欄の場合は個人投稿）
+  # 例: "my-company" または "" (空文字列で個人投稿)
+  default_url_name: ""
+  # 毎回確認するか（true: 毎回確認, false: デフォルト使用）
+  always_ask: true
+
+# インタビュー質問テンプレート
+interview_questions:
+  - "この技術・トピックと最初に出会ったきっかけは？"
+  - "実際に試してみてどう感じましたか？（率直な感想）"
+  - "躓いたポイントや、ハマったところはありましたか？"
+  - "どうやって解決しましたか？"
+  - "この記事を読む人に、一番伝えたいことは何ですか？"
+  - "他の人にも試してほしい？それともあまり勧めない？"
