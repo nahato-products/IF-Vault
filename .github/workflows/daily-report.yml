@@ -29,6 +29,7 @@ jobs:
             --repo ${{ github.repository }} \
             --title "日報 ${{ steps.date.outputs.jst_date }}" \
             --label "daily-report" \
+            --assignee hirokazukawamuro,zenntouyou-yabai \
             --body "# 日報 ${{ steps.date.outputs.jst_date_ja }}
 
           ## 📚 学んだこと / 気づき

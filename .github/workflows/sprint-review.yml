@@ -30,6 +30,7 @@ jobs:
             --repo ${{ github.repository }} \
             --title "スプリントレビュー ${{ steps.date.outputs.jst_date }}" \
             --label "sprint-review" \
+            --assignee hirokazukawamuro,zenntouyou-yabai \
             --body "# スプリントレビュー ${{ steps.date.outputs.jst_date_ja }}
 
           ## 【今週の目標】

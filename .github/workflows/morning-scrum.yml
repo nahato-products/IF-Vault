@@ -30,6 +30,7 @@ jobs:
             --repo ${{ github.repository }} \
             --title "スクラム ${{ steps.date.outputs.jst_date }}" \
             --label "scrum" \
+            --assignee hirokazukawamuro,zenntouyou-yabai \
             --body "# スクラム ${{ steps.date.outputs.jst_date_ja }}
 
           ## 📋 本日のタスク一覧
