@@ -1,0 +1,65 @@
+name: Sprint Review Notification
+
+on:
+  schedule:
+    # JST 金曜 17:00 = UTC 金曜 08:00
+    - cron: '0 8 * * 5'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  notify-sprint-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "username": "スプリントBot",
+              "icon_emoji": ":chart_with_upwards_trend:",
+              "text": "スプリントレビューの時間です！",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "スプリントレビュー 📊",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*【今週の目標】*\nスプリント開始時に設定した目標を振り返りましょう"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*【今週の成果】*\n完了したタスクや実装した機能を共有"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*【達成率】*\n達成率: _%_\n目標に対する進捗状況を確認"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*【ベロシティ】*\n今週: _pt_\n平均: _pt_\nチームの速度を測定"
+                  }
+                }
+              ]
+            }'

@@ -1,0 +1,72 @@
+name: Morning Scrum Notification
+
+on:
+  schedule:
+    # JST 10:45 = UTC 01:45（月〜金のみ）
+    - cron: '45 1 * * 1-5'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  notify-scrum:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "username": "スクラムBot",
+              "icon_emoji": ":runner:",
+              "text": "スクラム開始！👀",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "スクラム開始！👀",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*📋 本日のタスク一覧*\n各自のタスクを共有しましょう"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*🌈 今週のスプリントゴール*\nチーム目標を確認"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*🎯 今日やること*\n本日の作業予定を共有"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*💬 詰まってること or ヘルプ欲しいこと*\nブロッカーや相談事項を共有"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*✅ 昨日やったこと*\n昨日の成果を共有"
+                  }
+                }
+              ]
+            }'
