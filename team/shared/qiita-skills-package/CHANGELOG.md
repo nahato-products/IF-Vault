@@ -46,6 +46,24 @@ All notable changes to Qiita Skills Package will be documented in this file.
 
 ---
 
+## [1.1.0] - 2026-03-01
+
+### Added
+- **qiita-publish**: エラー自動診断・修復機能
+  - `.qiita-auto-fix.sh`: config.jsonのenv設定を自動チェック・修復
+  - `.config-backup.sh`: 設定の自動バックアップスクリプト
+  - `.config-restore.sh`: 設定の復元スクリプト
+  - `.qiita-mcp-healthcheck.sh`: MCPサーバーのヘルスチェック
+  - `TROUBLESHOOTING.md`: トラブルシューティングガイド
+
+### Fixed
+- **qiita-publish**: Unauthorized エラーの根本的な解決
+  - config.jsonに環境変数を直接埋め込む方式に変更
+  - .zshenvに依存せず確実に環境変数が渡される
+  - 自動診断・修復により、エラー発生時に即座に対処可能
+
+---
+
 ## [Unreleased]
 
 ### Planned

@@ -171,9 +171,51 @@ AskUserQuestionで選択してもらいます。
    - 記事を `11_Qiita/published/` に移動
    - 投稿URLとIDをユーザーに表示
 
-4. エラー時:
-   - エラー内容を表示
+4. **エラー時（自動診断・修復）:**
+
+   **Unauthorized エラーの場合:**
+
+   a. **即座に診断を実行:**
+   ```bash
+   # 1. config.json の存在確認
+   cat ~/.claude/config.json
+
+   # 2. Qiita MCP設定の確認
+   grep -q '"qiita"' ~/.claude/config.json
+
+   # 3. .env ファイルの確認
+   cat ~/Documents/Obsidian\ Vault/11_Qiita/qiita-mcp-server/.env | head -1 | cut -d'=' -f1
+   ```
+
+   b. **診断結果に基づいて自動修復:**
+
+   | 問題 | 自動修復アクション |
+   |------|-------------------|
+   | config.json に qiita 設定がない | config.json を自動修正し、MCPサーバー設定を追加 |
+   | .env ファイルがない | ユーザーに .env ファイルの作成を案内 |
+   | QIITA_ACCESS_TOKEN が空 | ユーザーにトークンの取得・設定を案内 |
+
+   c. **修復後の対応:**
+   ```markdown
+   🔧 自動修復を完了しました！
+
+   **修正内容:**
+   - ✅ config.json に Qiita MCP サーバー設定を追加
+   - ✅ 設定のバックアップを作成（~/.claude/backups/）
+
+   **次のステップ:**
+   1. Claude Code を完全に再起動してください
+   2. 再起動後、再度 `/qiita-publish` を実行してください
+
+   **それでも解決しない場合:**
+   - デバッグログを確認: `tail -100 ~/.claude/debug/latest`
+   - ヘルスチェックを実行: `~/.claude/skills/qiita-publish/.qiita-mcp-healthcheck.sh`
+   ```
+
+   **その他のエラーの場合:**
+   - エラー内容を詳細に表示
    - 代替手段（Web UI、CLI）を提案
+   - トラブルシューティングガイドへのリンク
 
 #### 選択肢2: コピペ用の本文を表示
 
