@@ -1,4 +1,4 @@
-name: Morning Scrum Notification
+name: Morning Scrum Generator
 
 on:
   schedule:
@@ -7,11 +7,71 @@ on:
   workflow_dispatch: # 手動実行も可能
 
 jobs:
-  notify-scrum:
+  create-scrum:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
 
     steps:
+      - name: Generate date
+        id: date
+        run: |
+          # JSTの日付を取得
+          echo "jst_date=$(TZ=Asia/Tokyo date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "jst_date_ja=$(TZ=Asia/Tokyo date +'%Y年%m月%d日')" >> $GITHUB_OUTPUT
+
+      - name: Create scrum issue
+        id: create_issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(gh issue create \
+            --repo ${{ github.repository }} \
+            --title "スクラム ${{ steps.date.outputs.jst_date }}" \
+            --label "scrum" \
+            --body "# スクラム ${{ steps.date.outputs.jst_date_ja }}
+
+          ## 📋 本日のタスク一覧
+          各自のタスクを共有しましょう
+
+          - [ ]
+
+          ---
+
+          ## 🌈 今週のスプリントゴール
+          チーム目標を確認
+
+          -
+
+          ---
+
+          ## 🎯 今日やること
+          本日の作業予定を共有
+
+          - [ ]
+
+          ---
+
+          ## 💬 詰まってること or ヘルプ欲しいこと
+          ブロッカーや相談事項を共有
+
+          -
+
+          ---
+
+          ## ✅ 昨日やったこと
+          昨日の成果を共有
+
+          - [ ]
+
+          ---
+
+          _このスクラムは GitHub Actions により自動生成されました_")
+          echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
+
       - name: Notify Slack
+        if: success()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
@@ -23,49 +83,17 @@ jobs:
               "text": "スクラム開始！👀",
               "blocks": [
                 {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "スクラム開始！👀",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "divider"
-                },
-                {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*📋 本日のタスク一覧*\n各自のタスクを共有しましょう"
+                    "text": "*スクラム開始！👀*\n\n今日のタスクを共有しましょう 💪"
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*🌈 今週のスプリントゴール*\nチーム目標を確認"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*🎯 今日やること*\n本日の作業予定を共有"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*💬 詰まってること or ヘルプ欲しいこと*\nブロッカーや相談事項を共有"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*✅ 昨日やったこと*\n昨日の成果を共有"
+                    "text": "<${{ steps.create_issue.outputs.issue_url }}|📋 スクラムを開く>"
                   }
                 }
               ]

@@ -1,4 +1,4 @@
-name: Sprint Review Notification
+name: Sprint Review Generator
 
 on:
   schedule:
@@ -7,11 +7,65 @@ on:
   workflow_dispatch: # 手動実行も可能
 
 jobs:
-  notify-sprint-review:
+  create-sprint-review:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
 
     steps:
+      - name: Generate date
+        id: date
+        run: |
+          # JSTの日付を取得
+          echo "jst_date=$(TZ=Asia/Tokyo date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "jst_date_ja=$(TZ=Asia/Tokyo date +'%Y年%m月%d日')" >> $GITHUB_OUTPUT
+
+      - name: Create sprint review issue
+        id: create_issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_URL=$(gh issue create \
+            --repo ${{ github.repository }} \
+            --title "スプリントレビュー ${{ steps.date.outputs.jst_date }}" \
+            --label "sprint-review" \
+            --body "# スプリントレビュー ${{ steps.date.outputs.jst_date_ja }}
+
+          ## 【今週の目標】
+          スプリント開始時に設定した目標を振り返りましょう
+
+          -
+
+          ---
+
+          ## 【今週の成果】
+          完了したタスクや実装した機能を共有
+
+          - [ ]
+
+          ---
+
+          ## 【達成率】
+          達成率: _%_
+
+          目標に対する進捗状況を確認
+
+          ---
+
+          ## 【ベロシティ】
+          今週: _pt_
+          平均: _pt_
+
+          チームの速度を測定
+
+          ---
+
+          _このスプリントレビューは GitHub Actions により自動生成されました_")
+          echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
+
       - name: Notify Slack
+        if: success()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
@@ -23,42 +77,17 @@ jobs:
               "text": "スプリントレビューの時間です！",
               "blocks": [
                 {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "スプリントレビュー 📊",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "divider"
-                },
-                {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*【今週の目標】*\nスプリント開始時に設定した目標を振り返りましょう"
+                    "text": "*スプリントレビュー 📊*\n\n今週の成果を振り返りましょう 🎉"
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*【今週の成果】*\n完了したタスクや実装した機能を共有"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*【達成率】*\n達成率: _%_\n目標に対する進捗状況を確認"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*【ベロシティ】*\n今週: _pt_\n平均: _pt_\nチームの速度を測定"
+                    "text": "<${{ steps.create_issue.outputs.issue_url }}|📋 スプリントレビューを開く>"
                   }
                 }
               ]
