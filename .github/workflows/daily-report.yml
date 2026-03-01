@@ -47,6 +47,7 @@ jobs:
           curl -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
             -d '{
+              "username": "NIPPOさん",
               "text": "📝 日報が作成されました！",
               "blocks": [
                 {
