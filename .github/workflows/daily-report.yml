@@ -38,3 +38,30 @@ jobs:
           ---
 
           _この日報は GitHub Actions により自動生成されました_"
+
+      - name: Notify Slack
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "text": "📝 日報が作成されました！",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*📝 日報が作成されました！*\n\n今日の振り返りを記録しましょう 💪"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<https://github.com/nahato-products/IF-Vault/issues?q=is:issue+label:daily-report+is:open+sort:created-desc|📋 日報を開く>"
+                  }
+                }
+              ]
+            }'
