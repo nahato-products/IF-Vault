@@ -64,6 +64,29 @@ All notable changes to Qiita Skills Package will be documented in this file.
 
 ---
 
+## [1.2.0] - 2026-03-01
+
+### Added
+- **qiita-publish**: Organization紐付けを必須ワークフローに組み込み
+  - フロントマターから `organization` フィールドを自動読み取り
+  - 未設定時は投稿前にユーザーに確認
+  - デフォルト値として "nahato_data" を提案
+  - 投稿成功後、organizationフィールドを自動更新
+
+- **qiita-publish**: MCP設定の読み込み順を明確化
+  - config.jsonのenv設定が最優先（推奨）
+  - .zshenvが次点
+  - .zshrcは非推奨（MCPサーバーから読み込まれない）
+  - 設定確認コマンドを追加
+
+### Improved
+- **qiita-publish**: 投稿成功後のフロントマター更新を強化
+  - `qiita_id` フィールドを自動追加
+  - `organization` フィールドを自動更新
+  - より確実な記事管理が可能に
+
+---
+
 ## [Unreleased]
 
 ### Planned

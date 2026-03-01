@@ -32,6 +32,7 @@ args:
   - `title`: 記事タイトル
   - `tags`: タグ一覧
   - `status`: 公開状態（draft/public）
+  - `organization`: Organization URL名（例: "nahato_data"）
 - フロントマターを削除した本文を取得
 
 #### B. Obsidianリンクの変換
@@ -154,20 +155,35 @@ AskUserQuestionで選択してもらいます。
    ]
    ```
 
-2. `qiita_post_article` ツールを使用して投稿
+2. **Organization設定の確認（必須）**
+   - フロントマターの `organization` フィールドを確認
+   - **空または未設定の場合:**
+     - AskUserQuestionで Organization URL名を確認
+     - 選択肢:
+       1. "nahato_data" (デフォルト)
+       2. "Organization なしで投稿"
+       3. "その他（手動入力）"
+   - **設定済みの場合:**
+     - その値を使用（例: "nahato_data"）
+   - **重要:** Organization URL名は QiitaのOrganizationページURL (`https://qiita.com/organizations/[URL名]`) から確認
+
+3. `qiita_post_article` ツールを使用して投稿
    ```javascript
    {
      title: "記事タイトル",
      body: "フロントマターを削除した本文",
      tags: [...],
      private: status === "draft",  // draft なら限定共有
-     tweet: false
+     tweet: false,
+     organization_url_name: "nahato_data"  // Organization設定（空なら省略）
    }
    ```
 
-3. 投稿成功後:
+4. 投稿成功後:
    - 記事URLをフロントマターの `qiita_url` に記入
+   - `qiita_id` に記事IDを記入
    - `status` を `published` に更新
+   - `organization` に使用したOrganization URL名を記入
    - 記事を `11_Qiita/published/` に移動
    - 投稿URLとIDをユーザーに表示
 
@@ -249,8 +265,64 @@ AskUserQuestionで選択してもらいます。
 次の記事を書く場合は `/qiita-draft` を実行してください。
 ```
 
+## Qiita MCP設定の読み込み順
+
+**重要:** Qiita MCPサーバーで環境変数（QIITA_ACCESS_TOKEN）を読み込む際の優先順位を理解することが、トラブル回避に重要です。
+
+### 環境変数の読み込み優先順位
+
+1. **最優先: `~/.claude/config.json` の `env` フィールド** ✅ **推奨**
+   ```json
+   {
+     "mcpServers": {
+       "qiita": {
+         "command": "node",
+         "args": [...],
+         "env": {
+           "QIITA_ACCESS_TOKEN": "your_token_here"  // ← これが最優先
+         }
+       }
+     }
+   }
+   ```
+   - **メリット:** 確実に環境変数が渡される、.zshenvに依存しない
+   - **デメリット:** トークンがconfig.jsonに直接記載される（権限管理に注意）
+
+2. **次点: `~/.zshenv`**
+   ```bash
+   export QIITA_ACCESS_TOKEN="your_token_here"
+   ```
+   - **メリット:** シェル環境変数として一元管理
+   - **デメリット:** Claude CodeがMCPサーバーを起動する際に読み込まれない場合がある
+
+3. **非推奨: `~/.zshrc`**
+   - **問題:** インタラクティブシェルでのみ読み込まれるため、MCPサーバーからは読み込まれない
+
+### 設定確認コマンド
+
+```bash
+# 1. config.json の env 設定を確認
+cat ~/.claude/config.json | grep -A 5 '"qiita"'
+
+# 2. .zshenv の設定を確認
+grep QIITA_ACCESS_TOKEN ~/.zshenv
+
+# 3. 現在のシェルで環境変数が設定されているか確認
+echo $QIITA_ACCESS_TOKEN
+```
+
+### トラブルシューティング
+
+**症状:** Unauthorized エラーが繰り返し発生
+**原因:** config.json に env 設定がない、または .zshenv が読み込まれていない
+**解決策:**
+1. `~/.claude/skills/qiita-publish/.qiita-auto-fix.sh` を実行
+2. Claude Code を**完全に再起動**
+3. デバッグログを確認: `tail -100 ~/.claude/debug/latest`
+
 ## 注意事項
 
+- **Organization紐付け:** フロントマターの `organization` フィールドを必ず確認・設定
 - **フロントマターの保持:** 元のファイルは変更せず、変換後の内容を別途表示
 - **画像の警告:** ローカル画像がある場合は必ず警告し、Qiitaにアップロードするよう促す
 - **リンク切れチェック:** 外部リンクや内部リンクが切れていないか確認
